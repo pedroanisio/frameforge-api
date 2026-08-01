@@ -1,0 +1,448 @@
+{
+  "bad_angle_unit_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.stops"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.angle"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.stops"
+      ],
+      [
+        "float_parsing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.angle.float"
+      ],
+      [
+        "float_parsing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].angle.float"
+      ],
+      [
+        "int_parsing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.angle.int"
+      ],
+      [
+        "int_parsing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].angle.int"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "string_pattern_mismatch",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.angle.constrained-str"
+      ],
+      [
+        "string_pattern_mismatch",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].angle.constrained-str"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ]
+    ],
+    "valid": false
+  },
+  "bad_length_unit_rejected": {
+    "errors": [
+      [
+        "float_parsing",
+        "pages.0.page.layers.0.objects.0.rect.stroke_style.Style.stroke_width.float"
+      ],
+      [
+        "int_parsing",
+        "pages.0.page.layers.0.objects.0.rect.stroke_style.Style.stroke_width.int"
+      ],
+      [
+        "string_pattern_mismatch",
+        "pages.0.page.layers.0.objects.0.rect.stroke_style.Style.stroke_width.constrained-str"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.stroke_style.str"
+      ]
+    ],
+    "valid": false
+  },
+  "canvas_with_both_preset_and_size": {
+    "errors": [
+      [
+        "literal_error",
+        "pages.0.page.canvas.function-after[_preset_or_size(), CanvasObject].preset"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.canvas.literal['A3','A4','A5','Letter','Legal','Tabloid','deck-16x9','deck-4x3','square','phone','tablet','web','qhd','4k','uhd','8k','instagram-square','instagram-portrait','instagram-landscape','instagram-story','facebook-post','facebook-cover','facebook-story','twitter-post','twitter-header','linkedin-post','linkedin-cover','youtube-thumbnail','youtube-banner','tiktok-video','pinterest-pin','snapchat','story','1x1','4x5','5x4','9x16','16x9','2x3','3x2','1.91x1','3x1','book-pocket','book-mass-market','book-trade','book-novel','book-digest','book-6x9','book-7x10','book-8x10','book-textbook','book-square-8','book-picture','book-square-10','book-coffee-table','book-art-10x12','book-art-11x14']"
+      ]
+    ],
+    "valid": false
+  },
+  "canvas_with_neither_preset_nor_size": {
+    "errors": [
+      [
+        "literal_error",
+        "pages.0.page.canvas.literal['A3','A4','A5','Letter','Legal','Tabloid','deck-16x9','deck-4x3','square','phone','tablet','web','qhd','4k','uhd','8k','instagram-square','instagram-portrait','instagram-landscape','instagram-story','facebook-post','facebook-cover','facebook-story','twitter-post','twitter-header','linkedin-post','linkedin-cover','youtube-thumbnail','youtube-banner','tiktok-video','pinterest-pin','snapchat','story','1x1','4x5','5x4','9x16','16x9','2x3','3x2','1.91x1','3x1','book-pocket','book-mass-market','book-trade','book-novel','book-digest','book-6x9','book-7x10','book-8x10','book-textbook','book-square-8','book-picture','book-square-10','book-coffee-table','book-art-10x12','book-art-11x14']"
+      ],
+      [
+        "value_error",
+        "pages.0.page.canvas.function-after[_preset_or_size(), CanvasObject]"
+      ]
+    ],
+    "valid": false
+  },
+  "connector_endpoint_without_ref_or_point_rejected": {
+    "errors": [
+      [
+        "list_type",
+        "pages.0.page.layers.0.objects.0.connector.from.list[float]"
+      ],
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.connector.from.function-after[_ref_or_point(), ConnectorEndpoint]"
+      ]
+    ],
+    "valid": false
+  },
+  "connector_legacy_object_key_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "connector_point_endpoints_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "connector_route_legacy_type_key_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "curve_contradictory_aliases_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.curve"
+      ]
+    ],
+    "valid": false
+  },
+  "curve_short_control_keys_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "flow_section_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "good_length_unit_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "gradient_line_and_angle_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.line"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.stops"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.angle"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.line"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.stops"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ],
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient]"
+      ]
+    ],
+    "valid": false
+  },
+  "gradient_line_on_radial_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.line"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.stops"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.line"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.stops"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ],
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient]"
+      ]
+    ],
+    "valid": false
+  },
+  "gradient_radius_on_linear_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.radius"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.stops"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.radius"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.stops"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ],
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient]"
+      ]
+    ],
+    "valid": false
+  },
+  "gradient_stop_canonical_position_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "gradient_stop_legacy_offset_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "gradient_user_space_radial_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "grammar_sugar_use_rejected": {
+    "errors": [
+      [
+        "union_tag_invalid",
+        "pages.0.page.layers.0.objects.0"
+      ]
+    ],
+    "valid": false
+  },
+  "minimal_document": {
+    "errors": [],
+    "valid": true
+  },
+  "missing_discriminator": {
+    "errors": [
+      [
+        "union_tag_not_found",
+        "pages.0.page.layers.0.objects.0"
+      ]
+    ],
+    "valid": false
+  },
+  "nested_groups_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "non_semver_document_version_rejected": {
+    "errors": [
+      [
+        "string_pattern_mismatch",
+        "version"
+      ]
+    ],
+    "valid": false
+  },
+  "p3_inline_stroke_geometry_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.line"
+      ]
+    ],
+    "valid": false
+  },
+  "p3_stroke_as_paint_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "paragraph_with_both_text_and_spans": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.flow.story.0.paragraph"
+      ]
+    ],
+    "valid": false
+  },
+  "paragraph_with_neither_text_nor_spans": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.flow.story.0.paragraph"
+      ]
+    ],
+    "valid": false
+  },
+  "style_dash_alias_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "style_dash_and_stroke_dasharray_rejected": {
+    "errors": [
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.stroke_style.str"
+      ],
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.rect.stroke_style.Style"
+      ]
+    ],
+    "valid": false
+  },
+  "text_with_both_text_and_spans": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.text"
+      ]
+    ],
+    "valid": false
+  },
+  "text_with_neither_text_nor_spans": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.text"
+      ]
+    ],
+    "valid": false
+  },
+  "text_with_spans_only_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "unknown_document_key": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "nonsense_key"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_object_key": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.colour"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_object_type": {
+    "errors": [
+      [
+        "union_tag_invalid",
+        "pages.0.page.layers.0.objects.0"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_page_key": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.not_a_field"
+      ]
+    ],
+    "valid": false
+  }
+}

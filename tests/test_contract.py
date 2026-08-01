@@ -20,9 +20,14 @@ from __future__ import annotations
 
 import ast
 import json
+import sys
 from pathlib import Path
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from _introspect import model_sources
 
 import frameforge_api
 from frameforge_api import (
@@ -33,9 +38,6 @@ from frameforge_api import (
     check_schema,
     load_schema,
 )
-from frameforge_api import model as model_module
-
-MODEL_SRC = Path(model_module.__file__)
 
 
 def minimal_doc(**over):
@@ -62,17 +64,25 @@ def minimal_doc(**over):
 def test_the_model_imports_nothing_from_frameforge():
     """The models must stay a leaf: `re`, `typing`, `pydantic` and nothing else
     from the family. A FrameForge import here would re-couple the contract to an
-    engine and defeat the whole extraction."""
-    tree = ast.parse(MODEL_SRC.read_text(encoding="utf-8"))
-    imported: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            imported.update(a.name.split(".")[0] for a in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
-            imported.add(node.module.split(".")[0])
-    assert not {m for m in imported if m.startswith("frameforge")}, (
-        f"the contract grew a FrameForge dependency: {sorted(imported)}")
-    assert imported <= {"__future__", "re", "typing", "pydantic"}, sorted(imported)
+    engine and defeat the whole extraction.
+
+    Checked per FILE, not per module object. `frameforge_api.model` is a package,
+    so parsing only the module `__file__` points at would inspect `__init__.py`
+    and nothing else — and `__init__.py` imports exclusively relative names, so
+    that version of this test would pass no matter what the other 17 files did.
+    """
+    for path in model_sources():
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        imported: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imported.update(a.name.split(".")[0] for a in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                imported.add(node.module.split(".")[0])
+        assert not {m for m in imported if m.startswith("frameforge")}, (
+            f"{path.name} grew a FrameForge dependency: {sorted(imported)}")
+        assert imported <= {"__future__", "re", "typing", "pydantic"}, (
+            f"{path.name}: {sorted(imported)}")
 
 
 def test_the_package_has_exactly_one_runtime_dependency():

@@ -15,9 +15,14 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from _introspect import declarations
 
 from frameforge_api import HEAD_VERSION, Document, build_schema
 
@@ -134,21 +139,32 @@ def test_grammar_sugar_is_rejected_on_purpose():
 
 
 @needs_monorepo
-def test_the_model_source_is_identical_to_the_monorepos():
-    """The models moved verbatim. Only the module docstring was re-pointed at the
-    new home, so every declaration must still match line for line — that is what
-    makes the schema comparison above meaningful."""
-    theirs = (MONOREPO / "src" / "frameforge" / "model.py")
+def test_every_declaration_still_matches_the_monorepos():
+    """The models moved verbatim — compared declaration for declaration.
+
+    This was a line-for-line comparison while the contract was a single file. It
+    could not survive the split into `model/`, and forcing it to would have meant
+    freezing the file layout forever to keep a test happy. Comparing normalised
+    ASTs keyed by name is the same assertion minus the accident: it is blind to
+    which file a class lives in, to declaration order and to import wiring — the
+    three things a module split is *allowed* to change — and it still fails on
+    any edit to a class body, a default, a description or a validator.
+
+    `tests/golden/declarations.json` applies the identical lens against this
+    package's own pre-split state; this one points it at upstream.
+    """
+    theirs = MONOREPO / "src" / "frameforge" / "model.py"
     if not theirs.is_file():
         pytest.skip("monorepo model.py not present")
-    from frameforge_api import model as ours_mod
-    ours = Path(ours_mod.__file__)
 
-    def body(p: Path) -> list[str]:
-        lines = p.read_text(encoding="utf-8").splitlines()
-        start = next(i for i, ln in enumerate(lines)
-                     if ln.startswith("from __future__"))       # skip the docstring
-        return lines[start:]
+    ours = declarations()
+    up = declarations([theirs])
+    # `__all__` is package wiring on our side and module wiring on theirs.
+    ours.pop("__all__", None)
+    up.pop("__all__", None)
 
-    assert body(ours) == body(theirs), (
-        "the extracted model has diverged from the monorepo's source of truth")
+    assert sorted(ours) == sorted(up), (
+        f"declaration set diverged from upstream: "
+        f"only here={sorted(set(ours) - set(up))} only upstream={sorted(set(up) - set(ours))}")
+    changed = sorted(k for k in up if ours[k] != up[k])
+    assert not changed, f"declarations diverged from the monorepo's source of truth: {changed}"

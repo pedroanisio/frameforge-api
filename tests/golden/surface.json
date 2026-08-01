@@ -1,0 +1,3379 @@
+{
+  "frameforge_api.__all__": [
+    "CONTRACT_VERSION",
+    "Document",
+    "HEAD_VERSION",
+    "SCHEMA_PATH",
+    "__version__",
+    "build_schema",
+    "check_schema",
+    "load_schema",
+    "model"
+  ],
+  "frameforge_api.model.__all__": [
+    "Document",
+    "HEAD_VERSION"
+  ],
+  "frameforge_api.model.importable": [
+    "ANGLE_STR_RE",
+    "ARROW_MARKER_KINDS",
+    "Align",
+    "Anchor",
+    "AnchorObject",
+    "Angle",
+    "AppearancePass",
+    "ArrowMarkerKind",
+    "AssetDef",
+    "BackgroundLayer",
+    "BibliographyFlow",
+    "BlendMode",
+    "BlockFlow",
+    "BloomEffect",
+    "Border",
+    "BorderSide",
+    "Box",
+    "BreakFields",
+    "BulletList",
+    "CanvasObject",
+    "CanvasSpec",
+    "Caption",
+    "Cell",
+    "CellValue",
+    "Circle",
+    "CiteInline",
+    "ClipPath",
+    "ClipPathVal",
+    "ClipSpec",
+    "ClipSpecOrBool",
+    "CodeFlow",
+    "CodeInline",
+    "Color",
+    "ColumnBreakFlow",
+    "ColumnSpec",
+    "ColumnSpecVal",
+    "Connector",
+    "ConnectorAnchor",
+    "ConnectorEndpoint",
+    "ConnectorLabel",
+    "ConnectorRoute",
+    "CounterDef",
+    "Curve",
+    "DASH_ARRAY_STR_RE",
+    "DASH_TOKEN_RE",
+    "DashArray",
+    "DashArrayString",
+    "Defs",
+    "Dimension",
+    "Document",
+    "Edges",
+    "Effect",
+    "EffectObject",
+    "EffectStackEntry",
+    "Ellipse",
+    "FG",
+    "FigureFlow",
+    "Fill",
+    "Filter",
+    "FilterFn",
+    "FlowRegion",
+    "FlowSection",
+    "Flowable",
+    "FontDef",
+    "FontDefOrName",
+    "FontStretch",
+    "FontStyle",
+    "FootnoteInline",
+    "Gradient",
+    "GradientStop",
+    "GrainEffect",
+    "Group",
+    "HEAD_VERSION",
+    "HeadingFlow",
+    "Humanize",
+    "Icon",
+    "Image",
+    "ImageFlow",
+    "ImagePaint",
+    "Inline",
+    "KeepTogetherFlow",
+    "LENGTH_STR_RE",
+    "Layer",
+    "Layout",
+    "Length",
+    "Line",
+    "LinkInline",
+    "ListFlow",
+    "ListItemFlow",
+    "ListItemVal",
+    "MathFlow",
+    "MathInline",
+    "Number",
+    "NumberFormat",
+    "ObjBase",
+    "OuterRing",
+    "Overflow",
+    "PERCENT_STR_RE",
+    "Padding",
+    "Page",
+    "PageBreakFlow",
+    "PageLink",
+    "PageMaster",
+    "PagePreset",
+    "PageProducer",
+    "Paint",
+    "ParagraphFlow",
+    "Path",
+    "PathCommand",
+    "PathSeg",
+    "Pattern",
+    "Percentage",
+    "Point",
+    "Polygon",
+    "Polyline",
+    "PostEffects",
+    "Radius",
+    "Rect",
+    "RefInline",
+    "RenderTarget",
+    "RenderingContract",
+    "Rotation",
+    "RotationOrNumber",
+    "Running",
+    "SEMVER_RE",
+    "Shadow",
+    "ShadowVal",
+    "SizeMode",
+    "SizeValue",
+    "Sizing",
+    "SpacerFlow",
+    "Span",
+    "StrList",
+    "StringSet",
+    "StrokeStyle",
+    "StrokeStyleRef",
+    "Style",
+    "StyleRef",
+    "TableFlow",
+    "TableObject",
+    "TargetAdjustments",
+    "Text",
+    "TextContract",
+    "TextDecoration",
+    "TextDecorationVal",
+    "TextStyle",
+    "TocFlow",
+    "Tokens",
+    "TransformFn",
+    "UMLAction",
+    "UMLActivationBar",
+    "UMLActivityNodeObject",
+    "UMLActorObject",
+    "UMLArtifactBox",
+    "UMLClassifierBox",
+    "UMLComponentBox",
+    "UMLFragmentFrame",
+    "UMLLifeline",
+    "UMLLollipop",
+    "UMLMarkerGlyph",
+    "UMLNodeBox",
+    "UMLPseudostateObject",
+    "UMLSocket",
+    "UMLStateBox",
+    "UMLSwimlane",
+    "UMLTimingLane",
+    "UMLVisualBase",
+    "UnitInterval",
+    "Units",
+    "UrlImage",
+    "VAlign",
+    "VisualObject",
+    "_SegArc",
+    "_SegClose",
+    "_SegCubic",
+    "_SegHoriz",
+    "_SegLine",
+    "_SegMove",
+    "_SegQuad",
+    "_SegSmooth",
+    "_SegTquad",
+    "_SegVert",
+    "__all__"
+  ],
+  "frameforge_api.model.not_importable": [],
+  "frameforge_api.schema.__all__": [
+    "SCHEMA_PATH",
+    "build",
+    "check",
+    "load",
+    "main",
+    "write"
+  ],
+  "models": {
+    "AnchorObject": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "ref",
+        "port"
+      ],
+      "validators": []
+    },
+    "AppearancePass": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "fill",
+        "stroke",
+        "stroke_style",
+        "opacity"
+      ],
+      "validators": []
+    },
+    "AssetDef": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "src",
+        "hash",
+        "kind",
+        "media_type"
+      ],
+      "validators": []
+    },
+    "BackgroundLayer": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "color",
+        "image",
+        "position",
+        "size",
+        "repeat",
+        "clip"
+      ],
+      "validators": []
+    },
+    "BibliographyFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "title",
+        "source",
+        "csl",
+        "entries",
+        "id"
+      ],
+      "validators": []
+    },
+    "BlockFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "children",
+        "style",
+        "role",
+        "fill",
+        "stroke",
+        "stroke_style",
+        "padding",
+        "id"
+      ],
+      "validators": []
+    },
+    "BloomEffect": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "radius",
+        "strength",
+        "threshold"
+      ],
+      "validators": []
+    },
+    "BorderSide": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "width",
+        "style",
+        "color"
+      ],
+      "validators": []
+    },
+    "BreakFields": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside"
+      ],
+      "validators": []
+    },
+    "BulletList": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "items",
+        "marker",
+        "marker_color",
+        "gap",
+        "indent"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "CanvasObject": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "preset",
+        "size",
+        "units",
+        "orientation",
+        "bleed",
+        "margin",
+        "background"
+      ],
+      "validators": [
+        "_preset_or_size"
+      ]
+    },
+    "Cell": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "content",
+        "style",
+        "span"
+      ],
+      "validators": []
+    },
+    "Circle": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "center",
+        "r",
+        "fill",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "CiteInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "key",
+        "mode",
+        "locator",
+        "prefix",
+        "suppress_author"
+      ],
+      "validators": []
+    },
+    "ClipPath": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "shape",
+        "args"
+      ],
+      "validators": []
+    },
+    "ClipSpec": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "shape",
+        "radius"
+      ],
+      "validators": []
+    },
+    "CodeFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "source",
+        "language",
+        "line_numbers",
+        "style"
+      ],
+      "validators": []
+    },
+    "CodeInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "text"
+      ],
+      "validators": []
+    },
+    "ColumnBreakFlow": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "type"
+      ],
+      "validators": []
+    },
+    "ColumnSpec": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "label",
+        "width",
+        "align"
+      ],
+      "validators": []
+    },
+    "Connector": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "from_",
+        "to",
+        "route",
+        "label",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "ConnectorEndpoint": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "ref",
+        "port",
+        "side",
+        "offset",
+        "point"
+      ],
+      "validators": [
+        "_accept_object_key",
+        "_ref_or_point"
+      ]
+    },
+    "ConnectorLabel": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "text",
+        "box",
+        "style"
+      ],
+      "validators": []
+    },
+    "ConnectorRoute": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "points"
+      ],
+      "validators": [
+        "_accept_type_key"
+      ]
+    },
+    "CounterDef": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "start",
+        "reset_with",
+        "format"
+      ],
+      "validators": []
+    },
+    "Curve": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "from_",
+        "to",
+        "control1",
+        "control2",
+        "stroke",
+        "fill"
+      ],
+      "validators": [
+        "_canonical_controls",
+        "_stroke_paint_only"
+      ]
+    },
+    "Defs": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "params",
+        "tokens",
+        "counters",
+        "masters",
+        "assets",
+        "data",
+        "symbols",
+        "components",
+        "ontology"
+      ],
+      "validators": []
+    },
+    "Dimension": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "kind",
+        "from_",
+        "to",
+        "value",
+        "text",
+        "prefix",
+        "suffix",
+        "offset",
+        "arrows",
+        "text_style"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "Document": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "dsl",
+        "version",
+        "profile",
+        "title",
+        "description",
+        "lang",
+        "defs",
+        "targets",
+        "pages",
+        "meta",
+        "humanize",
+        "text_contract"
+      ],
+      "validators": []
+    },
+    "EffectObject": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "color",
+        "blur",
+        "dx",
+        "dy",
+        "opacity"
+      ],
+      "validators": []
+    },
+    "EffectStackEntry": {
+      "bases": [
+        "EffectObject"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "color",
+        "blur",
+        "dx",
+        "dy",
+        "opacity",
+        "kind",
+        "preset"
+      ],
+      "validators": []
+    },
+    "Ellipse": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "center",
+        "rx",
+        "ry",
+        "fill",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "FG": {
+      "bases": [
+        "BaseModel"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [],
+      "validators": []
+    },
+    "FigureFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "object",
+        "alt",
+        "actual_text",
+        "align",
+        "units",
+        "size",
+        "caption",
+        "credit",
+        "id",
+        "number"
+      ],
+      "validators": []
+    },
+    "FilterFn": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "fn",
+        "value",
+        "shadow",
+        "base_frequency",
+        "num_octaves",
+        "seed",
+        "stitch_tiles",
+        "type",
+        "mode",
+        "opacity",
+        "scale",
+        "x_channel",
+        "y_channel",
+        "surface_scale",
+        "lighting_color",
+        "azimuth",
+        "elevation",
+        "x",
+        "y",
+        "z",
+        "points_at_x",
+        "points_at_y",
+        "points_at_z",
+        "diffuse_constant",
+        "specular_constant",
+        "specular_exponent"
+      ],
+      "validators": []
+    },
+    "FlowRegion": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "columns",
+        "column_gap",
+        "column_fill",
+        "column_rule",
+        "next"
+      ],
+      "validators": []
+    },
+    "FlowSection": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "mode",
+        "id",
+        "master",
+        "story",
+        "media",
+        "page_numbering",
+        "lang",
+        "links",
+        "semantic",
+        "meta"
+      ],
+      "validators": []
+    },
+    "FontDef": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "family",
+        "src",
+        "hash",
+        "fallback",
+        "weight",
+        "style"
+      ],
+      "validators": []
+    },
+    "FootnoteInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "content",
+        "placement",
+        "id"
+      ],
+      "validators": []
+    },
+    "Gradient": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "kind",
+        "stops",
+        "repeating",
+        "angle",
+        "from_",
+        "at",
+        "shape",
+        "line",
+        "radius",
+        "focal",
+        "meta"
+      ],
+      "validators": [
+        "_check_user_space_geometry"
+      ]
+    },
+    "GradientStop": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "color",
+        "position",
+        "opacity"
+      ],
+      "validators": [
+        "_accept_offset"
+      ]
+    },
+    "GrainEffect": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "amount",
+        "seed",
+        "monochrome"
+      ],
+      "validators": []
+    },
+    "Group": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "children",
+        "layout"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "HeadingFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "level",
+        "text",
+        "id",
+        "number",
+        "set_string",
+        "lang",
+        "style"
+      ],
+      "validators": []
+    },
+    "Humanize": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "enabled",
+        "seed",
+        "weight",
+        "opacity",
+        "drift_deg",
+        "roughen",
+        "grain"
+      ],
+      "validators": []
+    },
+    "Icon": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "glyph",
+        "color",
+        "font",
+        "size"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "Image": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "src",
+        "alt",
+        "actual_text",
+        "placeholder",
+        "preserve_aspect_ratio",
+        "clip",
+        "radius",
+        "label"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "ImageFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "src",
+        "alt",
+        "actual_text",
+        "width",
+        "height",
+        "preserve_aspect_ratio",
+        "caption",
+        "credit"
+      ],
+      "validators": []
+    },
+    "KeepTogetherFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "children"
+      ],
+      "validators": []
+    },
+    "Layer": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "role",
+        "z",
+        "opacity",
+        "objects"
+      ],
+      "validators": []
+    },
+    "Layout": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "gap",
+        "row_gap",
+        "column_gap",
+        "padding",
+        "columns",
+        "align",
+        "justify"
+      ],
+      "validators": []
+    },
+    "Line": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "from_",
+        "to",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "LinkInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "href",
+        "content",
+        "title"
+      ],
+      "validators": []
+    },
+    "ListFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "items",
+        "ordered",
+        "marker",
+        "style",
+        "indent"
+      ],
+      "validators": []
+    },
+    "ListItemFlow": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "text",
+        "spans",
+        "style"
+      ],
+      "validators": []
+    },
+    "MathFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "tex",
+        "mathml",
+        "alt",
+        "id",
+        "number"
+      ],
+      "validators": []
+    },
+    "MathInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "mathml",
+        "tex"
+      ],
+      "validators": []
+    },
+    "Number": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "series",
+        "parent",
+        "reset_with",
+        "format",
+        "prefix",
+        "suffix"
+      ],
+      "validators": []
+    },
+    "ObjBase": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "OuterRing": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "color",
+        "width",
+        "gap",
+        "offset",
+        "dash",
+        "opacity"
+      ],
+      "validators": []
+    },
+    "Page": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "mode",
+        "id",
+        "master",
+        "canvas",
+        "rendering",
+        "layers",
+        "reading_order",
+        "semantic",
+        "links",
+        "notes",
+        "post",
+        "meta"
+      ],
+      "validators": []
+    },
+    "PageBreakFlow": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "type"
+      ],
+      "validators": []
+    },
+    "PageLink": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "to",
+        "relation",
+        "label",
+        "external"
+      ],
+      "validators": []
+    },
+    "PageMaster": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "canvas",
+        "margin",
+        "fixed",
+        "regions",
+        "running",
+        "footnote_area",
+        "next"
+      ],
+      "validators": []
+    },
+    "ParagraphFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "text",
+        "spans",
+        "style",
+        "lang",
+        "widows",
+        "orphans"
+      ],
+      "validators": [
+        "_one_of"
+      ]
+    },
+    "Path": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "d",
+        "fill",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "Pattern": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "pattern",
+        "angle",
+        "spacing",
+        "stroke",
+        "background"
+      ],
+      "validators": []
+    },
+    "Polygon": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "points",
+        "fill",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "Polyline": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "points",
+        "closed",
+        "fill",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "PostEffects": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "blur",
+        "bloom",
+        "grain"
+      ],
+      "validators": []
+    },
+    "Rect": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "fill",
+        "radius",
+        "stroke"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "RefInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "target",
+        "show"
+      ],
+      "validators": []
+    },
+    "RenderTarget": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "name",
+        "canvas",
+        "adjustments"
+      ],
+      "validators": []
+    },
+    "RenderingContract": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "coordinate_mode",
+        "text",
+        "typography",
+        "semantics",
+        "debug_boxes",
+        "preserve_manual_line_breaks"
+      ],
+      "validators": []
+    },
+    "Rotation": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "angle",
+        "center"
+      ],
+      "validators": []
+    },
+    "Running": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "header",
+        "footer",
+        "page_number"
+      ],
+      "validators": []
+    },
+    "Shadow": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "offset_x",
+        "offset_y",
+        "blur",
+        "spread",
+        "color",
+        "inset"
+      ],
+      "validators": []
+    },
+    "Sizing": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "width",
+        "height",
+        "grow",
+        "min",
+        "max"
+      ],
+      "validators": []
+    },
+    "SpacerFlow": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "type",
+        "height"
+      ],
+      "validators": []
+    },
+    "Span": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "text",
+        "style",
+        "lang"
+      ],
+      "validators": []
+    },
+    "StringSet": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "name",
+        "value"
+      ],
+      "validators": []
+    },
+    "StrokeStyle": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "class_",
+        "css",
+        "font",
+        "size",
+        "weight",
+        "italic",
+        "bold",
+        "align",
+        "v_align",
+        "radius",
+        "wrap",
+        "dash",
+        "color",
+        "font_family",
+        "font_size",
+        "font_weight",
+        "font_style",
+        "font_stretch",
+        "font_variant",
+        "font_variant_caps",
+        "font_variant_numeric",
+        "font_variant_ligatures",
+        "font_feature_settings",
+        "font_variation_settings",
+        "font_kerning",
+        "line_height",
+        "letter_spacing",
+        "word_spacing",
+        "text_align",
+        "text_align_last",
+        "vertical_align",
+        "text_decoration",
+        "text_transform",
+        "text_indent",
+        "text_shadow",
+        "white_space",
+        "word_break",
+        "overflow_wrap",
+        "hyphens",
+        "text_wrap",
+        "hanging_punctuation",
+        "hyphenate_character",
+        "hyphenate_limit_chars",
+        "tab_size",
+        "text_overflow",
+        "line_clamp",
+        "max_lines",
+        "min_font_size",
+        "writing_mode",
+        "direction",
+        "unicode_bidi",
+        "width",
+        "height",
+        "min_width",
+        "max_width",
+        "min_height",
+        "max_height",
+        "box_sizing",
+        "padding",
+        "margin",
+        "border",
+        "border_top",
+        "border_right",
+        "border_bottom",
+        "border_left",
+        "border_radius",
+        "outline",
+        "outline_offset",
+        "overflow",
+        "overflow_x",
+        "overflow_y",
+        "opacity",
+        "visibility",
+        "z_index",
+        "background",
+        "background_color",
+        "background_image",
+        "background_position",
+        "background_size",
+        "background_repeat",
+        "background_clip",
+        "background_origin",
+        "background_blend_mode",
+        "fill",
+        "fill_rule",
+        "stroke",
+        "stroke_width",
+        "stroke_dasharray",
+        "stroke_dashoffset",
+        "stroke_linecap",
+        "stroke_linejoin",
+        "stroke_miterlimit",
+        "paint_order",
+        "vector_effect",
+        "arrow_start",
+        "arrow_end",
+        "box_shadow",
+        "filter",
+        "backdrop_filter",
+        "mix_blend_mode",
+        "isolation",
+        "clip_path",
+        "mask",
+        "transform",
+        "transform_origin",
+        "transform_box",
+        "perspective"
+      ],
+      "validators": [
+        "_normalize_dash_array"
+      ]
+    },
+    "Style": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "class_",
+        "css",
+        "font",
+        "size",
+        "weight",
+        "italic",
+        "bold",
+        "align",
+        "v_align",
+        "radius",
+        "wrap",
+        "dash",
+        "color",
+        "font_family",
+        "font_size",
+        "font_weight",
+        "font_style",
+        "font_stretch",
+        "font_variant",
+        "font_variant_caps",
+        "font_variant_numeric",
+        "font_variant_ligatures",
+        "font_feature_settings",
+        "font_variation_settings",
+        "font_kerning",
+        "line_height",
+        "letter_spacing",
+        "word_spacing",
+        "text_align",
+        "text_align_last",
+        "vertical_align",
+        "text_decoration",
+        "text_transform",
+        "text_indent",
+        "text_shadow",
+        "white_space",
+        "word_break",
+        "overflow_wrap",
+        "hyphens",
+        "text_wrap",
+        "hanging_punctuation",
+        "hyphenate_character",
+        "hyphenate_limit_chars",
+        "tab_size",
+        "text_overflow",
+        "line_clamp",
+        "max_lines",
+        "min_font_size",
+        "writing_mode",
+        "direction",
+        "unicode_bidi",
+        "width",
+        "height",
+        "min_width",
+        "max_width",
+        "min_height",
+        "max_height",
+        "box_sizing",
+        "padding",
+        "margin",
+        "border",
+        "border_top",
+        "border_right",
+        "border_bottom",
+        "border_left",
+        "border_radius",
+        "outline",
+        "outline_offset",
+        "overflow",
+        "overflow_x",
+        "overflow_y",
+        "opacity",
+        "visibility",
+        "z_index",
+        "background",
+        "background_color",
+        "background_image",
+        "background_position",
+        "background_size",
+        "background_repeat",
+        "background_clip",
+        "background_origin",
+        "background_blend_mode",
+        "fill",
+        "fill_rule",
+        "stroke",
+        "stroke_width",
+        "stroke_dasharray",
+        "stroke_dashoffset",
+        "stroke_linecap",
+        "stroke_linejoin",
+        "stroke_miterlimit",
+        "paint_order",
+        "vector_effect",
+        "arrow_start",
+        "arrow_end",
+        "box_shadow",
+        "filter",
+        "backdrop_filter",
+        "mix_blend_mode",
+        "isolation",
+        "clip_path",
+        "mask",
+        "transform",
+        "transform_origin",
+        "transform_box",
+        "perspective"
+      ],
+      "validators": [
+        "_normalize_dash_array"
+      ]
+    },
+    "TableFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "rows",
+        "columns",
+        "header",
+        "row_height",
+        "header_height",
+        "zebra",
+        "cell_padding",
+        "style",
+        "caption",
+        "credit",
+        "id",
+        "number"
+      ],
+      "validators": []
+    },
+    "TableObject": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "rows",
+        "columns",
+        "header",
+        "row_height",
+        "header_height",
+        "zebra",
+        "cell_padding"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "TargetAdjustments": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "font_scale",
+        "hide",
+        "padding_delta"
+      ],
+      "validators": []
+    },
+    "Text": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "type",
+        "text",
+        "spans",
+        "field"
+      ],
+      "validators": [
+        "_one_of_text_spans",
+        "_stroke_paint_only"
+      ]
+    },
+    "TextContract": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "min_font_size",
+        "overflow",
+        "line_clamp",
+        "text_overflow"
+      ],
+      "validators": []
+    },
+    "TextDecoration": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "line",
+        "style",
+        "color",
+        "thickness"
+      ],
+      "validators": []
+    },
+    "TextStyle": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "class_",
+        "css",
+        "font",
+        "size",
+        "weight",
+        "italic",
+        "bold",
+        "align",
+        "v_align",
+        "radius",
+        "wrap",
+        "dash",
+        "color",
+        "font_family",
+        "font_size",
+        "font_weight",
+        "font_style",
+        "font_stretch",
+        "font_variant",
+        "font_variant_caps",
+        "font_variant_numeric",
+        "font_variant_ligatures",
+        "font_feature_settings",
+        "font_variation_settings",
+        "font_kerning",
+        "line_height",
+        "letter_spacing",
+        "word_spacing",
+        "text_align",
+        "text_align_last",
+        "vertical_align",
+        "text_decoration",
+        "text_transform",
+        "text_indent",
+        "text_shadow",
+        "white_space",
+        "word_break",
+        "overflow_wrap",
+        "hyphens",
+        "text_wrap",
+        "hanging_punctuation",
+        "hyphenate_character",
+        "hyphenate_limit_chars",
+        "tab_size",
+        "text_overflow",
+        "line_clamp",
+        "max_lines",
+        "min_font_size",
+        "writing_mode",
+        "direction",
+        "unicode_bidi",
+        "width",
+        "height",
+        "min_width",
+        "max_width",
+        "min_height",
+        "max_height",
+        "box_sizing",
+        "padding",
+        "margin",
+        "border",
+        "border_top",
+        "border_right",
+        "border_bottom",
+        "border_left",
+        "border_radius",
+        "outline",
+        "outline_offset",
+        "overflow",
+        "overflow_x",
+        "overflow_y",
+        "opacity",
+        "visibility",
+        "z_index",
+        "background",
+        "background_color",
+        "background_image",
+        "background_position",
+        "background_size",
+        "background_repeat",
+        "background_clip",
+        "background_origin",
+        "background_blend_mode",
+        "fill",
+        "fill_rule",
+        "stroke",
+        "stroke_width",
+        "stroke_dasharray",
+        "stroke_dashoffset",
+        "stroke_linecap",
+        "stroke_linejoin",
+        "stroke_miterlimit",
+        "paint_order",
+        "vector_effect",
+        "arrow_start",
+        "arrow_end",
+        "box_shadow",
+        "filter",
+        "backdrop_filter",
+        "mix_blend_mode",
+        "isolation",
+        "clip_path",
+        "mask",
+        "transform",
+        "transform_origin",
+        "transform_box",
+        "perspective"
+      ],
+      "validators": [
+        "_normalize_dash_array"
+      ]
+    },
+    "TocFlow": {
+      "bases": [
+        "BreakFields"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "break_before",
+        "break_after",
+        "break_inside",
+        "type",
+        "of",
+        "levels",
+        "title",
+        "style",
+        "leader",
+        "number_width",
+        "level_indent"
+      ],
+      "validators": []
+    },
+    "Tokens": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "colors",
+        "fonts",
+        "text_styles",
+        "styles",
+        "stroke_styles",
+        "fill_styles",
+        "glyph_map"
+      ],
+      "validators": []
+    },
+    "TransformFn": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "fn",
+        "args"
+      ],
+      "validators": []
+    },
+    "UMLAction": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLActivationBar": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLActivityNodeObject": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLActorObject": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLArtifactBox": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLClassifierBox": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLComponentBox": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLFragmentFrame": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLLifeline": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLLollipop": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLMarkerGlyph": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type",
+        "position"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLNodeBox": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLPseudostateObject": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLSocket": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLStateBox": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLSwimlane": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLTimingLane": {
+      "bases": [
+        "UMLVisualBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color",
+        "type"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UMLVisualBase": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "allow",
+        "populate_by_name": "True",
+        "validate_by_alias": "True",
+        "validate_by_name": "True"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "kind",
+        "label",
+        "color"
+      ],
+      "validators": [
+        "_stroke_paint_only"
+      ]
+    },
+    "UrlImage": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "url"
+      ],
+      "validators": []
+    }
+  }
+}

@@ -73,12 +73,6 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-# `model.py` is VENDORED source of truth: it moved verbatim from the frameforge
-# monorepo and a fidelity test asserts it still matches, declaration for
-# declaration. Restyling it here (`Optional[X]` -> `X | None`, import order, …)
-# would break that identity and could shift the generated schema. It is
-# excluded from linting entirely and changed only by re-syncing from upstream.
-extend-exclude = ["src/frameforge_api/model.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
@@ -87,3 +81,26 @@ ignore = [
     "B017",     # tests assert on pydantic's ValidationError via Exception on purpose:
                 # the contract is "this is rejected", not "rejected with this class"
 ]
+
+# `frameforge_api/model/` holds VENDORED declarations: they came from the
+# frameforge monorepo and a fidelity test asserts they still match it, one
+# normalised AST per declaration. Restyling them (`Optional[X]` -> `X | None`,
+# resorting imports, …) would break that identity and could shift the generated
+# schema, so the STYLE rules are off there.
+#
+# The correctness rules stay on, and they earn their keep: splitting the module
+# into a package is precisely the operation that can leave a name unimported,
+# and `F821` caught exactly that (`FigureFlow.object`) on the first run. An
+# earlier version of this config excluded the contract from linting outright,
+# which would have let that through.
+[tool.ruff.lint.per-file-ignores]
+"src/frameforge_api/model/**/*.py" = [
+    "UP007", "UP045", "UP037",     # PEP 604/585 restyling — would diverge from upstream
+    "I001",                        # import order is upstream's, not ours
+    "SIM102",                      # validator branches are written to mirror the spec's prose
+    "RUF001", "RUF003",            # §, —, and other typography in the spec's own words
+    "RUF022",                      # `__all__` order is upstream's; the golden compares it
+]
+# A package __init__ re-exports; that is what it is for.
+"src/frameforge_api/model/__init__.py" = ["F401", "UP007", "UP045", "UP037", "I001", "RUF001", "RUF003", "RUF022"]
+"src/frameforge_api/model/objects/__init__.py" = ["F401", "UP007", "UP045", "UP037", "I001", "RUF001", "RUF003"]
