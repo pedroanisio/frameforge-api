@@ -21,6 +21,8 @@ repeat the disclaimer block.
 
 ## MANDATORY
 
+- Do not-dramatized a small thing.
+- Meta processing IS NEVER to be documented unless requested.
 - Treat generated artifacts as generated: edit source inputs or generators, then
   rerun the corresponding check.
 - Do not hand-edit `FIXTURE-STATUS.md`, generated MkDocs pages, or generated
