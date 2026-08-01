@@ -1,0 +1,83 @@
+[project]
+name = "frameforge-api"
+version = "2.8.2"
+description = "The FrameForge v2 document contract — authoritative Pydantic models and the JSON Schema generated from them"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Pedro Anisio Silva", email = "pedroanisio@gmail.com" }]
+keywords = ["frameforge", "schema", "json-schema", "pydantic", "document-composition", "contract"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Markup",
+    "Typing :: Typed",
+]
+# The whole point of this package: the contract is a leaf. One runtime
+# dependency, no engine, no SDK — so anything can depend on it cheaply.
+dependencies = [
+    "pydantic>=2",
+]
+
+[project.optional-dependencies]
+# Only the `ff-schema <doc.yaml>` validation path needs a YAML parser; the
+# models and the schema itself never do.
+yaml = ["pyyaml>=6"]
+
+[project.scripts]
+ff-schema = "frameforge_api.schema:main"
+
+[project.urls]
+Repository = "https://github.com/pedroanisio/frameforge-api"
+Issues = "https://github.com/pedroanisio/frameforge-api/issues"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.11",
+    "pytest>=8",
+    "pytest-cov>=5",
+    "pyyaml>=6",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/frameforge_api"]
+
+# The generated schema ships INSIDE the wheel so a consumer that never runs
+# Python (a TS client, an editor linter, a CI validator) still gets the contract.
+[tool.hatch.build.targets.wheel.force-include]
+"src/frameforge_api/schema/frameforge-v2.schema.json" = "frameforge_api/schema/frameforge-v2.schema.json"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/.venv", "/dist", "/htmlcov", "/.pytest_cache"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# `model.py` is VENDORED source of truth: it moved verbatim from the frameforge
+# monorepo and a fidelity test asserts it still matches, declaration for
+# declaration. Restyling it here (`Optional[X]` -> `X | None`, import order, …)
+# would break that identity and could shift the generated schema. It is
+# excluded from linting entirely and changed only by re-syncing from upstream.
+extend-exclude = ["src/frameforge_api/model.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+    "E501",     # long lines are the Field(...) documentation style
+    "B017",     # tests assert on pydantic's ValidationError via Exception on purpose:
+                # the contract is "this is rejected", not "rejected with this class"
+]
