@@ -19,7 +19,7 @@ from typing import Annotated, Literal, Optional, Union
 from pydantic import Field
 
 from ..layout import Layout
-from .base import ObjBase
+from .base import MatteMode, MatteSpec, ObjBase
 from .connector import (
     Connector,
     ConnectorAnchor,
@@ -27,7 +27,7 @@ from .connector import (
     ConnectorLabel,
     ConnectorRoute,
 )
-from .content import BulletList, Dimension, Icon, Image, Text
+from .content import BulletList, Dimension, GenerationParams, GenerativeObject, Icon, Image, Text
 from .paths import (
     Curve,
     Path,
@@ -44,7 +44,7 @@ from .paths import (
     _SegTquad,
     _SegVert,
 )
-from .shapes import Circle, Ellipse, Line, Polygon, Polyline, Rect
+from .shapes import Circle, Ellipse, Line, Polygon, Polyline, Rect, Star, StarType
 from .table import Cell, CellValue, ColumnSpec, ColumnSpecVal, TableObject
 from .uml import (
     UMLAction,
@@ -79,8 +79,8 @@ class Group(ObjBase):
 
 VisualObject = Annotated[
     Union[
-        Rect, Ellipse, Circle, Line, Polyline, Polygon, Path, Curve,
-        Text, Image, Icon, BulletList, Dimension, Connector, TableObject, Group,
+        Rect, Ellipse, Circle, Line, Polyline, Polygon, Star, Path, Curve,
+        Text, Image, GenerativeObject, Icon, BulletList, Dimension, Connector, TableObject, Group,
         UMLMarkerGlyph, UMLClassifierBox, UMLComponentBox, UMLStateBox,
         UMLAction, UMLArtifactBox, UMLNodeBox, UMLLifeline, UMLActivationBar,
         UMLActorObject, UMLSocket, UMLLollipop, UMLActivityNodeObject,

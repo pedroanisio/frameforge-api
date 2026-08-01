@@ -5,6 +5,277 @@ release line (`__version__`), while `HEAD_VERSION` is the FrameForge **document
 format** revision the package carries. A packaging release must not look like a
 format change, so they are never welded together.*
 
+## Unreleased
+
+*Package `1.2.0`; carries FrameForge document contract `HEAD_VERSION = 2.11.0`.*
+
+### Deprecation, made actionable — contract `2.11.0` (`deprecations`, `schema`)
+
+The contract always *had* deprecations. It had no way for anyone to act on them,
+and three separate defects were in the way.
+
+- **The migration path did not ship.** Three model docstrings and the P3 stroke
+  error message told the reader to run `tooling/codemod.py` — a script in the
+  `frameforge` monorepo, not in this wheel. Anyone who installed the contract on
+  its own was pointed at a path they do not have, and those strings are copied
+  verbatim into the generated JSON Schema, so the dangling pointer was
+  *published*, not internal.
+
+  **`frameforge_api.deprecations`** is that script as an ordinary importable
+  module with a console script over it — the same move `frameforge_api.schema`
+  made for the monorepo's un-importable `build_schema.py`.
+  `scan_document()` reports, `migrate_document()` rewrites, `ff-codemod` is the
+  CLI (`--write`, `--stdout`, `--json`, `--list`). Both functions are
+  non-mutating, and `migrate` is idempotent by construction, so it is safe in a
+  pre-commit hook or a CI gate.
+  `test_no_published_description_points_at_a_file_the_package_does_not_ship`
+  keeps the references honest.
+
+- **Deprecation was invisible to machines.** The status lived only in English
+  `description` prose: the count of the standard JSON Schema `deprecated`
+  keyword in the emitted schema was **zero**. Both halves are fixed, because one
+  is not enough — `Circle`, `Polygon`, `Curve` and `Tokens.text_styles` now
+  carry the standard 2020-12 `deprecated` annotation, and the deprecated *keys*
+  (`offset`, `object`, `type`, `c1`/`c2`, `dash`) **cannot**: they are
+  normalised by `mode="before"` validators, so they are accepted by the models
+  and never appear in the schema as properties. A consumer reading the schema
+  alone could not learn those spellings are even legal. They are published
+  instead as **`x-frameforge-deprecations`**, mirroring
+  `frameforge_api.DEPRECATIONS` — eleven entries carrying `id`, `kind`,
+  `subject`, `replacement`, `fix`, `valid_at_head`, the engine validator's
+  `code` for the same form, `severity` and a reason.
+
+- **`tokens.text_styles` was a shadowing hazard, not a deprecation.** Every
+  other legacy spelling collapses to one representation at parse time. This one
+  cannot: `text_styles` and `styles` are both live `dict[str, Style]` maps and
+  the renderer resolves `text_styles` first, so a name declared in both renders
+  as that one and the `styles` definition is dead — silently. It is the only
+  entry in the registry that can render a document *wrong* rather than merely
+  verbose. The codemod merges the two with `text_styles` winning (what the
+  renderer already does, so the merge is appearance-preserving) and reports
+  every shadowed name.
+
+  **Deliberately a lint, not a validation error.** `COMPATIBILITY` is
+  `backward`, and a collision was always valid; rejecting it now would break the
+  guarantee this package makes. The same rule is why none of the eleven forms
+  can be *removed* before 3.0 — "deprecated" in the 2.x line means discouraged,
+  mechanically migratable, and still accepted.
+
+*Why the contract clock moved for what is only annotation:* nothing validates
+differently, but the emitted schema bytes changed, and `$id`/`version` embed
+`HEAD_VERSION`. Two different files claiming to be `2.10.0` is exactly the drift
+this package exists to prevent.
+
+#### Also
+
+- Documented the portable font-closure boundary: `FontDef.src` plus `hash`
+  continue to pin document font identity, while `.fp` closure selection remains
+  runtime configuration on the SDK, renderer, and MCP. No `font_closure` or
+  `font_generics` field was added to the serialized document contract.
+
+- **`examples/legacy-shortcuts.before.json` / `.after.json`** — one worked
+  document carrying all eleven deprecated forms, and what `ff-codemod --write`
+  produces from it. A test asserts the pair has not drifted, and another asserts
+  the "before" half still demonstrates *every* registry entry. The pair is held
+  out of the reference-example sweep explicitly (the "before" half is
+  deliberately invalid), rather than by a silent glob.
+- **The pre-P3 oracle corpus is finally exercised.** `b1/` has been excluded
+  from every suite here with the words "kept as codemod *input*", and nothing
+  had ever run a codemod over it from this package, because there was none. All
+  nine documents — 552 deprecated forms, 544 of them inline stroke bundles —
+  now migrate to documents that validate at HEAD, idempotently.
+- **The codemod is bound by the compatibility guarantee too.** A migration tool
+  shipped beside a backward-compatibility promise is a way to break that promise
+  at arm's length. `test_backward_compat.py` now also asserts the codemod never
+  turns a valid document invalid, over the committed corpus and all 50+ lowered
+  monorepo fixtures.
+- **A correctness note for anyone porting the monorepo's codemod:** it maps a
+  pre-P3 `stroke.opacity` onto `stroke_opacity`, and `Style` has no such field.
+  `Style` is `extra="forbid"`, so that output does not validate. This
+  implementation maps it to `Style.opacity`.
+- **`tests/compat/v2.10.0-typographic-rhythm.json`** pins the revision
+  immediately before this one, for the usual reason: the revision before a
+  change is the one that change can most easily break.
+- The `$defs` count moves 115 → 119.
+
+---
+
+*Previously in this release line: package `1.1.0`, contract `2.10.0`.*
+
+Both clocks move: new importable models are a package minor, and a contract
+widening is a contract minor. Neither is a major, because **every addition is
+optional and every union is extended rather than replaced.**
+
+### Compatibility, now stated rather than assumed
+
+- **`frameforge_api.COMPATIBILITY = "backward"`.** The 2.x line had been
+  strictly backward compatible since 2.0.0 and nothing said so, which made it an
+  accident rather than a promise. It is now a declared guarantee in the
+  schema-registry sense: *a document valid under any earlier 2.x revision stays
+  valid at HEAD.* Within the line a change may add an optional field, add a union
+  member, widen a type, relax a constraint, or make a required field optional —
+  and may not add a required field, remove or rename one, drop a union member,
+  narrow a type, tighten a constraint, or change what an existing value means.
+  The reverse direction (FORWARD) is deliberately not promised.
+- **`tests/test_backward_compat.py` enforces it**, against two corpora:
+  `tests/compat/*.json` (committed documents pinned at 2.2.0, 2.4.0, 2.7.1 and
+  2.9.0, so CI needs no sibling checkout) and the monorepo's 57 fixtures
+  replayed by declared revision. All lowered fixtures from 2.0.0 onward validate
+  at 2.10.0.
+- **A 2.9.0 document is in the committed corpus**, because the revision
+  immediately before a widening is the one that widening can most easily break —
+  it carries typed ink, overprint, spine-relative margins, a spread and
+  printer's marks.
+
+### Typographic rhythm — contract `2.10.0` (`layout`, `page`, `document`, `style`)
+
+- **`BaselineGrid`**, declared at **`defs.baseline_grid`** and overridable per
+  page at **`RenderingContract.baseline_grid`**; blocks opt in with
+  **`Style.align_to_baseline`**. Three fields: `increment` (required, positive —
+  the pitch, and normally the body `line_height`), `start`, and `relative_to`
+  (`page` | `top_margin`).
+
+  *Why:* `Layout(kind="grid")` places boxes and said nothing about what they
+  should be *divisible by*. If body text is 10pt on 13pt leading and a module's
+  height is not a multiple of 13, every row leaves a remainder at its foot and
+  the horizontal gutters stop looking equal — authored identically, rendered
+  unevenly. The same increment is what aligns type across a gutter and across a
+  fold, which is precisely what 2.9.0's `FlowRegion.column_fill: "balance"` and
+  `CanvasObject.spread` had no way to ask for. `defs` is the only scope a
+  `FlowSection` has, so that is where a book states its rhythm.
+
+  It is inert until something opts in, and `align_to_baseline: false` is a
+  meaningful opt-*out* for a caption set smaller than the grid.
+
+- **`TextContract.measure`** — `[min, max]` intended line length in
+  **characters**, at `text_contract` or per page. Leading fixes the vertical
+  increment; measure fixes the horizontal one. Advisory and structurally inert:
+  the engine's validator is the only thing that can measure a resolved line.
+  Inverted (`[75, 45]`) and non-positive bounds are rejected here.
+
+- **`ColorProfileDef.total_ink_limit`** — maximum total coverage, as the sum of
+  a `CmykColor`'s four `0..1` components, so the scale runs `0..4` and `3.0` is
+  the common "300%" sheet-fed limit.
+
+  *Why:* 2.9.0 bounded each separation independently, which leaves
+  `c=m=y=k=1.0` — 400% — structurally legal and physically unprintable. This
+  package cannot enforce the cap (the coverage of a gradient, a spot
+  `alternate` or an ICC conversion is known only once resolved); declaring it
+  is what gives the engine's validator something to check against. The
+  percentage spelling (`300`) is rejected rather than read as 40000%.
+
+### Fixed
+
+- **Revision ordering compared semver as strings.**
+  `tests/test_backward_compat.py` gated its corpus with
+  `declared < HEAD_VERSION` on raw strings, and `"2.2.0" < "2.10.0"` is
+  **False** — `'2'` sorts after `'1'`. Latent while every minor was one digit;
+  2.10.0 is the first that is not, and it turned the entire committed compat
+  corpus red while every document in it was still perfectly valid. Now compared
+  as parsed precedence tuples, with a regression test pinning the exact
+  comparison that was wrong.
+
+### Print colour (`base`, `style`, `document`)
+
+- **`CmykColor`, `SpotColor`, `IccColor`**, discriminated on `space`, joined to
+  `Color` — which stays `Union[str, ColorObject]` with the string branch first,
+  so every existing document is unaffected. `Paint` picks them up automatically,
+  so typed ink reaches fills, strokes, gradient stops, backgrounds and tokens
+  without a second spelling.
+- **`ColorProfileDef` and `defs.color_profiles`** — declared ICC profiles,
+  pinned by `hash` the way `FontDef` pins a font, because a profile that changes
+  silently reprints the job in different colour.
+- **`Style.overprint` / `Style.overprint_mode`** — whether ink prints through or
+  knocks out. CSS has no equivalent (on screen the topmost paint just wins), and
+  getting it wrong is visible only on the printed sheet.
+
+  *Why:* the contract already shipped `bleed` and twelve `book-*` trim presets.
+  It could ask for a 6×9 trade book and could not say what ink prints.
+
+### Book geometry (`page`)
+
+- **`PageMargin`** with `inside` / `outside` / `gutter` beside `top` / `bottom` /
+  `left` / `right`, and `MarginSpec = Union[Box, PageMargin]` on both
+  `CanvasObject.margin` and `PageMaster.margin`. A bound book is described
+  spine-relative because the two horizontal margins swap sides on every leaf.
+  Mixing the two vocabularies is a validation error, not a silent pick — the
+  wrong pick misplaces the text block on every other page.
+- **`PageSide`**, `PageMaster.side` (`recto`/`verso`/`any`) and `Page.side`, so a
+  recto master and a verso master can mirror.
+- **`CanvasObject.spread`** — one sheet spanning a verso and a recto.
+
+### CJKV annotation (`inline`)
+
+- **`RubyInline`** (group ruby via a string, mono ruby via a list) and
+  **`WarichuInline`**, both added to the `Inline` union.
+
+  *Why:* `writing_mode`, `direction` and `unicode_bidi` have been declarable
+  since 2.2.0, so vertical Japanese was expressible and then could not be
+  annotated — the single most common thing done to it.
+
+### Render targets (`document`)
+
+- **`RenderOutput`** on `RenderTarget.output`: `format`, `dpi`, `scale`,
+  `quality`, `background`, `color_space`, `color_profile`, `output_intent`,
+  `font_embedding`, and printer's marks (`crop_marks`, `bleed_marks`,
+  `registration_marks`, `color_bars`, `page_information`).
+- **`RenderTarget.canvas` is now optional** — a required-to-optional widening,
+  which is backward compatible. Exporting one layout several ways no longer
+  means restating the canvas each time and watching the copies drift.
+
+  *Why:* the family renders to SVG, HTML, PNG, PDF and LaTeX, and none of that
+  was expressible in the document's own render contract. Every one of those was
+  a flag on somebody's command line, so it did not travel with the document.
+
+### Graphics primitives — parity with Lottie 1.0 (`objects`, `document`)
+
+Read against [Lottie 1.0](https://lottie.github.io/lottie-spec/1.0/specs/schema/),
+the closest published peer for the graphics half of the model. Four gaps closed,
+one difference documented rather than closed.
+
+- **`MatteSpec` and `ObjBase.matte`** — one object used as another's matte,
+  `alpha` or `luma`, either invertible. `style.mask` masked by an image and
+  `style.clip_path` clipped by a path; no object could matte another, so every
+  knockout and gradient fade needed rasterising outside the document. An object
+  naming itself is rejected; resolution of a non-self source is R12, the
+  engine's.
+- **`Star`** — a parametric star or regular polygon (`points`, `outer_radius`,
+  `inner_radius`, `outer_roundness`, `inner_roundness`, `star_type`), joined to
+  the `VisualObject` union beside the other primitives. `Polygon` took an
+  explicit vertex list, so a five-point star was ten computed points with the
+  parameters discarded. A star requires `inner_radius`; a polygon forbids it.
+  Orientation is the inherited `rotation` rather than a duplicate field.
+- **`ShapeDirection`** on `path`, `polyline`, `polygon` and `star` — winding
+  order, which with `fill_rule` decides which enclosed regions are holes.
+- **`ObjBase.name`** — a human label distinct from `id`, which stays the stable
+  address cross-references and mattes point at.
+- **`SymbolDef`** gives `defs.symbols` a declared shape. Typed as
+  `dict[str, Union[SymbolDef, dict]]`, not narrowed to `SymbolDef`, because
+  narrowing would reject documents that validate today.
+
+**Not closed, and documented instead:** Lottie's Precomposition. Instancing
+stays a pre-lowering authoring construct — `use` is resolved by `sdk.expand()`
+before validation, so a validated document is flat. See
+[ADR 0001](docs/adr/0001-flat-document-model.md) for why a document format and
+an animation format want opposite things here, and
+`examples/matte-and-star.json` for the primitives in use.
+
+### Also
+
+- `examples/press-ready-book.json` exercises all four areas in one document, and
+  `tests/test_examples.py` validates every example on each run, so a snippet
+  cannot rot into a confident wrong answer.
+- The `$defs` count moves 105 → 115.
+
+### Concurrently, from another change
+
+- Added `GenerationParams` and the prompt-bearing `GenerativeObject` to the
+  visual-object union. The new authoring object covers image, text, and diagram
+  requests, requires reproducibility metadata (`model`, optional seed/size/style),
+  enforces accessible text for visual outputs, and exposes explicit cache-bypass
+  intent through `regenerate`. It remains an unresolved request: downstream
+  generation must verify, lower, and pin the result before rendering.
+
 ## 1.0.0 — extracted from the frameforge monorepo (2026-07-31)
 
 *Carries FrameForge document contract `HEAD_VERSION = 2.8.2`.*

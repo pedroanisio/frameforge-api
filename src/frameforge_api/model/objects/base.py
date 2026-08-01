@@ -17,6 +17,33 @@ from ..style import StrokeStyleRef, StyleRef
 # --------------------------------------------------------------------------- #
 #  common-object-fields (mixin) + stroke single-form enforcement              #
 # --------------------------------------------------------------------------- #
+#: How the matte's pixels are read. `alpha` uses the source's opacity, `luma`
+#: its lightness — the two established mattes, both invertible.
+MatteMode = Literal["alpha", "luma"]
+
+
+class MatteSpec(FG):
+    """One object used as the matte for another.
+
+    Until now a matte could be an image (`style.mask`) or a path
+    (`style.clip_path`), and could never be another OBJECT. That left the whole
+    family of "knock this text out of that photograph" and "fade this group by
+    that gradient" only reachable by rasterising outside the document, which
+    discards everything the document knew.
+
+    `source` names an object on the same page. Whether it resolves is
+    whole-document referential integrity and belongs to the engine's validator
+    (R12); what is checkable here is that it is not the object's own id, which
+    is a definition that consumes itself and always a mistake.
+    """
+    source: str = Field(
+        description="Id of the object supplying the matte. Must resolve on the same page (R12).")
+    mode: Optional[MatteMode] = Field(
+        default=None, description="Read the source's alpha or its luminance. Absent = alpha.")
+    invert: Optional[bool] = Field(
+        default=None, description="Invert the matte: paint where the source is absent/dark.")
+
+
 class ObjBase(FG):
     id: Optional[str] = Field(
         default=None, description="Stable object id: the target namespace for anchors, "
@@ -99,17 +126,39 @@ class ObjBase(FG):
                                   "to this object (and, for containers, its subtree), overriding "
                                   "any document-level default.")
 
+    name: Optional[str] = Field(
+        default=None, description="Human-readable label for tooling and review. Distinct from "
+                                  "`id`, which is the stable address other objects and "
+                                  "cross-references point at: renaming must not break a link.")
+    matte: Optional[MatteSpec] = Field(
+        default=None, description="Use another object on this page as this object's matte "
+                                  "(alpha or luminance, either invertible).")
+
+    @model_validator(mode="after")
+    def _matte_is_not_self(self):
+        if self.matte is not None and self.id is not None and self.matte.source == self.id:
+            raise ValueError(
+                f"object {self.id!r} names itself as its own matte; a matte must be a "
+                "different object")
+        return self
+
     @model_validator(mode="before")
     @classmethod
     def _stroke_paint_only(cls, data):
         # P3 BREAKING: an inline-geometry `stroke` object is removed. Catch it with
         # an actionable error pointing at the codemod, instead of a vague type error.
         # Runs before field validation so it fires for every visual object subclass.
+        #
+        # The tool named here MUST be one this wheel ships. It used to name
+        # `tooling/codemod.py`, which lives in the frameforge monorepo — so the
+        # only actionable line in the message was unactionable for anyone who
+        # installed the contract on its own. `ff-codemod` is a console script of
+        # this distribution; `tests/test_deprecations.py` gates the reference.
         sv = data.get("stroke") if isinstance(data, dict) else None
         if isinstance(sv, dict) and any(k in sv for k in ("width", "dash", "linecap", "linejoin")):
             raise ValueError(
                 "stroke is paint-only (P3): an inline geometry object {color,width,dash,...} "
                 "is not allowed. Put paint in `stroke` (a colour/gradient/pattern) and geometry "
-                "in `stroke_style` (a named Style). Run tooling/codemod.py to migrate."
+                "in `stroke_style` (a named Style). Run `ff-codemod --write <doc>` to migrate."
             )
         return data

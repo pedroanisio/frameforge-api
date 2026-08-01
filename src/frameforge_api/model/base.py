@@ -6,7 +6,7 @@ coercing to a default downstream.
 """
 from __future__ import annotations
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -58,11 +58,68 @@ DashArrayString = Annotated[str, Field(
 DashArray = Union[Literal["none"], list[Length], DashArrayString]
 
 
-Color = str                 # hex (#rgb[a]/#rrggbb[aa]), CSS name, or a tokens.colors key
-
-
 UnitInterval = Annotated[float, Field(
     ge=0.0, le=1.0, description="Unit-interval number in 0.0..1.0.")]
+
+
+# ---- colour: a screen string, or a typed print ink (2.9.0) ---------------- #
+#
+# Until 2.9.0 a colour was `str` and nothing else, which meant the contract
+# could ask for a 6x9 trade book with bleed and could not say what ink prints.
+# The string branch is unchanged and stays FIRST, so every existing document
+# validates exactly as before; the typed branches are additive.
+#
+# The three spaces are the three answers to "which ink?": process (CMYK
+# separations), spot (a named ink on its own plate), and ICC (device-independent
+# components against a declared profile). They are discriminated on `space`, so
+# a typo is a union-tag error rather than a silent fallback to the string branch.
+class CmykColor(FG):
+    """Process colour: coverage per separation, 0..1 each."""
+    space: Literal["cmyk"] = Field(description="Discriminator: process (four-colour) ink.")
+    c: UnitInterval = Field(description="Cyan coverage 0..1.")
+    m: UnitInterval = Field(description="Magenta coverage 0..1.")
+    y: UnitInterval = Field(description="Yellow coverage 0..1.")
+    k: UnitInterval = Field(description="Black coverage 0..1.")
+    name: Optional[str] = Field(
+        default=None, description="Optional swatch name for round-tripping to a palette.")
+
+
+class SpotColor(FG):
+    """A named ink imaged on its own printing plate.
+
+    `name` is required because it IS the separation: an unnamed spot cannot
+    become a plate, and two differently-named entries for the same ink become
+    two plates. `alternate` is the process build used wherever the spot cannot
+    be imaged (screen preview, a CMYK-only press run).
+    """
+    space: Literal["spot"] = Field(description="Discriminator: a named spot ink.")
+    name: str = Field(description="Ink name as it appears on the separation, e.g. 'PANTONE 283 C'.")
+    system: Optional[Literal["pantone", "hks", "toyo", "dic", "ral", "custom"]] = Field(
+        default=None, description="Swatch system the name is drawn from.")
+    tint: Optional[UnitInterval] = Field(
+        default=None, description="Screen tint of the ink, 0..1; absent = solid.")
+    alternate: Optional[Union[str, "CmykColor"]] = Field(
+        default=None, description="Process build substituted where the spot cannot be imaged.")
+
+
+class IccColor(FG):
+    """Device-independent colour: components against a declared ICC profile."""
+    space: Literal["icc"] = Field(description="Discriminator: ICC-profiled colour.")
+    profile: str = Field(description="`defs.color_profiles` key naming the profile (must resolve).")
+    components: list[float] = Field(
+        min_length=1, max_length=15,
+        description="Component values in the profile's own space and order.")
+    fallback: Optional[str] = Field(
+        default=None, description="sRGB hex used where the profile is unavailable.")
+
+
+ColorObject = Annotated[
+    Union[CmykColor, SpotColor, IccColor],
+    Field(discriminator="space"),
+]
+
+#: hex (#rgb[a]/#rrggbb[aa]), CSS name, a `tokens.colors` key, or a typed ink.
+Color = Union[str, ColorObject]
 
 
 Point = Annotated[list[float], Field(
@@ -105,6 +162,12 @@ PagePreset = Literal[
     "book-square-8", "book-picture", "book-square-10",
     "book-coffee-table", "book-art-10x12", "book-art-11x14",
 ]
+
+
+#: Winding order of a shape's outline. Together with `fill_rule` it decides
+#: which enclosed regions are holes: two subpaths wound the same way punch a hole
+#: under `evenodd` and do not under `nonzero`. Absent = the renderer's default.
+ShapeDirection = Literal["clockwise", "counter-clockwise"]
 
 
 Units = Literal["pt", "px", "mm", "in", "cm"]

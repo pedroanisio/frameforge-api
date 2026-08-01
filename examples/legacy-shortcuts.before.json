@@ -1,0 +1,100 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.2.0",
+  "title": "Every deprecated form, in one document",
+  "description": "The BEFORE half of the migration pair. Deliberately NOT valid at HEAD: it carries the two removed forms (a pre-P3 inline stroke bundle and the pre-P4 content-sizing `size`) alongside every still-accepted legacy spelling. `ff-codemod --write` turns this file into legacy-shortcuts.after.json, and tests/test_deprecations.py asserts the pair has not drifted.",
+  "defs": {
+    "tokens": {
+      "colors": {
+        "ink": "#1d1d1b",
+        "rule": "#d5d0c6"
+      },
+      "text_styles": {
+        "body": {"font_size": "10pt", "line_height": "13pt"},
+        "caption": {"font_size": "8pt"}
+      },
+      "styles": {
+        "body": {"font_size": "24pt"},
+        "lead": {"font_size": "14pt"}
+      }
+    }
+  },
+  "pages": [
+    {
+      "mode": "page",
+      "id": "p1",
+      "canvas": {"size": [420, 300], "units": "px"},
+      "layers": [
+        {
+          "id": "main",
+          "objects": [
+            {
+              "type": "circle",
+              "id": "dot",
+              "center": [60, 60],
+              "r": 24,
+              "fill": "#d4145a"
+            },
+            {
+              "type": "polygon",
+              "id": "wedge",
+              "points": [[140, 40], [200, 40], [170, 92]],
+              "fill": "#eeeae1"
+            },
+            {
+              "type": "curve",
+              "id": "swash",
+              "from": [240, 40],
+              "to": [400, 90],
+              "c1": [280, 10],
+              "c2": [360, 120],
+              "stroke": "#1d1d1b"
+            },
+            {
+              "type": "rect",
+              "id": "panel",
+              "box": [20, 130, 180, 90],
+              "size": {"width": "fill", "height": "hug", "grow": 1},
+              "fill": {
+                "kind": "linear",
+                "angle": 90,
+                "stops": [
+                  {"color": "#ffffff", "offset": 0},
+                  {"color": "#eeeae1", "offset": 0.5},
+                  {"color": "#d5d0c6", "offset": 1}
+                ]
+              }
+            },
+            {
+              "type": "line",
+              "id": "rule",
+              "from": [20, 240],
+              "to": [400, 240],
+              "stroke": {
+                "color": "#d5d0c6",
+                "width": 1,
+                "dash": "4 2",
+                "linecap": "round"
+              }
+            },
+            {
+              "type": "text",
+              "id": "caption",
+              "box": [220, 130, 180, 40],
+              "text": "Deprecated, not removed.",
+              "stroke_style": {"dash": "2 2", "stroke_width": 0.5}
+            },
+            {
+              "type": "connector",
+              "id": "link",
+              "from": {"object": "panel", "side": "east"},
+              "to": {"object": "caption", "side": "west"},
+              "route": {"type": "orthogonal"},
+              "stroke": "#1d1d1b"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

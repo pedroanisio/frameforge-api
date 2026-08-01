@@ -1,0 +1,258 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.11.0",
+  "title": "A press-ready book — everything 2.9.0 added, in one document",
+  "description": "A bound 6x9 trade book with a spot ink, spine-relative margins, a Japanese passage with ruby, and two render targets: a press PDF and a web PNG. Validated by tests/test_examples.py, so it cannot rot.",
+  "lang": "en",
+  "defs": {
+    "color_profiles": {
+      "fogra39": {
+        "space": "cmyk",
+        "name": "Coated FOGRA39 (ISO 12647-2:2004)",
+        "src": "profiles/CoatedFOGRA39.icc",
+        "hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "rendering_intent": "relative-colorimetric"
+      }
+    },
+    "tokens": {
+      "colors": {
+        "rule": {
+          "space": "cmyk",
+          "c": 0,
+          "m": 0,
+          "y": 0,
+          "k": 0.15
+        },
+        "accent": {
+          "space": "spot",
+          "name": "PANTONE 283 C",
+          "system": "pantone",
+          "alternate": {
+            "space": "cmyk",
+            "c": 0.31,
+            "m": 0.09,
+            "y": 0,
+            "k": 0
+          }
+        },
+        "text": {
+          "space": "cmyk",
+          "c": 0,
+          "m": 0,
+          "y": 0,
+          "k": 1
+        }
+      },
+      "styles": {
+        "body": {
+          "font_size": 10.5,
+          "line_height": 1.5,
+          "color": "text",
+          "hyphens": "auto"
+        },
+        "jp": {
+          "font_family": "Noto Serif JP",
+          "writing_mode": "vertical-rl",
+          "font_size": 11
+        }
+      }
+    },
+    "masters": {
+      "recto": {
+        "canvas": {
+          "preset": "book-6x9",
+          "bleed": "3mm"
+        },
+        "side": "recto",
+        "margin": {
+          "top": "18mm",
+          "bottom": "22mm",
+          "inside": "20mm",
+          "outside": "14mm",
+          "gutter": "5mm"
+        },
+        "regions": [
+          {
+            "id": "col",
+            "box": [
+              56,
+              51,
+              320,
+              522
+            ]
+          }
+        ],
+        "running": {
+          "page_number": true
+        }
+      },
+      "verso": {
+        "canvas": {
+          "preset": "book-6x9",
+          "bleed": "3mm"
+        },
+        "side": "verso",
+        "margin": {
+          "top": "18mm",
+          "bottom": "22mm",
+          "inside": "20mm",
+          "outside": "14mm",
+          "gutter": "5mm"
+        },
+        "regions": [
+          {
+            "id": "col",
+            "box": [
+              40,
+              51,
+              320,
+              522
+            ]
+          }
+        ],
+        "running": {
+          "page_number": true
+        }
+      }
+    }
+  },
+  "targets": [
+    {
+      "name": "press",
+      "output": {
+        "format": "pdf",
+        "output_intent": "press",
+        "color_space": "cmyk",
+        "color_profile": "fogra39",
+        "font_embedding": "subset",
+        "crop_marks": true,
+        "bleed_marks": true,
+        "registration_marks": true,
+        "color_bars": true,
+        "page_information": true
+      }
+    },
+    {
+      "name": "web",
+      "output": {
+        "format": "png",
+        "dpi": 144,
+        "color_space": "srgb",
+        "background": "opaque"
+      }
+    }
+  ],
+  "pages": [
+    {
+      "mode": "page",
+      "id": "half-title",
+      "side": "recto",
+      "canvas": {
+        "preset": "book-6x9",
+        "bleed": "3mm"
+      },
+      "layers": [
+        {
+          "id": "main",
+          "objects": [
+            {
+              "type": "rect",
+              "id": "band",
+              "box": [
+                0,
+                120,
+                432,
+                6
+              ],
+              "fill": "accent",
+              "style": {
+                "overprint": "fill",
+                "overprint_mode": "nonzero-cmyk"
+              }
+            },
+            {
+              "type": "text",
+              "box": [
+                56,
+                160,
+                320,
+                40
+              ],
+              "text": "A Press-Ready Book",
+              "style": {
+                "font_size": 24,
+                "color": "text"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "flow",
+      "id": "chapter-1",
+      "master": "recto",
+      "story": [
+        {
+          "type": "heading",
+          "level": 1,
+          "text": "On ink and paper",
+          "id": "ch1"
+        },
+        {
+          "type": "paragraph",
+          "style": "body",
+          "spans": [
+            {
+              "text": "The accent rule above prints on its own plate as "
+            },
+            {
+              "kind": "code",
+              "text": "PANTONE 283 C"
+            },
+            {
+              "text": ", overprinting the black beneath it rather than knocking out."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "style": "jp",
+          "spans": [
+            {
+              "kind": "ruby",
+              "base": "漢字",
+              "text": "かんじ",
+              "position": "over"
+            },
+            {
+              "text": "と"
+            },
+            {
+              "kind": "ruby",
+              "base": "仮名",
+              "text": [
+                "か",
+                "な"
+              ]
+            },
+            {
+              "text": "の組版"
+            },
+            {
+              "kind": "warichu",
+              "content": [
+                "縦組みの割注"
+              ],
+              "lines": 2,
+              "brackets": "parenthesis"
+            },
+            {
+              "text": "。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

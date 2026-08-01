@@ -1,0 +1,193 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.7.1",
+  "title": "2.7.1 — the visual object set immediately before 2.9.0",
+  "description": "The last revision before the print/book/CJKV widening. Exercises the object vocabulary, connectors, tables, groups and the appearance stack, so a regression in any of them shows up as a compat failure rather than a silent narrowing.",
+  "pages": [
+    {
+      "mode": "page",
+      "id": "p1",
+      "canvas": {
+        "size": [
+          800,
+          600
+        ],
+        "units": "px"
+      },
+      "layers": [
+        {
+          "id": "main",
+          "objects": [
+            {
+              "type": "group",
+              "box": [
+                0,
+                0,
+                800,
+                300
+              ],
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "a",
+                  "box": [
+                    20,
+                    20,
+                    120,
+                    60
+                  ],
+                  "radius": 6,
+                  "fill": "#eef"
+                },
+                {
+                  "type": "ellipse",
+                  "center": [
+                    260,
+                    50
+                  ],
+                  "rx": 60,
+                  "ry": 30,
+                  "fill": "#fee"
+                },
+                {
+                  "type": "circle",
+                  "center": [
+                    390,
+                    50
+                  ],
+                  "r": 30,
+                  "fill": "#efe"
+                },
+                {
+                  "type": "rect",
+                  "id": "b",
+                  "box": [
+                    460,
+                    20,
+                    120,
+                    60
+                  ],
+                  "fill": "#ffe"
+                }
+              ]
+            },
+            {
+              "type": "connector",
+              "from": {
+                "ref": "a",
+                "side": "east"
+              },
+              "to": {
+                "ref": "b",
+                "side": "west"
+              },
+              "route": {
+                "kind": "orthogonal"
+              }
+            },
+            {
+              "type": "path",
+              "d": "M 0 320 L 100 380 L 200 320 Z",
+              "fill": "#ddd"
+            },
+            {
+              "type": "curve",
+              "from": [
+                220,
+                320
+              ],
+              "to": [
+                400,
+                380
+              ],
+              "control1": [
+                280,
+                300
+              ],
+              "control2": [
+                340,
+                400
+              ],
+              "stroke": "#333"
+            },
+            {
+              "type": "polyline",
+              "points": [
+                [
+                  420,
+                  320
+                ],
+                [
+                  470,
+                  380
+                ],
+                [
+                  520,
+                  320
+                ]
+              ],
+              "stroke": "#333"
+            },
+            {
+              "type": "table",
+              "box": [
+                0,
+                400,
+                400,
+                120
+              ],
+              "columns": [
+                "Name",
+                {
+                  "label": "n",
+                  "align": "right",
+                  "width": "30%"
+                }
+              ],
+              "rows": [
+                [
+                  "alpha",
+                  1
+                ],
+                [
+                  "beta",
+                  2
+                ]
+              ]
+            },
+            {
+              "type": "image",
+              "box": [
+                420,
+                400,
+                120,
+                120
+              ],
+              "src": "logo.png",
+              "alt": "logo"
+            },
+            {
+              "type": "text",
+              "box": [
+                0,
+                540,
+                800,
+                40
+              ],
+              "text": "2.7.1 baseline",
+              "effects": [
+                {
+                  "kind": "shadow",
+                  "dx": 1,
+                  "dy": 1,
+                  "blur": 2,
+                  "color": "#0003"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

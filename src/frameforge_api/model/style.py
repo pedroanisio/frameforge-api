@@ -158,7 +158,10 @@ class UrlImage(FG):
 ImagePaint = Union[Gradient, UrlImage, str]       # image paint value: url("…")/data-uri/token, or a gradient
 
 
-Paint = Union[Gradient, Pattern, UrlImage, str]   # "none"|"currentColor"|<color>|<image>|<pattern>
+# "none"|"currentColor"|<color>|<image>|<pattern>. The trailing `Color` is the
+# colour branch: since 2.9.0 that is a string OR a typed ink (CMYK/spot/ICC),
+# so every paintable surface accepts print colour without a second spelling.
+Paint = Union[Gradient, Pattern, UrlImage, Color]
 
 
 # NOTE: this alias was named `Image`, colliding with the `Image` object class
@@ -436,6 +439,16 @@ class Style(FG):
     min_font_size: Optional[float] = Field(
         default=None, description="FG text-fit extension (P1): floor font size for "
                                   "overflow:shrink_to_fit. Not a CSS property.")
+    align_to_baseline: Optional[bool] = Field(
+        default=None,
+        description="FG typographic extension (2.10.0): snap this block's baselines to the "
+                    "resolved baseline grid (`rendering.baseline_grid`, else "
+                    "`defs.baseline_grid`), so type lines up across columns, spreads and "
+                    "facing pages. Absent/False = free leading. Aligning to the grid rounds "
+                    "each line down to the next gridline, so a block whose `line_height` "
+                    "exceeds the grid increment will open up to a whole multiple of it — set "
+                    "the increment to the body leading. Nothing happens if no grid is in "
+                    "scope. Not a CSS property.")
     writing_mode: Optional[Literal["horizontal-tb", "vertical-rl", "vertical-lr"]] = Field(
         default=None, description="CSS writing-mode (block flow direction).")
     direction: Optional[Literal["ltr", "rtl"]] = Field(
@@ -524,6 +537,17 @@ class Style(FG):
         default=None, description="SVG paint-order string (e.g. 'stroke fill markers').")
     vector_effect: Optional[Literal["none", "non-scaling-stroke"]] = Field(
         default=None, description="non-scaling-stroke keeps stroke width fixed under transforms.")
+    # ---- prepress ink behaviour (2.9.0) ----
+    # CSS has no equivalent: on screen the topmost paint simply wins. On press,
+    # whether the ink underneath is removed (knockout, the default) or printed
+    # through (overprint) is a per-object decision that changes the plates, and
+    # getting it wrong shows up only on the printed sheet.
+    overprint: Optional[Literal["none", "fill", "stroke", "both"]] = Field(
+        default=None, description="Which paints overprint the ink beneath instead of knocking "
+                                  "it out. Absent = the renderer's default (knockout).")
+    overprint_mode: Optional[Literal["zero-cmyk", "nonzero-cmyk"]] = Field(
+        default=None, description="PDF overprint mode (OPM). zero-cmyk: a 0 component erases the "
+                                  "ink below; nonzero-cmyk: a 0 component leaves it untouched.")
     arrow_start: Optional[Union[bool, ArrowMarkerKind]] = Field(
         default=None, description="FG stroke extension: arrowhead at the path start — true "
                                   "(= filled_triangle) or one of filled_triangle, "

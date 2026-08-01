@@ -156,6 +156,12 @@ def test_every_declaration_still_matches_the_monorepos():
     theirs = MONOREPO / "src" / "frameforge" / "model.py"
     if not theirs.is_file():
         pytest.skip("monorepo model.py not present")
+    if MONOREPO_SCHEMA.is_file():
+        upstream_version = json.loads(
+            MONOREPO_SCHEMA.read_text(encoding="utf-8")).get("version")
+        if upstream_version != HEAD_VERSION:
+            pytest.skip(
+                f"monorepo is at {upstream_version}, this package at {HEAD_VERSION}")
 
     ours = declarations()
     up = declarations([theirs])

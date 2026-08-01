@@ -47,6 +47,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -83,6 +104,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -200,6 +242,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -283,6 +346,72 @@
         }
       },
       "title": "BackgroundLayer",
+      "type": "object"
+    },
+    "BaselineGrid": {
+      "additionalProperties": false,
+      "description": "The leading grid text baselines snap to.\n\n`Layout(kind=\"grid\")` places boxes; it says nothing about what those boxes\nshould be *divisible by*. That is what a baseline grid supplies, and its\nabsence is visible: if body text is 10pt on 13pt leading and a module's\nheight is not a multiple of 13, every row leaves a remainder at its foot and\nthe horizontal gutters stop looking equal. The same increment is what aligns\ntype across the gutter between columns and across the two leaves of a\nspread — which is exactly where `FlowRegion.column_fill: balance` and\n`CanvasObject.spread` need it.\n\nDeclared once at `defs.baseline_grid` (the document default, and the only\nscope a flowed section has), overridden per page at\n`RenderingContract.baseline_grid`. It is inert until something opts in:\na block snaps to it by setting `align_to_baseline` on its style.\n\nThe increment IS the body leading — set them to the same value.",
+      "properties": {
+        "increment": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            }
+          ],
+          "description": "Grid pitch: the distance between successive gridlines, and normally the body text's `line_height`. Must be positive.",
+          "title": "Increment"
+        },
+        "relative_to": {
+          "anyOf": [
+            {
+              "enum": [
+                "page",
+                "top_margin"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Datum the grid is measured from: the page edge, or the top content margin (default top_margin, so the grid follows the text block rather than the trim).",
+          "title": "Relative To"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Offset of the first gridline from `relative_to` (default 0).",
+          "title": "Start"
+        }
+      },
+      "required": [
+        "increment"
+      ],
+      "title": "BaselineGrid",
       "type": "object"
     },
     "BibliographyFlow": {
@@ -580,6 +709,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -666,6 +816,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -759,6 +930,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -1075,12 +1267,45 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
           "description": "Marker colour (defaults to the text colour).",
           "title": "Marker Color"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -1095,6 +1320,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -1294,6 +1532,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -1346,11 +1605,14 @@
               "type": "array"
             },
             {
+              "$ref": "#/$defs/PageMargin"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
-          "description": "Default content margin [top, right, bottom, left].",
+          "description": "Default content margin: [top, right, bottom, left], or a named PageMargin (which adds inside/outside/gutter for bound work).",
           "title": "Margin"
         },
         "orientation": {
@@ -1460,6 +1722,19 @@
           "description": "[width, height] in `units`; exactly one of `preset` or `size`.",
           "title": "Size"
         },
+        "spread": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "This canvas is a two-page spread — one sheet spanning a verso and a recto, with the binding down the middle. Absent = a single page.",
+          "title": "Spread"
+        },
         "units": {
           "anyOf": [
             {
@@ -1535,7 +1810,8 @@
     },
     "Circle": {
       "additionalProperties": false,
-      "description": "Renderer-shortcut alias for an ellipse with rx==ry. Deprecated at HEAD;\nthe codemod normalises it to `ellipse`.",
+      "deprecated": true,
+      "description": "Renderer-shortcut alias for an ellipse with rx==ry. DEPRECATED at HEAD;\n`ff-codemod` normalises it to `ellipse`.\n\nStill valid, and will stay valid for the life of the 2.x line: dropping a\nunion member is exactly what `COMPATIBILITY = \"backward\"` forbids. Carries\nthe JSON Schema `deprecated` keyword so a tool can see the status without\nreading this sentence.",
       "properties": {
         "appearance": {
           "anyOf": [
@@ -1678,6 +1954,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -1763,6 +2060,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -1776,6 +2085,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -1911,6 +2233,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -1968,7 +2311,7 @@
         },
         "type": {
           "const": "circle",
-          "description": "Discriminator: DEPRECATED alias of ellipse with rx==ry (codemod normalises).",
+          "description": "Discriminator: DEPRECATED alias of ellipse with rx==ry (`ff-codemod` normalises).",
           "title": "Type",
           "type": "string"
         },
@@ -2162,6 +2505,68 @@
       "title": "ClipSpec",
       "type": "object"
     },
+    "CmykColor": {
+      "additionalProperties": false,
+      "description": "Process colour: coverage per separation, 0..1 each.",
+      "properties": {
+        "c": {
+          "description": "Cyan coverage 0..1.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "C",
+          "type": "number"
+        },
+        "k": {
+          "description": "Black coverage 0..1.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "K",
+          "type": "number"
+        },
+        "m": {
+          "description": "Magenta coverage 0..1.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "M",
+          "type": "number"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional swatch name for round-tripping to a palette.",
+          "title": "Name"
+        },
+        "space": {
+          "const": "cmyk",
+          "description": "Discriminator: process (four-colour) ink.",
+          "title": "Space",
+          "type": "string"
+        },
+        "y": {
+          "description": "Yellow coverage 0..1.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "space",
+        "c",
+        "m",
+        "y",
+        "k"
+      ],
+      "title": "CmykColor",
+      "type": "object"
+    },
     "CodeFlow": {
       "additionalProperties": false,
       "properties": {
@@ -2305,6 +2710,102 @@
         "text"
       ],
       "title": "CodeInline",
+      "type": "object"
+    },
+    "ColorProfileDef": {
+      "additionalProperties": false,
+      "description": "A declared ICC colour profile: what device-independent colour is measured against.\n\nPinned by `hash` for the same reason `FontDef` is — a profile that silently\nchanges reprints the whole job in different colour, and the failure is only\nvisible on paper.",
+      "properties": {
+        "hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Content hash of the profile file ('sha256:<hex>'), pinning it the way FontDef.hash pins a font.",
+          "title": "Hash"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable profile name, e.g. 'Coated FOGRA39 (ISO 12647-2:2004)'.",
+          "title": "Name"
+        },
+        "rendering_intent": {
+          "anyOf": [
+            {
+              "enum": [
+                "perceptual",
+                "relative-colorimetric",
+                "saturation",
+                "absolute-colorimetric"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Conversion intent used when transforming into this profile.",
+          "title": "Rendering Intent"
+        },
+        "space": {
+          "description": "Colour space the profile describes; fixes how many components a value has.",
+          "enum": [
+            "cmyk",
+            "rgb",
+            "gray",
+            "lab",
+            "spot"
+          ],
+          "title": "Space",
+          "type": "string"
+        },
+        "src": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Path or URL to the .icc/.icm profile. Absent = the renderer's built-in profile for `space`.",
+          "title": "Src"
+        },
+        "total_ink_limit": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "maximum": 4.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum TOTAL ink coverage this press condition accepts, as the sum of a CmykColor's four 0..1 components — so the scale runs 0..4 and 3.0 is the common '300%' sheet-fed limit. `CmykColor` bounds each separation independently, which leaves c=m=y=k=1.0 (400%) structurally legal and unprintable: it floods, offsets and will not dry. Declaring the cap here is what gives the engine's validator something to check a resolved paint against — this package cannot do it, because the coverage of a gradient, a spot `alternate` or an ICC conversion is only known once resolved (2.10.0).",
+          "title": "Total Ink Limit"
+        }
+      },
+      "required": [
+        "space"
+      ],
+      "title": "ColorProfileDef",
       "type": "object"
     },
     "ColumnBreakFlow": {
@@ -2609,6 +3110,18 @@
           "default": null,
           "description": "Optional boxed text label (drawn at its own box)."
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -2622,6 +3135,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -2762,6 +3288,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3107,7 +3654,8 @@
     },
     "Curve": {
       "additionalProperties": false,
-      "description": "Renderer-shortcut alias for a single cubic Bézier. Deprecated; codemod → path.\n\n`c1`/`c2` are accepted as legacy aliases of `control1`/`control2` and are\nnormalised to the canonical keys; setting both with different values is an\nerror (mirrors the GradientStop offset→position pattern).",
+      "deprecated": true,
+      "description": "Renderer-shortcut alias for a single cubic Bézier. DEPRECATED; `ff-codemod`\nrewrites it to a `path` of one cubic segment.\n\n`c1`/`c2` are accepted as legacy aliases of `control1`/`control2` and are\nnormalised to the canonical keys; setting both with different values is an\nerror (mirrors the GradientStop offset→position pattern).\n\nStill valid for the life of the 2.x line, and marked with the JSON Schema\n`deprecated` keyword so tooling can see that without parsing prose.",
       "properties": {
         "appearance": {
           "anyOf": [
@@ -3278,6 +3826,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -3373,6 +3942,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -3386,6 +3967,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -3516,6 +4110,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -3582,7 +4197,7 @@
           "type": "array"
         },
         "type": {
-          "description": "Discriminator: DEPRECATED single cubic Bézier (codemod normalises to path).",
+          "description": "Discriminator: DEPRECATED single cubic Bézier (`ff-codemod` normalises to path).",
           "enum": [
             "curve",
             "bezier"
@@ -3630,6 +4245,34 @@
           "default": null,
           "description": "Pinned external assets referenced by `src` (§9.3).",
           "title": "Assets"
+        },
+        "baseline_grid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BaselineGrid"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The document's leading grid — the vertical increment every module height and every snapped baseline is a multiple of. This is the only scope a flowed section has (a `FlowSection` carries no rendering contract), so it is where a book declares its rhythm; a fixed page may override it at `rendering.baseline_grid`. Inert until a block opts in with `align_to_baseline` (2.10.0)."
+        },
+        "color_profiles": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/ColorProfileDef"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Declared ICC profiles, keyed by the name an `icc` colour or a render target's `color_profile` refers to (§9.4).",
+          "title": "Color Profiles"
         },
         "components": {
           "anyOf": [
@@ -3734,7 +4377,17 @@
         "symbols": {
           "anyOf": [
             {
-              "additionalProperties": true,
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SymbolDef"
+                  },
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                ]
+              },
               "type": "object"
             },
             {
@@ -4011,6 +4664,18 @@
           "title": "Kind",
           "type": "string"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -4024,6 +4689,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "offset": {
           "anyOf": [
@@ -4349,6 +5027,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -4423,6 +5122,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -4647,6 +5367,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -4732,6 +5473,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -4745,6 +5498,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -4883,6 +5649,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -5106,6 +5893,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -5150,6 +5943,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -5199,6 +5998,7 @@
               "curve": "#/$defs/Curve",
               "dimension": "#/$defs/Dimension",
               "ellipse": "#/$defs/Ellipse",
+              "generative": "#/$defs/GenerativeObject",
               "group": "#/$defs/Group",
               "icon": "#/$defs/Icon",
               "image": "#/$defs/Image",
@@ -5207,6 +6007,7 @@
               "polygon": "#/$defs/Polygon",
               "polyline": "#/$defs/Polyline",
               "rect": "#/$defs/Rect",
+              "star": "#/$defs/Star",
               "table": "#/$defs/TableObject",
               "text": "#/$defs/Text",
               "uml.action": "#/$defs/UMLAction",
@@ -5249,6 +6050,9 @@
               "$ref": "#/$defs/Polygon"
             },
             {
+              "$ref": "#/$defs/Star"
+            },
+            {
               "$ref": "#/$defs/Path"
             },
             {
@@ -5259,6 +6063,9 @@
             },
             {
               "$ref": "#/$defs/Image"
+            },
+            {
+              "$ref": "#/$defs/GenerativeObject"
             },
             {
               "$ref": "#/$defs/Icon"
@@ -5516,6 +6323,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -6404,6 +7232,560 @@
       "title": "FootnoteInline",
       "type": "object"
     },
+    "GenerationParams": {
+      "additionalProperties": false,
+      "description": "Portable parameters for a model-backed content-generation request.\n\nProvider-specific request bodies do not belong in the durable document\ncontract. This closed vocabulary captures the parameters FrameForge can pin\nand compare across providers while leaving endpoint adaptation to the\nauthor-side generation tier.",
+      "properties": {
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Requested deterministic seed, when the selected model supports one.",
+          "title": "Seed"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Requested output size: a provider name such as '1024x1024' or positive [width, height] pixels.",
+          "title": "Size"
+        },
+        "style": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Provider-neutral style hint recorded with the generation request.",
+          "title": "Style"
+        }
+      },
+      "title": "GenerationParams",
+      "type": "object"
+    },
+    "GenerativeObject": {
+      "additionalProperties": false,
+      "description": "Unresolved authoring intent for content produced by a generative model.\n\nA generation tier consumes this object once, verifies the result, lowers it\nto an ordinary image/text/group object, and pins the resulting asset. A\nrenderer must never treat this object as permission to make a live model\ncall: model sampling is non-deterministic and outside the durable IR.",
+      "properties": {
+        "actual_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Full semantic replacement text for tagged/a11y export.",
+          "title": "Actual Text"
+        },
+        "alt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Accessibility alternative text for image/diagram output.",
+          "title": "Alt"
+        },
+        "appearance": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/AppearancePass"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Appearance stack (2.4.0): the geometry is painted once per pass (fill/stroke/opacity), bottom→top in list order. Out of the deep-core profile (§8.5).",
+          "title": "Appearance"
+        },
+        "bind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Data-binding expression/reference (resolved at expansion).",
+          "title": "Bind"
+        },
+        "box": {
+          "anyOf": [
+            {
+              "description": "[x, y, w, h] box, top-left origin, +y down; x/y are parent-local (page space at the root); w/h may be relative (%/fr) inside layout containers (spec §3.4/§3.6).",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+                    "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "maxItems": 4,
+              "minItems": 4,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Placement box [x, y, w, h], parent-local, +y down; under row/column/grid layout the authored x/y are replaced by computed positions (§3.6).",
+          "title": "Box"
+        },
+        "construction": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Marks non-printing construction geometry (datums, guides, snap targets): excluded from rendering unless the document opts in via meta.show_construction.",
+          "title": "Construction"
+        },
+        "containment": {
+          "anyOf": [
+            {
+              "const": "allowed",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Explicit consent for intentional canvas bleed. `allowed` suppresses the containment advisory for this object and, for a group, its subtree; it never changes clipping or rendering.",
+          "title": "Containment"
+        },
+        "decorative": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Marks a purely decorative object: excluded from reading-order/accessibility requirements and scoped overlap audits. It does not suppress canvas containment; use containment: allowed for intentional bleed.",
+          "title": "Decorative"
+        },
+        "effects": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/EffectStackEntry"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ORDERED effect stack (2.4.0): entries apply first→last and a kind may repeat — the live-effects analogue of the single shadow/glow fields. Out of the deep-core profile (§8.5).",
+          "title": "Effects"
+        },
+        "fill_opacity": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fill-only opacity in 0..1 (multiplies with `opacity`).",
+          "title": "Fill Opacity"
+        },
+        "glow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/EffectObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Glow effect: preset name, bool, or EffectObject.",
+          "title": "Glow"
+        },
+        "grid_span": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "[column_span, row_span] cell span; only meaningful under a grid layout parent (default [1, 1]; §3.6e).",
+          "title": "Grid Span"
+        },
+        "humanize": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Humanize"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Scoped humanize override: a seeded imperfection 'hand' applied to this object (and, for containers, its subtree), overriding any document-level default."
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
+          "title": "Id"
+        },
+        "kind": {
+          "description": "Concrete content family the generation tier must produce.",
+          "enum": [
+            "image",
+            "text",
+            "diagram"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
+        "meta": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
+          "title": "Meta"
+        },
+        "model": {
+          "description": "Model identifier recorded for reproducibility and provenance.",
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Model",
+          "type": "string"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
+        },
+        "opacity": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Object opacity in 0..1; on a group it composites the subtree as one unit (§3.6d).",
+          "title": "Opacity"
+        },
+        "outer_ring": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OuterRing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Decorative ring drawn around the object at a gap/offset."
+        },
+        "overlap": {
+          "anyOf": [
+            {
+              "const": "allowed",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Consent for INTENTIONAL same-layer overlap (§3.3): `allowed` declares that this object may share ink with a same-layer sibling on purpose — a watermark, a caption over an image, double-exposure type. Absence means no consent, so the render-time collision detector reports the overlap as an accident. Read only by the audit; it never changes how the object draws. Cross-layer overlap is exempt by construction.",
+          "title": "Overlap"
+        },
+        "params": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GenerationParams"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Portable seed, size and style parameters for the request."
+        },
+        "ports": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "description": "[x, y] coordinate pair in the parent-local space (top-left origin, +y down).",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Named attachment points in the object's local space, addressed by anchors as {ref, port}.",
+          "title": "Ports"
+        },
+        "prompt": {
+          "description": "Nonblank source prompt supplied to the selected generative model.",
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Prompt",
+          "type": "string"
+        },
+        "regenerate": {
+          "default": false,
+          "description": "Bypass a matching generation cache entry and request a fresh result.",
+          "title": "Regenerate",
+          "type": "boolean"
+        },
+        "rotation": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "#/$defs/Rotation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Rotation in degrees (clockwise, +y down) or a {angle, center} object; composes onto the subtree for containers.",
+          "title": "Rotation"
+        },
+        "shadow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/EffectObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drop-shadow effect: preset name, bool, or EffectObject.",
+          "title": "Shadow"
+        },
+        "sizing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sizing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "P4 per-axis content sizing (fixed|hug|fill with grow/min/max); renamed from `size` (IconObject.size collision)."
+        },
+        "stroke_opacity": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stroke-only opacity in 0..1 (multiplies with `opacity`).",
+          "title": "Stroke Opacity"
+        },
+        "stroke_style": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/Style"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stroke GEOMETRY bundle (P3): a tokens.stroke_styles key or an inline Style carrying stroke_width/dash/caps/arrow_*; its colour is a default overridden by the object's `stroke` paint.",
+          "title": "Stroke Style"
+        },
+        "style": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/Style"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Object style: a tokens key or an inline Style bag.",
+          "title": "Style"
+        },
+        "type": {
+          "const": "generative",
+          "description": "Discriminator: unresolved model-generated authoring content.",
+          "title": "Type",
+          "type": "string"
+        },
+        "z": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stacking order within the layer (higher paints later).",
+          "title": "Z"
+        }
+      },
+      "required": [
+        "type",
+        "kind",
+        "prompt",
+        "model"
+      ],
+      "title": "GenerativeObject",
+      "type": "object"
+    },
     "Gradient": {
       "additionalProperties": false,
       "properties": {
@@ -6601,9 +7983,34 @@
       "additionalProperties": false,
       "properties": {
         "color": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            }
+          ],
           "description": "Stop colour: hex, CSS name, or a tokens.colors key.",
-          "title": "Color",
-          "type": "string"
+          "title": "Color"
         },
         "opacity": {
           "anyOf": [
@@ -6767,6 +8174,7 @@
                 "curve": "#/$defs/Curve",
                 "dimension": "#/$defs/Dimension",
                 "ellipse": "#/$defs/Ellipse",
+                "generative": "#/$defs/GenerativeObject",
                 "group": "#/$defs/Group",
                 "icon": "#/$defs/Icon",
                 "image": "#/$defs/Image",
@@ -6775,6 +8183,7 @@
                 "polygon": "#/$defs/Polygon",
                 "polyline": "#/$defs/Polyline",
                 "rect": "#/$defs/Rect",
+                "star": "#/$defs/Star",
                 "table": "#/$defs/TableObject",
                 "text": "#/$defs/Text",
                 "uml.action": "#/$defs/UMLAction",
@@ -6817,6 +8226,9 @@
                 "$ref": "#/$defs/Polygon"
               },
               {
+                "$ref": "#/$defs/Star"
+              },
+              {
                 "$ref": "#/$defs/Path"
               },
               {
@@ -6827,6 +8239,9 @@
               },
               {
                 "$ref": "#/$defs/Image"
+              },
+              {
+                "$ref": "#/$defs/GenerativeObject"
               },
               {
                 "$ref": "#/$defs/Icon"
@@ -7048,6 +8463,18 @@
           "default": null,
           "description": "Child placement algorithm; absent behaves as kind: free."
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -7061,6 +8488,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -7469,6 +8909,53 @@
       "title": "Humanize",
       "type": "object"
     },
+    "IccColor": {
+      "additionalProperties": false,
+      "description": "Device-independent colour: components against a declared ICC profile.",
+      "properties": {
+        "components": {
+          "description": "Component values in the profile's own space and order.",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 15,
+          "minItems": 1,
+          "title": "Components",
+          "type": "array"
+        },
+        "fallback": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "sRGB hex used where the profile is unavailable.",
+          "title": "Fallback"
+        },
+        "profile": {
+          "description": "`defs.color_profiles` key naming the profile (must resolve).",
+          "title": "Profile",
+          "type": "string"
+        },
+        "space": {
+          "const": "icc",
+          "description": "Discriminator: ICC-profiled colour.",
+          "title": "Space",
+          "type": "string"
+        }
+      },
+      "required": [
+        "space",
+        "profile",
+        "components"
+      ],
+      "title": "IccColor",
+      "type": "object"
+    },
     "Icon": {
       "additionalProperties": false,
       "properties": {
@@ -7536,6 +9023,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -7697,6 +9205,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -7710,6 +9230,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -8168,6 +9701,18 @@
           "description": "Short caption/label drawn with the image.",
           "title": "Label"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -8181,6 +9726,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -8545,6 +10103,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -8589,6 +10153,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -8850,6 +10420,7 @@
                     "curve": "#/$defs/Curve",
                     "dimension": "#/$defs/Dimension",
                     "ellipse": "#/$defs/Ellipse",
+                    "generative": "#/$defs/GenerativeObject",
                     "group": "#/$defs/Group",
                     "icon": "#/$defs/Icon",
                     "image": "#/$defs/Image",
@@ -8858,6 +10429,7 @@
                     "polygon": "#/$defs/Polygon",
                     "polyline": "#/$defs/Polyline",
                     "rect": "#/$defs/Rect",
+                    "star": "#/$defs/Star",
                     "table": "#/$defs/TableObject",
                     "text": "#/$defs/Text",
                     "uml.action": "#/$defs/UMLAction",
@@ -8900,6 +10472,9 @@
                     "$ref": "#/$defs/Polygon"
                   },
                   {
+                    "$ref": "#/$defs/Star"
+                  },
+                  {
                     "$ref": "#/$defs/Path"
                   },
                   {
@@ -8910,6 +10485,9 @@
                   },
                   {
                     "$ref": "#/$defs/Image"
+                  },
+                  {
+                    "$ref": "#/$defs/GenerativeObject"
                   },
                   {
                     "$ref": "#/$defs/Icon"
@@ -9445,6 +11023,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -9458,6 +11048,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -9586,6 +11189,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -9722,6 +11346,12 @@
               },
               {
                 "$ref": "#/$defs/Span"
+              },
+              {
+                "$ref": "#/$defs/RubyInline"
+              },
+              {
+                "$ref": "#/$defs/WarichuInline"
               }
             ]
           },
@@ -9952,6 +11582,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -10179,6 +11815,52 @@
       "title": "MathInline",
       "type": "object"
     },
+    "MatteSpec": {
+      "additionalProperties": false,
+      "description": "One object used as the matte for another.\n\nUntil now a matte could be an image (`style.mask`) or a path\n(`style.clip_path`), and could never be another OBJECT. That left the whole\nfamily of \"knock this text out of that photograph\" and \"fade this group by\nthat gradient\" only reachable by rasterising outside the document, which\ndiscards everything the document knew.\n\n`source` names an object on the same page. Whether it resolves is\nwhole-document referential integrity and belongs to the engine's validator\n(R12); what is checkable here is that it is not the object's own id, which\nis a definition that consumes itself and always a mistake.",
+      "properties": {
+        "invert": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Invert the matte: paint where the source is absent/dark.",
+          "title": "Invert"
+        },
+        "mode": {
+          "anyOf": [
+            {
+              "enum": [
+                "alpha",
+                "luma"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Read the source's alpha or its luminance. Absent = alpha.",
+          "title": "Mode"
+        },
+        "source": {
+          "description": "Id of the object supplying the matte. Must resolve on the same page (R12).",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "MatteSpec",
+      "type": "object"
+    },
     "Number": {
       "additionalProperties": false,
       "properties": {
@@ -10273,6 +11955,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -10574,6 +12277,23 @@
           "default": null,
           "description": "Loose semantic annotations for the page (not deeply typed).",
           "title": "Semantic"
+        },
+        "side": {
+          "anyOf": [
+            {
+              "enum": [
+                "recto",
+                "verso"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Which side of the leaf this page falls on. Fixes the folio parity of a bound sequence — and therefore which way its spine-relative margins face. Absent = inferred from position.",
+          "title": "Side"
         }
       },
       "required": [
@@ -10663,6 +12383,161 @@
       "title": "PageLink",
       "type": "object"
     },
+    "PageMargin": {
+      "additionalProperties": false,
+      "description": "Named page margins, including the two a bound book needs.\n\n`[top, right, bottom, left]` describes a sheet. A bound book is described in\n*spine-relative* terms — `inside` sits against the binding, `outside` at the\nfore-edge — because the two swap sides on every turn of the leaf. Twelve\n`book-*` trim presets shipped from the start with no way to say this; a\nverso page could only be laid out by mirroring the numbers by hand.\n\n`gutter` is the extra allowance added at the binding edge on top of\n`inside`, for the paper the fold and the glue consume.\n\nThe two vocabularies are mutually exclusive per axis: `left`/`right` and\n`inside`/`outside` name the same two edges, so accepting both would mean\nsilently choosing one, and the wrong choice misplaces the text block on\nevery other page of the book.",
+      "properties": {
+        "bottom": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Foot margin.",
+          "title": "Bottom"
+        },
+        "gutter": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Extra allowance at the binding edge, added to `inside` (or to the spine side of left/right) for fold and glue.",
+          "title": "Gutter"
+        },
+        "inside": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Spine-side margin (binding edge); excludes left/right.",
+          "title": "Inside"
+        },
+        "left": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Left margin (sheet-relative; excludes inside/outside).",
+          "title": "Left"
+        },
+        "outside": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fore-edge margin; excludes left/right.",
+          "title": "Outside"
+        },
+        "right": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Right margin (sheet-relative; excludes inside/outside).",
+          "title": "Right"
+        },
+        "top": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Head margin.",
+          "title": "Top"
+        }
+      },
+      "title": "PageMargin",
+      "type": "object"
+    },
     "PageMaster": {
       "additionalProperties": false,
       "properties": {
@@ -10750,6 +12625,7 @@
                     "curve": "#/$defs/Curve",
                     "dimension": "#/$defs/Dimension",
                     "ellipse": "#/$defs/Ellipse",
+                    "generative": "#/$defs/GenerativeObject",
                     "group": "#/$defs/Group",
                     "icon": "#/$defs/Icon",
                     "image": "#/$defs/Image",
@@ -10758,6 +12634,7 @@
                     "polygon": "#/$defs/Polygon",
                     "polyline": "#/$defs/Polyline",
                     "rect": "#/$defs/Rect",
+                    "star": "#/$defs/Star",
                     "table": "#/$defs/TableObject",
                     "text": "#/$defs/Text",
                     "uml.action": "#/$defs/UMLAction",
@@ -10800,6 +12677,9 @@
                     "$ref": "#/$defs/Polygon"
                   },
                   {
+                    "$ref": "#/$defs/Star"
+                  },
+                  {
                     "$ref": "#/$defs/Path"
                   },
                   {
@@ -10810,6 +12690,9 @@
                   },
                   {
                     "$ref": "#/$defs/Image"
+                  },
+                  {
+                    "$ref": "#/$defs/GenerativeObject"
                   },
                   {
                     "$ref": "#/$defs/Icon"
@@ -10928,11 +12811,14 @@
               "type": "array"
             },
             {
+              "$ref": "#/$defs/PageMargin"
+            },
+            {
               "type": "null"
             }
           ],
           "default": null,
-          "description": "Content margin [top, right, bottom, left].",
+          "description": "Content margin: [top, right, bottom, left], or a named PageMargin (inside/outside/gutter for bound work).",
           "title": "Margin"
         },
         "next": {
@@ -10975,6 +12861,27 @@
           ],
           "default": null,
           "description": "Repeating header/footer/page-number furniture."
+        },
+        "side": {
+          "anyOf": [
+            {
+              "enum": [
+                "recto",
+                "verso"
+              ],
+              "type": "string"
+            },
+            {
+              "const": "any",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Which side of the leaf this master lays out. A bound book declares a recto master and a verso master so their spine-relative margins mirror. Absent = any.",
+          "title": "Side"
         }
       },
       "required": [
@@ -11099,6 +13006,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -11513,6 +13426,23 @@
           "description": "Marks a purely decorative object: excluded from reading-order/accessibility requirements and scoped overlap audits. It does not suppress canvas containment; use containment: allowed for intentional bleed.",
           "title": "Decorative"
         },
+        "direction": {
+          "anyOf": [
+            {
+              "enum": [
+                "clockwise",
+                "counter-clockwise"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Winding order of the outline; with `fill_rule` it decides which enclosed regions are holes.",
+          "title": "Direction"
+        },
         "effects": {
           "anyOf": [
             {
@@ -11542,6 +13472,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -11629,6 +13580,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -11642,6 +13605,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -11772,6 +13748,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -11885,6 +13882,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -11945,6 +13963,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -11962,7 +14001,8 @@
     },
     "Polygon": {
       "additionalProperties": false,
-      "description": "Renderer-shortcut alias for a closed polyline. Deprecated; codemod normalises.",
+      "deprecated": true,
+      "description": "Renderer-shortcut alias for a closed polyline. DEPRECATED; `ff-codemod`\nnormalises it to `polyline` + `closed: true`.\n\nStill valid for the life of the 2.x line, and marked with the JSON Schema\n`deprecated` keyword so tooling can see that without parsing prose.",
       "properties": {
         "appearance": {
           "anyOf": [
@@ -12064,6 +14104,23 @@
           "description": "Marks a purely decorative object: excluded from reading-order/accessibility requirements and scoped overlap audits. It does not suppress canvas containment; use containment: allowed for intentional bleed.",
           "title": "Decorative"
         },
+        "direction": {
+          "anyOf": [
+            {
+              "enum": [
+                "clockwise",
+                "counter-clockwise"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Winding order of the outline; with `fill_rule` it decides\n                                  which enclosed regions are holes.",
+          "title": "Direction"
+        },
         "effects": {
           "anyOf": [
             {
@@ -12093,6 +14150,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -12180,6 +14258,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -12193,6 +14283,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -12338,6 +14441,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -12395,7 +14519,7 @@
         },
         "type": {
           "const": "polygon",
-          "description": "Discriminator: DEPRECATED alias of a closed polyline (codemod normalises).",
+          "description": "Discriminator: DEPRECATED alias of a closed polyline (`ff-codemod` normalises).",
           "title": "Type",
           "type": "string"
         },
@@ -12536,6 +14660,23 @@
           "description": "Marks a purely decorative object: excluded from reading-order/accessibility requirements and scoped overlap audits. It does not suppress canvas containment; use containment: allowed for intentional bleed.",
           "title": "Decorative"
         },
+        "direction": {
+          "anyOf": [
+            {
+              "enum": [
+                "clockwise",
+                "counter-clockwise"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Winding order of the outline; with `fill_rule` it decides\n                                  which enclosed regions are holes.",
+          "title": "Direction"
+        },
         "effects": {
           "anyOf": [
             {
@@ -12565,6 +14706,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -12652,6 +14814,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -12665,6 +14839,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -12808,6 +14995,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -13072,6 +15280,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -13157,6 +15386,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -13170,6 +15411,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -13321,6 +15575,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -13444,6 +15719,231 @@
       "title": "RefInline",
       "type": "object"
     },
+    "RenderOutput": {
+      "additionalProperties": false,
+      "description": "What the renderer is asked to PRODUCE, as opposed to what to lay out.\n\nUntil 2.9.0 a target could only restate the canvas and nudge the type: the\ndocument could not say whether it wanted SVG or a press-ready PDF, at what\nresolution, in which colour, with which fonts embedded. Every one of those\nwas a flag on somebody's command line, which meant it was not part of the\ndocument and did not travel with it.",
+      "properties": {
+        "background": {
+          "anyOf": [
+            {
+              "enum": [
+                "transparent",
+                "opaque"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Whether the output canvas is painted or left transparent.",
+          "title": "Background"
+        },
+        "bleed_marks": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Draw marks at the bleed boundary.",
+          "title": "Bleed Marks"
+        },
+        "color_bars": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Draw ink-density control bars for the press operator.",
+          "title": "Color Bars"
+        },
+        "color_profile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "`defs.color_profiles` key embedded as the output intent.",
+          "title": "Color Profile"
+        },
+        "color_space": {
+          "anyOf": [
+            {
+              "enum": [
+                "srgb",
+                "display-p3",
+                "rec2020",
+                "cmyk",
+                "gray"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Colour space the output is written in.",
+          "title": "Color Space"
+        },
+        "crop_marks": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Draw trim marks at the page corners.",
+          "title": "Crop Marks"
+        },
+        "dpi": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Raster resolution in dots per inch (raster formats only). Press work is conventionally 300; screen 72-144.",
+          "title": "Dpi"
+        },
+        "font_embedding": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "subset",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Font embedding policy. `subset` is the press default; `none` requires the fonts to be resident wherever it is opened.",
+          "title": "Font Embedding"
+        },
+        "format": {
+          "anyOf": [
+            {
+              "enum": [
+                "svg",
+                "html",
+                "png",
+                "jpeg",
+                "webp",
+                "pdf",
+                "latex"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Output format the target produces.",
+          "title": "Format"
+        },
+        "output_intent": {
+          "anyOf": [
+            {
+              "enum": [
+                "screen",
+                "print",
+                "press"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Who the output is for. Selects the renderer's defaults for resolution, colour and marks when they are not stated.",
+          "title": "Output Intent"
+        },
+        "page_information": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Print filename, date and separation name outside the trim.",
+          "title": "Page Information"
+        },
+        "quality": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Encoder quality 0..1 for lossy formats (jpeg/webp).",
+          "title": "Quality"
+        },
+        "registration_marks": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Draw registration targets used to align the separations.",
+          "title": "Registration Marks"
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Uniform output scale factor applied after layout.",
+          "title": "Scale"
+        }
+      },
+      "title": "RenderOutput",
+      "type": "object"
+    },
     "RenderTarget": {
       "additionalProperties": false,
       "properties": {
@@ -13525,20 +16025,35 @@
             },
             {
               "$ref": "#/$defs/CanvasObject"
+            },
+            {
+              "type": "null"
             }
           ],
-          "description": "Canvas the document is re-targeted onto.",
+          "default": null,
+          "description": "Canvas the document is re-targeted onto. Absent = keep the document's own canvas and change only `output` — the common case when one layout is exported several ways.",
           "title": "Canvas"
         },
         "name": {
           "description": "Target name (selects the canvas + adjustments at render).",
           "title": "Name",
           "type": "string"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RenderOutput"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What this target produces: format, resolution, colour, font embedding and printer's marks."
         }
       },
       "required": [
-        "name",
-        "canvas"
+        "name"
       ],
       "title": "RenderTarget",
       "type": "object"
@@ -13546,6 +16061,18 @@
     "RenderingContract": {
       "additionalProperties": false,
       "properties": {
+        "baseline_grid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BaselineGrid"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Per-page override of `defs.baseline_grid` — the frame-level scope, for a page whose leading differs from the document's (a chapter opening, a notes page set smaller). Absent = inherit the document grid. Typed deliberately rather than added to the loose `typography` bag: the grid changes where every baseline lands, which is not a hint (2.10.0)."
+        },
         "coordinate_mode": {
           "anyOf": [
             {
@@ -13667,6 +16194,146 @@
       "title": "Rotation",
       "type": "object"
     },
+    "RubyInline": {
+      "additionalProperties": false,
+      "description": "Ruby annotation: a pronunciation or gloss set alongside a base run.\n\nThe contract has carried `writing_mode`, `direction` and `unicode_bidi`\nsince 2.2.0, so vertical Japanese has always been expressible — and until\n2.9.0 it could not be annotated, which is the single most common thing done\nto it. `text` may be one annotation for the whole base (group ruby) or one\nper base character (mono ruby); both are in daily use and the renderer\ncannot infer which was meant, so the shape says it.",
+      "properties": {
+        "align": {
+          "anyOf": [
+            {
+              "enum": [
+                "start",
+                "center",
+                "space-between",
+                "space-around",
+                "distribute-letter",
+                "distribute-space"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Distribution of the annotation across the base (CSS ruby-align).",
+          "title": "Align"
+        },
+        "base": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/RefInline"
+                  },
+                  {
+                    "$ref": "#/$defs/CiteInline"
+                  },
+                  {
+                    "$ref": "#/$defs/MathInline"
+                  },
+                  {
+                    "$ref": "#/$defs/CodeInline"
+                  },
+                  {
+                    "$ref": "#/$defs/FootnoteInline"
+                  },
+                  {
+                    "$ref": "#/$defs/LinkInline"
+                  },
+                  {
+                    "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "description": "The annotated text: a plain string, or inline content.",
+          "title": "Base"
+        },
+        "kind": {
+          "const": "ruby",
+          "description": "Discriminator: a ruby-annotated run.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "enum": [
+                "over",
+                "under",
+                "inter-character"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Where the annotation sits relative to the base. Absent = over for horizontal text, right for vertical (the CSS default).",
+          "title": "Position"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+              "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Annotation type size; absent = the renderer's ruby default (conventionally half the base size).",
+          "title": "Size"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "The annotation. A string annotates the whole base (group ruby); a list annotates base characters one for one (mono ruby).",
+          "title": "Text"
+        }
+      },
+      "required": [
+        "kind",
+        "base",
+        "text"
+      ],
+      "title": "RubyInline",
+      "type": "object"
+    },
     "Running": {
       "additionalProperties": false,
       "properties": {
@@ -13683,6 +16350,7 @@
                     "curve": "#/$defs/Curve",
                     "dimension": "#/$defs/Dimension",
                     "ellipse": "#/$defs/Ellipse",
+                    "generative": "#/$defs/GenerativeObject",
                     "group": "#/$defs/Group",
                     "icon": "#/$defs/Icon",
                     "image": "#/$defs/Image",
@@ -13691,6 +16359,7 @@
                     "polygon": "#/$defs/Polygon",
                     "polyline": "#/$defs/Polyline",
                     "rect": "#/$defs/Rect",
+                    "star": "#/$defs/Star",
                     "table": "#/$defs/TableObject",
                     "text": "#/$defs/Text",
                     "uml.action": "#/$defs/UMLAction",
@@ -13733,6 +16402,9 @@
                     "$ref": "#/$defs/Polygon"
                   },
                   {
+                    "$ref": "#/$defs/Star"
+                  },
+                  {
                     "$ref": "#/$defs/Path"
                   },
                   {
@@ -13743,6 +16415,9 @@
                   },
                   {
                     "$ref": "#/$defs/Image"
+                  },
+                  {
+                    "$ref": "#/$defs/GenerativeObject"
                   },
                   {
                     "$ref": "#/$defs/Icon"
@@ -13838,6 +16513,7 @@
                     "curve": "#/$defs/Curve",
                     "dimension": "#/$defs/Dimension",
                     "ellipse": "#/$defs/Ellipse",
+                    "generative": "#/$defs/GenerativeObject",
                     "group": "#/$defs/Group",
                     "icon": "#/$defs/Icon",
                     "image": "#/$defs/Image",
@@ -13846,6 +16522,7 @@
                     "polygon": "#/$defs/Polygon",
                     "polyline": "#/$defs/Polyline",
                     "rect": "#/$defs/Rect",
+                    "star": "#/$defs/Star",
                     "table": "#/$defs/TableObject",
                     "text": "#/$defs/Text",
                     "uml.action": "#/$defs/UMLAction",
@@ -13888,6 +16565,9 @@
                     "$ref": "#/$defs/Polygon"
                   },
                   {
+                    "$ref": "#/$defs/Star"
+                  },
+                  {
                     "$ref": "#/$defs/Path"
                   },
                   {
@@ -13898,6 +16578,9 @@
                   },
                   {
                     "$ref": "#/$defs/Image"
+                  },
+                  {
+                    "$ref": "#/$defs/GenerativeObject"
                   },
                   {
                     "$ref": "#/$defs/Icon"
@@ -14028,6 +16711,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -14311,6 +17015,691 @@
       "title": "Span",
       "type": "object"
     },
+    "SpotColor": {
+      "additionalProperties": false,
+      "description": "A named ink imaged on its own printing plate.\n\n`name` is required because it IS the separation: an unnamed spot cannot\nbecome a plate, and two differently-named entries for the same ink become\ntwo plates. `alternate` is the process build used wherever the spot cannot\nbe imaged (screen preview, a CMYK-only press run).",
+      "properties": {
+        "alternate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/CmykColor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Process build substituted where the spot cannot be imaged.",
+          "title": "Alternate"
+        },
+        "name": {
+          "description": "Ink name as it appears on the separation, e.g. 'PANTONE 283 C'.",
+          "title": "Name",
+          "type": "string"
+        },
+        "space": {
+          "const": "spot",
+          "description": "Discriminator: a named spot ink.",
+          "title": "Space",
+          "type": "string"
+        },
+        "system": {
+          "anyOf": [
+            {
+              "enum": [
+                "pantone",
+                "hks",
+                "toyo",
+                "dic",
+                "ral",
+                "custom"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Swatch system the name is drawn from.",
+          "title": "System"
+        },
+        "tint": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Screen tint of the ink, 0..1; absent = solid.",
+          "title": "Tint"
+        }
+      },
+      "required": [
+        "space",
+        "name"
+      ],
+      "title": "SpotColor",
+      "type": "object"
+    },
+    "Star": {
+      "additionalProperties": false,
+      "description": "A parametric star or regular polygon.\n\n`Polygon` takes an explicit vertex list, so a five-point star was ten\nhand-computed points with the parameters discarded — nothing downstream could\nrecover that it *was* a star, or restyle it as a seven-point one. This keeps\nthe parameters, which is what makes the shape editable rather than merely\ndrawn.\n\nOrientation is the inherited `rotation`, not a field of its own: a rotated\nstar is a rotated object, and duplicating the concept would let the two\ndisagree. Absent, the first point is at twelve o'clock.\n\n`star_type` decides whether `inner_radius` is meaningful: a star alternates\nbetween the two radii, a polygon has only the outer one. Supplying the wrong\ncombination is an error rather than a silent reinterpretation — the same rule\nthe gradient geometry validator applies, and for the same reason: the\nagent-native surface has exactly one meaning.",
+      "properties": {
+        "appearance": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/AppearancePass"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Appearance stack (2.4.0): the geometry is painted once per pass (fill/stroke/opacity), bottom→top in list order. Out of the deep-core profile (§8.5).",
+          "title": "Appearance"
+        },
+        "bind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Data-binding expression/reference (resolved at expansion).",
+          "title": "Bind"
+        },
+        "box": {
+          "anyOf": [
+            {
+              "description": "[x, y, w, h] box, top-left origin, +y down; x/y are parent-local (page space at the root); w/h may be relative (%/fr) inside layout containers (spec §3.4/§3.6).",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "description": "Length string: '<n><unit>' with unit pt|px|pc|mm|cm|in|em|rem (absolute; bare numbers are pt/px, treated 1:1) or %|fr (relative — % resolves against the container content-box, fr only inside a layout container; spec §3.4/§3.6g).",
+                    "pattern": "^-?(?:\\d+\\.?\\d*|\\.\\d+)(?:pt|px|pc|mm|cm|in|em|rem|%|fr)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "maxItems": 4,
+              "minItems": 4,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Placement box [x, y, w, h], parent-local, +y down; under row/column/grid layout the authored x/y are replaced by computed positions (§3.6).",
+          "title": "Box"
+        },
+        "center": {
+          "description": "Centre [x, y], parent-local.",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Center",
+          "type": "array"
+        },
+        "construction": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Marks non-printing construction geometry (datums, guides, snap targets): excluded from rendering unless the document opts in via meta.show_construction.",
+          "title": "Construction"
+        },
+        "containment": {
+          "anyOf": [
+            {
+              "const": "allowed",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Explicit consent for intentional canvas bleed. `allowed` suppresses the containment advisory for this object and, for a group, its subtree; it never changes clipping or rendering.",
+          "title": "Containment"
+        },
+        "decorative": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Marks a purely decorative object: excluded from reading-order/accessibility requirements and scoped overlap audits. It does not suppress canvas containment; use containment: allowed for intentional bleed.",
+          "title": "Decorative"
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "enum": [
+                "clockwise",
+                "counter-clockwise"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Winding order of the outline; with `fill_rule` it decides which enclosed regions are holes.",
+          "title": "Direction"
+        },
+        "effects": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/EffectStackEntry"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ORDERED effect stack (2.4.0): entries apply first→last and a kind may repeat — the live-effects analogue of the single shadow/glow fields. Out of the deep-core profile (§8.5).",
+          "title": "Effects"
+        },
+        "fill": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Gradient"
+            },
+            {
+              "$ref": "#/$defs/Pattern"
+            },
+            {
+              "$ref": "#/$defs/UrlImage"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fill paint of the enclosed region.",
+          "title": "Fill"
+        },
+        "fill_opacity": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fill-only opacity in 0..1 (multiplies with `opacity`).",
+          "title": "Fill Opacity"
+        },
+        "glow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/EffectObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Glow effect: preset name, bool, or EffectObject.",
+          "title": "Glow"
+        },
+        "grid_span": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "[column_span, row_span] cell span; only meaningful under a grid layout parent (default [1, 1]; §3.6e).",
+          "title": "Grid Span"
+        },
+        "humanize": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Humanize"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Scoped humanize override: a seeded imperfection 'hand' applied to this object (and, for containers, its subtree), overriding any document-level default."
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
+          "title": "Id"
+        },
+        "inner_radius": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Distance from centre to the inner vertices. Required for a star, forbidden for a polygon.",
+          "title": "Inner Radius"
+        },
+        "inner_roundness": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Corner rounding at the inner vertices, 0..1.",
+          "title": "Inner Roundness"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
+        "meta": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
+          "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
+        },
+        "opacity": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Object opacity in 0..1; on a group it composites the subtree as one unit (§3.6d).",
+          "title": "Opacity"
+        },
+        "outer_radius": {
+          "description": "Distance from centre to the outer vertices.",
+          "exclusiveMinimum": 0,
+          "title": "Outer Radius",
+          "type": "number"
+        },
+        "outer_ring": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OuterRing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Decorative ring drawn around the object at a gap/offset."
+        },
+        "outer_roundness": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Corner rounding at the outer vertices, 0..1.",
+          "title": "Outer Roundness"
+        },
+        "overlap": {
+          "anyOf": [
+            {
+              "const": "allowed",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Consent for INTENTIONAL same-layer overlap (§3.3): `allowed` declares that this object may share ink with a same-layer sibling on purpose — a watermark, a caption over an image, double-exposure type. Absence means no consent, so the render-time collision detector reports the overlap as an accident. Read only by the audit; it never changes how the object draws. Cross-layer overlap is exempt by construction.",
+          "title": "Overlap"
+        },
+        "points": {
+          "description": "Number of points (star) or sides (polygon); at least 3.",
+          "minimum": 3,
+          "title": "Points",
+          "type": "integer"
+        },
+        "ports": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "description": "[x, y] coordinate pair in the parent-local space (top-left origin, +y down).",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Named attachment points in the object's local space, addressed by anchors as {ref, port}.",
+          "title": "Ports"
+        },
+        "rotation": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "#/$defs/Rotation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Rotation in degrees (clockwise, +y down) or a {angle, center} object; composes onto the subtree for containers.",
+          "title": "Rotation"
+        },
+        "shadow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/EffectObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drop-shadow effect: preset name, bool, or EffectObject.",
+          "title": "Shadow"
+        },
+        "sizing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sizing"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "P4 per-axis content sizing (fixed|hug|fill with grow/min/max); renamed from `size` (IconObject.size collision)."
+        },
+        "star_type": {
+          "default": "star",
+          "description": "Alternate between two radii (star) or use one (polygon).",
+          "enum": [
+            "star",
+            "polygon"
+          ],
+          "title": "Star Type",
+          "type": "string"
+        },
+        "stroke": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Gradient"
+            },
+            {
+              "$ref": "#/$defs/Pattern"
+            },
+            {
+              "$ref": "#/$defs/UrlImage"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stroke paint only (P3); geometry lives in `stroke_style`.",
+          "title": "Stroke"
+        },
+        "stroke_opacity": {
+          "anyOf": [
+            {
+              "description": "Unit-interval number in 0.0..1.0.",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stroke-only opacity in 0..1 (multiplies with `opacity`).",
+          "title": "Stroke Opacity"
+        },
+        "stroke_style": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/Style"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stroke GEOMETRY bundle (P3): a tokens.stroke_styles key or an inline Style carrying stroke_width/dash/caps/arrow_*; its colour is a default overridden by the object's `stroke` paint.",
+          "title": "Stroke Style"
+        },
+        "style": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/Style"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Object style: a tokens key or an inline Style bag.",
+          "title": "Style"
+        },
+        "type": {
+          "const": "star",
+          "description": "Discriminator: a parametric star or regular polygon.",
+          "title": "Type",
+          "type": "string"
+        },
+        "z": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stacking order within the layer (higher paints later).",
+          "title": "Z"
+        }
+      },
+      "required": [
+        "type",
+        "center",
+        "points",
+        "outer_radius"
+      ],
+      "title": "Star",
+      "type": "object"
+    },
     "StringSet": {
       "additionalProperties": false,
       "properties": {
@@ -14362,6 +17751,19 @@
           "default": null,
           "description": "Shorthand for text_align.",
           "title": "Align"
+        },
+        "align_to_baseline": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "FG typographic extension (2.10.0): snap this block's baselines to the resolved baseline grid (`rendering.baseline_grid`, else `defs.baseline_grid`), so type lines up across columns, spreads and facing pages. Absent/False = free leading. Aligning to the grid rounds each line down to the next gridline, so a block whose `line_height` exceeds the grid increment will open up to a whole multiple of it — set the increment to the body leading. Nothing happens if no grid is in scope. Not a CSS property.",
+          "title": "Align To Baseline"
         },
         "arrow_end": {
           "anyOf": [
@@ -14501,6 +17903,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -14820,6 +18243,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -14907,6 +18351,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -15752,6 +19217,42 @@
           "description": "Vertical overflow policy.",
           "title": "Overflow Y"
         },
+        "overprint": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "fill",
+                "stroke",
+                "both"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Which paints overprint the ink beneath instead of knocking it out. Absent = the renderer's default (knockout).",
+          "title": "Overprint"
+        },
+        "overprint_mode": {
+          "anyOf": [
+            {
+              "enum": [
+                "zero-cmyk",
+                "nonzero-cmyk"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "PDF overprint mode (OPM). zero-cmyk: a 0 component erases the ink below; nonzero-cmyk: a 0 component leaves it untouched.",
+          "title": "Overprint Mode"
+        },
         "padding": {
           "anyOf": [
             {
@@ -15904,6 +19405,27 @@
             },
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -16557,6 +20079,218 @@
       "title": "Style",
       "type": "object"
     },
+    "SymbolDef": {
+      "additionalProperties": false,
+      "description": "A reusable drawing, defined once and expanded into the document by the SDK.\n\nInstancing is deliberately NOT a runtime primitive: `use` objects are\npre-lowering grammar that `sdk.expand()` resolves before the contract ever\nsees a document, which is what keeps a validated document flat, diffable and\nfree of resolution order. See `docs/adr/0001-flat-document-model.md`.\n\nWhat was missing was the DEFINITION side. `defs.symbols` was typed `dict`, so\na symbol body could be anything at all and no consumer could read one without\nguessing. This gives it a shape without imposing it: `Defs.symbols` accepts\nthis model OR an arbitrary mapping, because narrowing it would reject\ndocuments that validate today and the BACKWARD guarantee forbids that.",
+      "properties": {
+        "content": {
+          "description": "The symbol's objects, in paint order, in its own coordinate space.",
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "bezier": "#/$defs/Curve",
+                "bullet_list": "#/$defs/BulletList",
+                "circle": "#/$defs/Circle",
+                "connector": "#/$defs/Connector",
+                "curve": "#/$defs/Curve",
+                "dimension": "#/$defs/Dimension",
+                "ellipse": "#/$defs/Ellipse",
+                "generative": "#/$defs/GenerativeObject",
+                "group": "#/$defs/Group",
+                "icon": "#/$defs/Icon",
+                "image": "#/$defs/Image",
+                "line": "#/$defs/Line",
+                "path": "#/$defs/Path",
+                "polygon": "#/$defs/Polygon",
+                "polyline": "#/$defs/Polyline",
+                "rect": "#/$defs/Rect",
+                "star": "#/$defs/Star",
+                "table": "#/$defs/TableObject",
+                "text": "#/$defs/Text",
+                "uml.action": "#/$defs/UMLAction",
+                "uml.activation_bar": "#/$defs/UMLActivationBar",
+                "uml.activity_node": "#/$defs/UMLActivityNodeObject",
+                "uml.actor": "#/$defs/UMLActorObject",
+                "uml.artifact_box": "#/$defs/UMLArtifactBox",
+                "uml.classifier_box": "#/$defs/UMLClassifierBox",
+                "uml.component_box": "#/$defs/UMLComponentBox",
+                "uml.fragment_frame": "#/$defs/UMLFragmentFrame",
+                "uml.lifeline": "#/$defs/UMLLifeline",
+                "uml.lollipop": "#/$defs/UMLLollipop",
+                "uml.marker_glyph": "#/$defs/UMLMarkerGlyph",
+                "uml.node_box": "#/$defs/UMLNodeBox",
+                "uml.pseudostate": "#/$defs/UMLPseudostateObject",
+                "uml.socket": "#/$defs/UMLSocket",
+                "uml.state_box": "#/$defs/UMLStateBox",
+                "uml.swimlane": "#/$defs/UMLSwimlane",
+                "uml.timing_lane": "#/$defs/UMLTimingLane"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Rect"
+              },
+              {
+                "$ref": "#/$defs/Ellipse"
+              },
+              {
+                "$ref": "#/$defs/Circle"
+              },
+              {
+                "$ref": "#/$defs/Line"
+              },
+              {
+                "$ref": "#/$defs/Polyline"
+              },
+              {
+                "$ref": "#/$defs/Polygon"
+              },
+              {
+                "$ref": "#/$defs/Star"
+              },
+              {
+                "$ref": "#/$defs/Path"
+              },
+              {
+                "$ref": "#/$defs/Curve"
+              },
+              {
+                "$ref": "#/$defs/Text"
+              },
+              {
+                "$ref": "#/$defs/Image"
+              },
+              {
+                "$ref": "#/$defs/GenerativeObject"
+              },
+              {
+                "$ref": "#/$defs/Icon"
+              },
+              {
+                "$ref": "#/$defs/BulletList"
+              },
+              {
+                "$ref": "#/$defs/Dimension"
+              },
+              {
+                "$ref": "#/$defs/Connector"
+              },
+              {
+                "$ref": "#/$defs/TableObject"
+              },
+              {
+                "$ref": "#/$defs/Group"
+              },
+              {
+                "$ref": "#/$defs/UMLMarkerGlyph"
+              },
+              {
+                "$ref": "#/$defs/UMLClassifierBox"
+              },
+              {
+                "$ref": "#/$defs/UMLComponentBox"
+              },
+              {
+                "$ref": "#/$defs/UMLStateBox"
+              },
+              {
+                "$ref": "#/$defs/UMLAction"
+              },
+              {
+                "$ref": "#/$defs/UMLArtifactBox"
+              },
+              {
+                "$ref": "#/$defs/UMLNodeBox"
+              },
+              {
+                "$ref": "#/$defs/UMLLifeline"
+              },
+              {
+                "$ref": "#/$defs/UMLActivationBar"
+              },
+              {
+                "$ref": "#/$defs/UMLActorObject"
+              },
+              {
+                "$ref": "#/$defs/UMLSocket"
+              },
+              {
+                "$ref": "#/$defs/UMLLollipop"
+              },
+              {
+                "$ref": "#/$defs/UMLActivityNodeObject"
+              },
+              {
+                "$ref": "#/$defs/UMLPseudostateObject"
+              },
+              {
+                "$ref": "#/$defs/UMLFragmentFrame"
+              },
+              {
+                "$ref": "#/$defs/UMLSwimlane"
+              },
+              {
+                "$ref": "#/$defs/UMLTimingLane"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Content",
+          "type": "array"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the symbol depicts — the accessible description an instance inherits when it states none of its own.",
+          "title": "Description"
+        },
+        "meta": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form annotation bag; never interpreted by the renderer.",
+          "title": "Meta"
+        },
+        "viewbox": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 4,
+              "minItems": 4,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "[x, y, w, h] the content is authored against; instances scale into their own box against it. Absent = the content's bounds.",
+          "title": "Viewbox"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "title": "SymbolDef",
+      "type": "object"
+    },
     "TableFlow": {
       "additionalProperties": false,
       "properties": {
@@ -16650,6 +20384,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -16756,6 +20496,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -17269,6 +21015,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -17282,6 +21040,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -17807,6 +21578,18 @@
           "description": "Stable object id: the target namespace for anchors, bind, reading_order and adjustments (§3.1).",
           "title": "Id"
         },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
+        },
         "meta": {
           "anyOf": [
             {
@@ -17820,6 +21603,19 @@
           "default": null,
           "description": "Free-form annotation bag (e.g. meta.no_overlap, meta.role); never interpreted as geometry.",
           "title": "Meta"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable label for tooling and review. Distinct from `id`, which is the stable address other objects and cross-references point at: renaming must not break a link.",
+          "title": "Name"
         },
         "opacity": {
           "anyOf": [
@@ -17963,6 +21759,12 @@
                   },
                   {
                     "$ref": "#/$defs/Span"
+                  },
+                  {
+                    "$ref": "#/$defs/RubyInline"
+                  },
+                  {
+                    "$ref": "#/$defs/WarichuInline"
                   }
                 ]
               },
@@ -18079,6 +21881,24 @@
           "description": "Default maximum rendered line count.",
           "title": "Line Clamp"
         },
+        "measure": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "[min, max] intended line measure in CHARACTERS — the column width the type is meant to be read at. Leading fixes the vertical increment; measure fixes the horizontal one, and the two together are what make a column readable. Advisory: it constrains nothing structurally, and is checked by the engine's validator, which can measure a resolved line. 45-75 is the conventional range for continuous prose (2.10.0).",
+          "title": "Measure"
+        },
         "min_font_size": {
           "anyOf": [
             {
@@ -18138,6 +21958,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -18413,7 +22254,32 @@
           "anyOf": [
             {
               "additionalProperties": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "discriminator": {
+                      "mapping": {
+                        "cmyk": "#/$defs/CmykColor",
+                        "icc": "#/$defs/IccColor",
+                        "spot": "#/$defs/SpotColor"
+                      },
+                      "propertyName": "space"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/CmykColor"
+                      },
+                      {
+                        "$ref": "#/$defs/SpotColor"
+                      },
+                      {
+                        "$ref": "#/$defs/IccColor"
+                      }
+                    ]
+                  }
+                ]
               },
               "type": "object"
             },
@@ -18441,6 +22307,27 @@
                   },
                   {
                     "type": "string"
+                  },
+                  {
+                    "discriminator": {
+                      "mapping": {
+                        "cmyk": "#/$defs/CmykColor",
+                        "icc": "#/$defs/IccColor",
+                        "spot": "#/$defs/SpotColor"
+                      },
+                      "propertyName": "space"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/CmykColor"
+                      },
+                      {
+                        "$ref": "#/$defs/SpotColor"
+                      },
+                      {
+                        "$ref": "#/$defs/IccColor"
+                      }
+                    ]
                   }
                 ]
               },
@@ -18538,7 +22425,8 @@
             }
           ],
           "default": null,
-          "description": "Named text styles (legacy namespace; superseded by `styles`, still resolved first by the renderer).",
+          "deprecated": true,
+          "description": "DEPRECATED namespace, superseded by `styles` — but NOT an alias of it. Both maps stay live and the renderer resolves `text_styles` FIRST, so a name declared in both silently renders as this one and the `styles` definition is dead. Every other legacy spelling in the contract collapses at parse time; this one cannot, because collapsing it would change which definition wins. `ff-codemod` merges the two (this map winning, as the renderer does) and reports every shadowed name.",
           "title": "Text Styles"
         }
       },
@@ -18659,6 +22547,27 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
             },
             {
               "type": "null"
@@ -18827,6 +22736,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -19112,6 +23033,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -19278,6 +23220,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -19563,6 +23517,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -19729,6 +23704,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -20014,6 +24001,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -20180,6 +24188,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -20465,6 +24485,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -20631,6 +24672,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -20916,6 +24969,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -21082,6 +25156,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -21367,6 +25453,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -21533,6 +25640,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -21818,6 +25937,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -21984,6 +26124,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -22269,6 +26421,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -22435,6 +26608,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -22720,6 +26905,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -22886,6 +27092,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -23171,6 +27389,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -23337,6 +27576,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -23633,6 +27884,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -23799,6 +28071,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -24084,6 +28368,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -24250,6 +28555,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -24535,6 +28852,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -24701,6 +29039,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -24986,6 +29336,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -25152,6 +29523,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -25437,6 +29820,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -25603,6 +30007,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -25888,6 +30304,27 @@
               "type": "string"
             },
             {
+              "discriminator": {
+                "mapping": {
+                  "cmyk": "#/$defs/CmykColor",
+                  "icc": "#/$defs/IccColor",
+                  "spot": "#/$defs/SpotColor"
+                },
+                "propertyName": "space"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/CmykColor"
+                },
+                {
+                  "$ref": "#/$defs/SpotColor"
+                },
+                {
+                  "$ref": "#/$defs/IccColor"
+                }
+              ]
+            },
+            {
               "type": "null"
             }
           ],
@@ -26054,6 +30491,18 @@
           "default": null,
           "description": "Optional displayed label.",
           "title": "Label"
+        },
+        "matte": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MatteSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use another object on this page as this object's matte (alpha or luminance, either invertible)."
         },
         "meta": {
           "anyOf": [
@@ -26284,9 +30733,101 @@
       ],
       "title": "UrlImage",
       "type": "object"
+    },
+    "WarichuInline": {
+      "additionalProperties": false,
+      "description": "Warichu: an inline note set as two or more short lines inside the text line.\n\nDistinct from a footnote, which leaves the line and lands in the page's note\narea. A warichu stays in the run and simply sets narrower, so it is inline\ncontent, not block content.",
+      "properties": {
+        "brackets": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "parenthesis",
+                "bracket",
+                "tortoise",
+                "lenticular"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Enclosing marks drawn around the note.",
+          "title": "Brackets"
+        },
+        "content": {
+          "description": "The note's inline content.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/RefInline"
+              },
+              {
+                "$ref": "#/$defs/CiteInline"
+              },
+              {
+                "$ref": "#/$defs/MathInline"
+              },
+              {
+                "$ref": "#/$defs/CodeInline"
+              },
+              {
+                "$ref": "#/$defs/FootnoteInline"
+              },
+              {
+                "$ref": "#/$defs/LinkInline"
+              },
+              {
+                "$ref": "#/$defs/Span"
+              },
+              {
+                "$ref": "#/$defs/RubyInline"
+              },
+              {
+                "$ref": "#/$defs/WarichuInline"
+              }
+            ]
+          },
+          "title": "Content",
+          "type": "array"
+        },
+        "kind": {
+          "const": "warichu",
+          "description": "Discriminator: an inline split-line note.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "lines": {
+          "anyOf": [
+            {
+              "maximum": 4,
+              "minimum": 2,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Lines the note is split across; absent = 2, the convention.",
+          "title": "Lines"
+        }
+      },
+      "required": [
+        "kind",
+        "content"
+      ],
+      "title": "WarichuInline",
+      "type": "object"
     }
   },
-  "$id": "https://frameforge.dev/schema/2.8.2/frameforge-v2.schema.json",
+  "$id": "https://frameforge.dev/schema/2.11.0/frameforge-v2.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -26446,7 +30987,7 @@
       "title": "Title"
     },
     "version": {
-      "description": "Spec version the document targets (semver; HEAD is 2.8.2; older targets like 2.2.0 remain valid).",
+      "description": "Spec version the document targets (semver; HEAD is 2.11.0; older targets like 2.2.0 remain valid).",
       "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
       "title": "Version",
       "type": "string"
@@ -26457,7 +30998,130 @@
     "version",
     "pages"
   ],
-  "title": "FrameForge v2 (HEAD 2.8.2) — generated from the Pydantic models (core conformance profile)",
+  "title": "FrameForge v2 (HEAD 2.11.0) — generated from the Pydantic models (core conformance profile)",
   "type": "object",
-  "version": "2.8.2"
+  "version": "2.11.0",
+  "x-frameforge-deprecations": [
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "deprecated-alias-circle",
+      "kind": "object-type",
+      "note": "A circle is an ellipse with rx == ry. Two spellings of one shape means two code paths in every renderer and two ways for a document to be internally inconsistent; the codemod rewrites it to `ellipse`.",
+      "replacement": "ellipse",
+      "severity": "info",
+      "subject": "circle",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "deprecated-alias-polygon",
+      "kind": "object-type",
+      "note": "A polygon is a closed polyline. `polyline` already carries `closed`, so the alias adds a union member without adding an expressible shape.",
+      "replacement": "polyline (closed: true)",
+      "severity": "info",
+      "subject": "polygon",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "deprecated-alias-curve",
+      "kind": "object-type",
+      "note": "A curve is a path of one cubic segment, and `path` can already say every curve plus everything a curve cannot. Two discriminator spellings (`curve` and `bezier`) for one object compound the problem.",
+      "replacement": "path",
+      "severity": "info",
+      "subject": "curve / bezier",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "curve-control-shorthand",
+      "kind": "legacy-key",
+      "note": "Short aliases of the canonical control points. Setting a short and a long form that disagree is an error rather than a silent pick, but the two spellings still let one document contradict itself between objects.",
+      "replacement": "control1 / control2",
+      "severity": "info",
+      "subject": "c1 / c2 on curve",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "gradient-stop-offset",
+      "kind": "legacy-key",
+      "note": "2.2.0 made `position` authoritative. `offset` is still accepted and normalised — including the 0..1 unit-interval spelling, which becomes a percentage — but it never appears in the schema, so a consumer reading the schema alone cannot know it is legal.",
+      "replacement": "GradientStop.position",
+      "severity": "info",
+      "subject": "GradientStop.offset",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "connector-endpoint-object",
+      "kind": "legacy-key",
+      "note": "`ref` is the canonical name for the target object id, matching every other reference in the contract; `object` is the renderer's older spelling, kept because the committed fixtures use it.",
+      "replacement": "ConnectorEndpoint.ref",
+      "severity": "info",
+      "subject": "ConnectorEndpoint.object",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "connector-route-type",
+      "kind": "legacy-key",
+      "note": "`type` is the discriminator key everywhere else in the contract, so a route whose `type` is a routing mode rather than an object kind reads as a discriminator and is not one.",
+      "replacement": "ConnectorRoute.kind",
+      "severity": "info",
+      "subject": "ConnectorRoute.type",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "style-dash-shorthand",
+      "kind": "legacy-key",
+      "note": "A shorthand for the CSS-named property the style module standardised on. It serialises as `stroke_dasharray` anyway, so authoring `dash` only moves the normalisation later. Declaring both is an error.",
+      "replacement": "Style.stroke_dasharray",
+      "severity": "info",
+      "subject": "Style.dash",
+      "valid_at_head": true
+    },
+    {
+      "code": "deprecated-alias",
+      "fix": "automatic",
+      "id": "tokens-text-styles",
+      "kind": "namespace",
+      "note": "Unlike every other entry here this one does NOT collapse at parse time: `text_styles` and `styles` are both live `dict[str, Style]` maps and the renderer resolves `text_styles` first. A name present in both therefore resolves to the one the author probably did not mean, and nothing in the contract reports it. The codemod merges them, `text_styles` winning, which is what the renderer already does.",
+      "replacement": "tokens.styles",
+      "severity": "info",
+      "subject": "tokens.text_styles",
+      "valid_at_head": true
+    },
+    {
+      "code": "stroke-single-form",
+      "fix": "automatic",
+      "id": "stroke-single-form",
+      "kind": "removed-form",
+      "note": "The one breaking change of the 2.x line (P3). Paint and geometry were split so a stroke could reference a shared geometry token; the old bundle is rejected with an actionable error rather than a vague type error.",
+      "replacement": "stroke (paint) + stroke_style (geometry)",
+      "severity": "error",
+      "subject": "inline-geometry stroke {color, width, dash, ...}",
+      "valid_at_head": false
+    },
+    {
+      "code": "size-renamed",
+      "fix": "automatic",
+      "id": "size-renamed",
+      "kind": "removed-form",
+      "note": "P4 renamed the content-sizing key because it collided with the numeric `Icon.size`. The rewrite is unambiguous: every current `size` field in the contract is a scalar or a pair, so only the pre-P4 key was ever an object.",
+      "replacement": "sizing",
+      "severity": "error",
+      "subject": "content-sizing size (an object)",
+      "valid_at_head": false
+    }
+  ]
 }

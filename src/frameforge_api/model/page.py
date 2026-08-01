@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 
 from .base import Box, Color, FG, Length, PagePreset, UnitInterval, Units
 from .flow import Flowable
+from .layout import BaselineGrid
 from .objects import VisualObject
 from .style import BorderSide, Style
 
@@ -14,6 +15,59 @@ from .style import BorderSide, Style
 # --------------------------------------------------------------------------- #
 #  Pages, masters, canvas                                                     #
 # --------------------------------------------------------------------------- #
+#: Which side of a bound leaf a page falls on. Recto is the right-hand page (odd
+#: folio), verso the left. A book's margins mirror across the two, which is why
+#: this is contract rather than presentation.
+PageSide = Literal["recto", "verso"]
+
+
+class PageMargin(FG):
+    """Named page margins, including the two a bound book needs.
+
+    `[top, right, bottom, left]` describes a sheet. A bound book is described in
+    *spine-relative* terms — `inside` sits against the binding, `outside` at the
+    fore-edge — because the two swap sides on every turn of the leaf. Twelve
+    `book-*` trim presets shipped from the start with no way to say this; a
+    verso page could only be laid out by mirroring the numbers by hand.
+
+    `gutter` is the extra allowance added at the binding edge on top of
+    `inside`, for the paper the fold and the glue consume.
+
+    The two vocabularies are mutually exclusive per axis: `left`/`right` and
+    `inside`/`outside` name the same two edges, so accepting both would mean
+    silently choosing one, and the wrong choice misplaces the text block on
+    every other page of the book.
+    """
+    top: Optional[Length] = Field(default=None, description="Head margin.")
+    bottom: Optional[Length] = Field(default=None, description="Foot margin.")
+    left: Optional[Length] = Field(
+        default=None, description="Left margin (sheet-relative; excludes inside/outside).")
+    right: Optional[Length] = Field(
+        default=None, description="Right margin (sheet-relative; excludes inside/outside).")
+    inside: Optional[Length] = Field(
+        default=None, description="Spine-side margin (binding edge); excludes left/right.")
+    outside: Optional[Length] = Field(
+        default=None, description="Fore-edge margin; excludes left/right.")
+    gutter: Optional[Length] = Field(
+        default=None, description="Extra allowance at the binding edge, added to `inside` "
+                                  "(or to the spine side of left/right) for fold and glue.")
+
+    @model_validator(mode="after")
+    def _one_horizontal_vocabulary(self):
+        sheet = self.left is not None or self.right is not None
+        bound = self.inside is not None or self.outside is not None
+        if sheet and bound:
+            raise ValueError(
+                "`left`/`right` and `inside`/`outside` are two names for the same two "
+                "edges; use one vocabulary. Sheet-relative for loose pages, "
+                "spine-relative (inside/outside) for anything bound.")
+        return self
+
+
+#: A margin as four lengths, or named — including the spine-relative pair.
+MarginSpec = Union[Box, PageMargin]
+
+
 class CanvasObject(FG):
     preset: Optional[PagePreset] = Field(
         default=None, description="Named canvas preset (pixel sizes mirror the renderer's "
@@ -26,8 +80,14 @@ class CanvasObject(FG):
         default=None, description="Swap preset width/height for landscape.")
     bleed: Optional[Length] = Field(
         default=None, description="Bleed extended beyond the canvas on all sides (print).")
-    margin: Optional[Box] = Field(
-        default=None, description="Default content margin [top, right, bottom, left].")
+    margin: Optional[MarginSpec] = Field(
+        default=None, description="Default content margin: [top, right, bottom, left], or a "
+                                  "named PageMargin (which adds inside/outside/gutter for "
+                                  "bound work).")
+    spread: Optional[bool] = Field(
+        default=None, description="This canvas is a two-page spread — one sheet spanning a "
+                                  "verso and a recto, with the binding down the middle. "
+                                  "Absent = a single page.")
     background: Optional[Color] = Field(
         default=None, description="Page background colour (token or literal), painted behind "
                                   "all layers/flow content. Absent = the renderer's documented "
@@ -67,8 +127,13 @@ class Running(FG):
 
 class PageMaster(FG):
     canvas: CanvasSpec = Field(description="Canvas of pages produced from this master.")
-    margin: Optional[Box] = Field(
-        default=None, description="Content margin [top, right, bottom, left].")
+    margin: Optional[MarginSpec] = Field(
+        default=None, description="Content margin: [top, right, bottom, left], or a named "
+                                  "PageMargin (inside/outside/gutter for bound work).")
+    side: Optional[Union[PageSide, Literal["any"]]] = Field(
+        default=None, description="Which side of the leaf this master lays out. A bound book "
+                                  "declares a recto master and a verso master so their "
+                                  "spine-relative margins mirror. Absent = any.")
     fixed: Optional[list[VisualObject]] = Field(
         default=None, description="Objects painted on every page before flow content.")
     regions: Optional[list[FlowRegion]] = Field(
@@ -105,6 +170,27 @@ class TextContract(FG):
         default=None, description="Default maximum rendered line count.")
     text_overflow: Optional[Literal["clip", "ellipsis"]] = Field(
         default=None, description="Marker for clamped text (clip or ellipsis).")
+    measure: Optional[Annotated[list[int], Field(min_length=2, max_length=2)]] = Field(
+        default=None,
+        description="[min, max] intended line measure in CHARACTERS — the column width the "
+                    "type is meant to be read at. Leading fixes the vertical increment; "
+                    "measure fixes the horizontal one, and the two together are what make a "
+                    "column readable. Advisory: it constrains nothing structurally, and is "
+                    "checked by the engine's validator, which can measure a resolved line. "
+                    "45-75 is the conventional range for continuous prose (2.10.0).")
+
+    @model_validator(mode="after")
+    def _measure_is_an_ordered_positive_range(self):
+        if self.measure is None:
+            return self
+        low, high = self.measure
+        if low <= 0:
+            raise ValueError("text_contract.measure bounds are character counts, so both "
+                             "must be positive")
+        if low > high:
+            raise ValueError(f"text_contract.measure is [min, max]; got [{low}, {high}], "
+                             f"which is inverted")
+        return self
 
 
 class RenderingContract(FG):
@@ -113,6 +199,13 @@ class RenderingContract(FG):
     text: Optional[TextContract] = Field(
         default=None, description="Text fitting/overflow defaults for the page (the "
                                   "normative home of text_contract).")
+    baseline_grid: Optional[BaselineGrid] = Field(
+        default=None,
+        description="Per-page override of `defs.baseline_grid` — the frame-level scope, for "
+                    "a page whose leading differs from the document's (a chapter opening, a "
+                    "notes page set smaller). Absent = inherit the document grid. Typed "
+                    "deliberately rather than added to the loose `typography` bag: the grid "
+                    "changes where every baseline lands, which is not a hint (2.10.0).")
     typography: Optional[dict] = Field(
         default=None, description="Loose typography hints bag (renderer-specific; not deeply typed).")
     semantics: Optional[dict] = Field(
@@ -178,6 +271,10 @@ class Page(FG):
     canvas: Optional[CanvasSpec] = Field(
         default=None, description="Page canvas (preset name or explicit object); defaults to "
                                   "the master's canvas, else the renderer default.")
+    side: Optional[PageSide] = Field(
+        default=None, description="Which side of the leaf this page falls on. Fixes the folio "
+                                  "parity of a bound sequence — and therefore which way its "
+                                  "spine-relative margins face. Absent = inferred from position.")
     rendering: Optional[RenderingContract] = Field(
         default=None, description="Per-page rendering contract overrides.")
     layers: Optional[list[Layer]] = Field(

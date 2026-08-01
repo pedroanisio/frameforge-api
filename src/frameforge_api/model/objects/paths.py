@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Literal, Optional, Union
 from pydantic import ConfigDict, Field, model_validator
 
-from ..base import Point
+from ..base import ShapeDirection, Point
 from .base import ObjBase
 from ..style import Fill, Paint
 
@@ -72,16 +72,25 @@ class Path(ObjBase):
     fill: Optional[Fill] = Field(default=None, description="Fill paint of the enclosed region.")
     stroke: Optional[Paint] = Field(
         default=None, description="Stroke paint only (P3); geometry lives in `stroke_style`.")
+    direction: Optional[ShapeDirection] = Field(
+        default=None, description="Winding order of the outline; with `fill_rule` it decides which enclosed regions are holes.")
 
 
 class Curve(ObjBase):
-    """Renderer-shortcut alias for a single cubic Bézier. Deprecated; codemod → path.
+    """Renderer-shortcut alias for a single cubic Bézier. DEPRECATED; `ff-codemod`
+    rewrites it to a `path` of one cubic segment.
 
     `c1`/`c2` are accepted as legacy aliases of `control1`/`control2` and are
     normalised to the canonical keys; setting both with different values is an
-    error (mirrors the GradientStop offset→position pattern)."""
+    error (mirrors the GradientStop offset→position pattern).
+
+    Still valid for the life of the 2.x line, and marked with the JSON Schema
+    `deprecated` keyword so tooling can see that without parsing prose."""
+    model_config = ConfigDict(extra="forbid", populate_by_name=True,
+                              json_schema_extra={"deprecated": True})
     type: Literal["curve", "bezier"] = Field(
-        description="Discriminator: DEPRECATED single cubic Bézier (codemod normalises to path).")
+        description="Discriminator: DEPRECATED single cubic Bézier "
+                    "(`ff-codemod` normalises to path).")
     from_: Point = Field(alias="from", description="Start point [x, y].")
     to: Point = Field(description="End point [x, y].")
     control1: Optional[Point] = Field(
@@ -91,7 +100,6 @@ class Curve(ObjBase):
     stroke: Optional[Paint] = Field(
         default=None, description="Stroke paint only (P3); geometry lives in `stroke_style`.")
     fill: Optional[Fill] = Field(default=None, description="Fill paint of the enclosed region.")
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     @model_validator(mode="before")
     @classmethod

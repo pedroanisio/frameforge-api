@@ -1,0 +1,113 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.4.0",
+  "title": "2.4.0 — flowed story, masters, effect stack",
+  "description": "The flow side of the contract as it stood at 2.4.0, when the ordered per-object effect stack arrived. Uses a master with regions and a footnote area, and a three-field render target.",
+  "defs": {
+    "masters": {
+      "body": {
+        "canvas": {
+          "preset": "book-6x9"
+        },
+        "margin": [
+          54,
+          54,
+          72,
+          54
+        ],
+        "regions": [
+          {
+            "id": "col",
+            "box": [
+              54,
+              54,
+              324,
+              522
+            ],
+            "columns": 1
+          }
+        ],
+        "footnote_area": {
+          "id": "notes",
+          "box": [
+            54,
+            590,
+            324,
+            60
+          ]
+        },
+        "running": {
+          "page_number": true
+        }
+      }
+    }
+  },
+  "targets": [
+    {
+      "name": "mobile",
+      "canvas": {
+        "preset": "phone"
+      },
+      "adjustments": {
+        "font_scale": 0.85,
+        "padding_delta": -4
+      }
+    }
+  ],
+  "pages": [
+    {
+      "mode": "flow",
+      "id": "story",
+      "master": "body",
+      "story": [
+        {
+          "type": "heading",
+          "level": 1,
+          "text": "A chapter",
+          "id": "ch1"
+        },
+        {
+          "type": "paragraph",
+          "spans": [
+            {
+              "text": "Body text with a note"
+            },
+            {
+              "kind": "footnote",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "The note body."
+                }
+              ]
+            },
+            {
+              "text": " and a reference to "
+            },
+            {
+              "kind": "ref",
+              "target": "ch1",
+              "show": "title"
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            "alpha",
+            "beta"
+          ]
+        },
+        {
+          "type": "code",
+          "language": "python",
+          "source": "print('still valid')"
+        }
+      ]
+    }
+  ]
+}

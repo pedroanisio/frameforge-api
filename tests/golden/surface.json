@@ -1,14 +1,19 @@
 {
   "frameforge_api.__all__": [
+    "COMPATIBILITY",
     "CONTRACT_VERSION",
+    "DEPRECATIONS",
     "Document",
     "HEAD_VERSION",
     "SCHEMA_PATH",
     "__version__",
     "build_schema",
     "check_schema",
+    "deprecations",
     "load_schema",
-    "model"
+    "migrate_document",
+    "model",
+    "scan_document"
   ],
   "frameforge_api.model.__all__": [
     "Document",
@@ -25,6 +30,7 @@
     "ArrowMarkerKind",
     "AssetDef",
     "BackgroundLayer",
+    "BaselineGrid",
     "BibliographyFlow",
     "BlendMode",
     "BlockFlow",
@@ -45,9 +51,12 @@
     "ClipPathVal",
     "ClipSpec",
     "ClipSpecOrBool",
+    "CmykColor",
     "CodeFlow",
     "CodeInline",
     "Color",
+    "ColorObject",
+    "ColorProfileDef",
     "ColumnBreakFlow",
     "ColumnSpec",
     "ColumnSpecVal",
@@ -83,6 +92,8 @@
     "FontStretch",
     "FontStyle",
     "FootnoteInline",
+    "GenerationParams",
+    "GenerativeObject",
     "Gradient",
     "GradientStop",
     "GrainEffect",
@@ -90,6 +101,7 @@
     "HEAD_VERSION",
     "HeadingFlow",
     "Humanize",
+    "IccColor",
     "Icon",
     "Image",
     "ImageFlow",
@@ -105,8 +117,11 @@
     "ListFlow",
     "ListItemFlow",
     "ListItemVal",
+    "MarginSpec",
     "MathFlow",
     "MathInline",
+    "MatteMode",
+    "MatteSpec",
     "Number",
     "NumberFormat",
     "ObjBase",
@@ -117,9 +132,11 @@
     "Page",
     "PageBreakFlow",
     "PageLink",
+    "PageMargin",
     "PageMaster",
     "PagePreset",
     "PageProducer",
+    "PageSide",
     "Paint",
     "ParagraphFlow",
     "Path",
@@ -134,25 +151,32 @@
     "Radius",
     "Rect",
     "RefInline",
+    "RenderOutput",
     "RenderTarget",
     "RenderingContract",
     "Rotation",
     "RotationOrNumber",
+    "RubyInline",
     "Running",
     "SEMVER_RE",
     "Shadow",
     "ShadowVal",
+    "ShapeDirection",
     "SizeMode",
     "SizeValue",
     "Sizing",
     "SpacerFlow",
     "Span",
+    "SpotColor",
+    "Star",
+    "StarType",
     "StrList",
     "StringSet",
     "StrokeStyle",
     "StrokeStyleRef",
     "Style",
     "StyleRef",
+    "SymbolDef",
     "TableFlow",
     "TableObject",
     "TargetAdjustments",
@@ -187,6 +211,7 @@
     "UrlImage",
     "VAlign",
     "VisualObject",
+    "WarichuInline",
     "_SegArc",
     "_SegClose",
     "_SegCubic",
@@ -268,6 +293,22 @@
         "clip"
       ],
       "validators": []
+    },
+    "BaselineGrid": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "increment",
+        "start",
+        "relative_to"
+      ],
+      "validators": [
+        "_increment_is_positive"
+      ]
     },
     "BibliographyFlow": {
       "bases": [
@@ -386,6 +427,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "items",
         "marker",
@@ -394,6 +437,7 @@
         "indent"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -411,6 +455,7 @@
         "orientation",
         "bleed",
         "margin",
+        "spread",
         "background"
       ],
       "validators": [
@@ -436,7 +481,8 @@
         "ObjBase"
       ],
       "config": {
-        "extra": "forbid"
+        "extra": "forbid",
+        "json_schema_extra": "{'deprecated': True}"
       },
       "fields": [
         "id",
@@ -463,6 +509,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "center",
         "r",
@@ -470,6 +518,7 @@
         "stroke"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -516,6 +565,23 @@
       ],
       "validators": []
     },
+    "CmykColor": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "space",
+        "c",
+        "m",
+        "y",
+        "k",
+        "name"
+      ],
+      "validators": []
+    },
     "CodeFlow": {
       "bases": [
         "BreakFields"
@@ -545,6 +611,23 @@
       "fields": [
         "kind",
         "text"
+      ],
+      "validators": []
+    },
+    "ColorProfileDef": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "space",
+        "src",
+        "hash",
+        "name",
+        "rendering_intent",
+        "total_ink_limit"
       ],
       "validators": []
     },
@@ -609,6 +692,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "from_",
         "to",
@@ -617,6 +702,7 @@
         "stroke"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -688,6 +774,7 @@
       ],
       "config": {
         "extra": "forbid",
+        "json_schema_extra": "{'deprecated': True}",
         "populate_by_name": "True",
         "validate_by_alias": "True",
         "validate_by_name": "True"
@@ -717,6 +804,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "from_",
         "to",
@@ -727,6 +816,7 @@
       ],
       "validators": [
         "_canonical_controls",
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -743,6 +833,8 @@
         "counters",
         "masters",
         "assets",
+        "color_profiles",
+        "baseline_grid",
         "data",
         "symbols",
         "components",
@@ -785,6 +877,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "kind",
         "from_",
@@ -798,6 +892,7 @@
         "text_style"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -890,6 +985,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "center",
         "rx",
@@ -898,6 +995,7 @@
         "stroke"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1044,6 +1142,69 @@
       ],
       "validators": []
     },
+    "GenerationParams": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "seed",
+        "size",
+        "style"
+      ],
+      "validators": []
+    },
+    "GenerativeObject": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "matte",
+        "type",
+        "kind",
+        "prompt",
+        "model",
+        "params",
+        "alt",
+        "actual_text",
+        "regenerate"
+      ],
+      "validators": [
+        "_matte_is_not_self",
+        "_stroke_paint_only",
+        "_visual_output_has_accessible_text"
+      ]
+    },
     "Gradient": {
       "bases": [
         "FG"
@@ -1133,11 +1294,14 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "children",
         "layout"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1181,6 +1345,21 @@
       ],
       "validators": []
     },
+    "IccColor": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "space",
+        "profile",
+        "components",
+        "fallback"
+      ],
+      "validators": []
+    },
     "Icon": {
       "bases": [
         "ObjBase"
@@ -1213,6 +1392,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "glyph",
         "color",
@@ -1220,6 +1401,7 @@
         "size"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1255,6 +1437,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "src",
         "alt",
@@ -1266,6 +1450,7 @@
         "label"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1378,12 +1563,15 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "from_",
         "to",
         "stroke"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1470,6 +1658,20 @@
       ],
       "validators": []
     },
+    "MatteSpec": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "source",
+        "mode",
+        "invert"
+      ],
+      "validators": []
+    },
     "Number": {
       "bases": [
         "FG"
@@ -1518,9 +1720,12 @@
         "grid_span",
         "sizing",
         "meta",
-        "humanize"
+        "humanize",
+        "name",
+        "matte"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1553,6 +1758,7 @@
         "id",
         "master",
         "canvas",
+        "side",
         "rendering",
         "layers",
         "reading_order",
@@ -1591,6 +1797,26 @@
       ],
       "validators": []
     },
+    "PageMargin": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "inside",
+        "outside",
+        "gutter"
+      ],
+      "validators": [
+        "_one_horizontal_vocabulary"
+      ]
+    },
     "PageMaster": {
       "bases": [
         "FG"
@@ -1601,6 +1827,7 @@
       "fields": [
         "canvas",
         "margin",
+        "side",
         "fixed",
         "regions",
         "running",
@@ -1664,12 +1891,16 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "d",
         "fill",
-        "stroke"
+        "stroke",
+        "direction"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1695,7 +1926,8 @@
         "ObjBase"
       ],
       "config": {
-        "extra": "forbid"
+        "extra": "forbid",
+        "json_schema_extra": "{'deprecated': True}"
       },
       "fields": [
         "id",
@@ -1722,12 +1954,16 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "points",
         "fill",
-        "stroke"
+        "stroke",
+        "direction"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1763,13 +1999,17 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "points",
         "closed",
         "fill",
-        "stroke"
+        "stroke",
+        "direction"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1819,12 +2059,15 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "fill",
         "radius",
         "stroke"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -1842,6 +2085,31 @@
       ],
       "validators": []
     },
+    "RenderOutput": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "format",
+        "dpi",
+        "scale",
+        "quality",
+        "background",
+        "color_space",
+        "color_profile",
+        "output_intent",
+        "font_embedding",
+        "crop_marks",
+        "bleed_marks",
+        "registration_marks",
+        "color_bars",
+        "page_information"
+      ],
+      "validators": []
+    },
     "RenderTarget": {
       "bases": [
         "FG"
@@ -1852,7 +2120,8 @@
       "fields": [
         "name",
         "canvas",
-        "adjustments"
+        "adjustments",
+        "output"
       ],
       "validators": []
     },
@@ -1866,6 +2135,7 @@
       "fields": [
         "coordinate_mode",
         "text",
+        "baseline_grid",
         "typography",
         "semantics",
         "debug_boxes",
@@ -1883,6 +2153,23 @@
       "fields": [
         "angle",
         "center"
+      ],
+      "validators": []
+    },
+    "RubyInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "base",
+        "text",
+        "position",
+        "align",
+        "size"
       ],
       "validators": []
     },
@@ -1960,6 +2247,74 @@
       ],
       "validators": []
     },
+    "SpotColor": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "space",
+        "name",
+        "system",
+        "tint",
+        "alternate"
+      ],
+      "validators": []
+    },
+    "Star": {
+      "bases": [
+        "ObjBase"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "id",
+        "box",
+        "rotation",
+        "ports",
+        "bind",
+        "decorative",
+        "containment",
+        "overlap",
+        "construction",
+        "z",
+        "opacity",
+        "fill_opacity",
+        "stroke_opacity",
+        "stroke_style",
+        "style",
+        "shadow",
+        "glow",
+        "effects",
+        "appearance",
+        "outer_ring",
+        "grid_span",
+        "sizing",
+        "meta",
+        "humanize",
+        "name",
+        "matte",
+        "type",
+        "star_type",
+        "center",
+        "points",
+        "outer_radius",
+        "inner_radius",
+        "outer_roundness",
+        "inner_roundness",
+        "direction",
+        "fill",
+        "stroke"
+      ],
+      "validators": [
+        "_matte_is_not_self",
+        "_radii_match_the_figure",
+        "_stroke_paint_only"
+      ]
+    },
     "StringSet": {
       "bases": [
         "FG"
@@ -2032,6 +2387,7 @@
         "line_clamp",
         "max_lines",
         "min_font_size",
+        "align_to_baseline",
         "writing_mode",
         "direction",
         "unicode_bidi",
@@ -2078,6 +2434,8 @@
         "stroke_miterlimit",
         "paint_order",
         "vector_effect",
+        "overprint",
+        "overprint_mode",
         "arrow_start",
         "arrow_end",
         "box_shadow",
@@ -2155,6 +2513,7 @@
         "line_clamp",
         "max_lines",
         "min_font_size",
+        "align_to_baseline",
         "writing_mode",
         "direction",
         "unicode_bidi",
@@ -2201,6 +2560,8 @@
         "stroke_miterlimit",
         "paint_order",
         "vector_effect",
+        "overprint",
+        "overprint_mode",
         "arrow_start",
         "arrow_end",
         "box_shadow",
@@ -2218,6 +2579,21 @@
       "validators": [
         "_normalize_dash_array"
       ]
+    },
+    "SymbolDef": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "content",
+        "viewbox",
+        "description",
+        "meta"
+      ],
+      "validators": []
     },
     "TableFlow": {
       "bases": [
@@ -2278,6 +2654,8 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "rows",
         "columns",
@@ -2288,6 +2666,7 @@
         "cell_padding"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2337,12 +2716,15 @@
         "sizing",
         "meta",
         "humanize",
+        "name",
+        "matte",
         "type",
         "text",
         "spans",
         "field"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_one_of_text_spans",
         "_stroke_paint_only"
       ]
@@ -2358,9 +2740,12 @@
         "min_font_size",
         "overflow",
         "line_clamp",
-        "text_overflow"
+        "text_overflow",
+        "measure"
       ],
-      "validators": []
+      "validators": [
+        "_measure_is_an_ordered_positive_range"
+      ]
     },
     "TextDecoration": {
       "bases": [
@@ -2436,6 +2821,7 @@
         "line_clamp",
         "max_lines",
         "min_font_size",
+        "align_to_baseline",
         "writing_mode",
         "direction",
         "unicode_bidi",
@@ -2482,6 +2868,8 @@
         "stroke_miterlimit",
         "paint_order",
         "vector_effect",
+        "overprint",
+        "overprint_mode",
         "arrow_start",
         "arrow_end",
         "box_shadow",
@@ -2589,12 +2977,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2634,12 +3024,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2679,12 +3071,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2724,12 +3118,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2769,12 +3165,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2814,12 +3212,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2859,12 +3259,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2904,12 +3306,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2949,12 +3353,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -2994,12 +3400,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3039,6 +3447,7 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
@@ -3046,6 +3455,7 @@
         "position"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3085,12 +3495,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3130,12 +3542,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3175,12 +3589,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3220,12 +3636,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3265,12 +3683,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3310,12 +3730,14 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color",
         "type"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3355,11 +3777,13 @@
         "meta",
         "humanize",
         "name",
+        "matte",
         "kind",
         "label",
         "color"
       ],
       "validators": [
+        "_matte_is_not_self",
         "_stroke_paint_only"
       ]
     },
@@ -3372,6 +3796,21 @@
       },
       "fields": [
         "url"
+      ],
+      "validators": []
+    },
+    "WarichuInline": {
+      "bases": [
+        "FG"
+      ],
+      "config": {
+        "extra": "forbid"
+      },
+      "fields": [
+        "kind",
+        "content",
+        "lines",
+        "brackets"
       ],
       "validators": []
     }

@@ -1,0 +1,32 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.2.0",
+  "title": "2.2.0 — the style module, string colour, box margins",
+  "description": "Pinned at the revision that adopted the authoritative style module. Every colour here is a bare string and every margin is [top, right, bottom, left], because that is all 2.2.0 could say. It must keep validating verbatim.",
+  "defs": {
+    "tokens": {
+      "colors": {"brand": "#d4145a", "ink": "rebeccapurple"},
+      "styles": {"body": {"font_size": 11, "line_height": 1.45, "color": "ink"}}
+    }
+  },
+  "pages": [{
+    "mode": "page",
+    "id": "p1",
+    "canvas": {"preset": "A4", "margin": [18, 20, 22, 20], "background": "#ffffff"},
+    "layers": [{
+      "id": "main",
+      "objects": [
+        {"type": "rect", "box": [0, 0, 120, 60], "fill": "brand", "stroke": "#000",
+         "stroke_style": {"stroke_width": "0.5pt", "stroke_dasharray": "4 2"}},
+        {"type": "rect", "box": [0, 70, 120, 60],
+         "fill": {"kind": "linear", "angle": 45,
+                  "stops": [{"color": "#fff", "position": "0%"},
+                            {"color": "brand", "position": "100%"}]}},
+        {"type": "text", "box": [0, 140, 400, 40], "style": "body",
+         "spans": [{"text": "Set in 2.2.0, "},
+                   {"kind": "link", "href": "#p1", "content": ["still valid"]},
+                   {"text": " at HEAD."}]}
+      ]
+    }]
+  }]
+}

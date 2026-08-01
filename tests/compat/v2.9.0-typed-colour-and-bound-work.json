@@ -1,0 +1,169 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.9.0",
+  "title": "2.9.0 — typed colour, prepress ink and bound work",
+  "description": "Pinned at the revision immediately before the 2.10.0 typographic-rhythm widening. Everything 2.9.0 introduced appears here — process/spot/ICC ink, overprint, spine-relative margins, a spread, printer's marks — so a later revision that narrows any of it turns this red instead of surfacing in a downstream validator.",
+  "lang": "en",
+  "defs": {
+    "color_profiles": {
+      "fogra39": {
+        "space": "cmyk",
+        "name": "Coated FOGRA39 (ISO 12647-2:2004)",
+        "src": "profiles/CoatedFOGRA39.icc",
+        "hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "rendering_intent": "relative-colorimetric"
+      }
+    },
+    "tokens": {
+      "colors": {
+        "body_black": { "space": "cmyk", "c": 0, "m": 0, "y": 0, "k": 1 },
+        "spot_blue": {
+          "space": "spot",
+          "name": "PANTONE 283 C",
+          "system": "pantone",
+          "tint": 0.6,
+          "alternate": { "space": "cmyk", "c": 0.31, "m": 0.09, "y": 0, "k": 0 }
+        },
+        "measured": {
+          "space": "icc",
+          "profile": "fogra39",
+          "components": [0.12, 0.04, 0.0, 0.88],
+          "fallback": "#1a1a1a"
+        },
+        "screen_grey": "#767676"
+      },
+      "styles": {
+        "body": {
+          "font_size": "10pt",
+          "line_height": "13pt",
+          "color": "body_black",
+          "hyphens": "auto",
+          "hyphenate_limit_chars": [6, 3, 3]
+        },
+        "rule": {
+          "stroke": "spot_blue",
+          "stroke_width": "0.5pt",
+          "overprint": "stroke",
+          "overprint_mode": "nonzero-cmyk"
+        }
+      }
+    },
+    "masters": {
+      "recto": {
+        "canvas": { "preset": "book-6x9", "bleed": "3mm" },
+        "side": "recto",
+        "margin": { "top": "54pt", "bottom": "60pt", "inside": "72pt", "outside": "54pt", "gutter": "9pt" },
+        "regions": [
+          { "id": "text", "box": [72, 54, 306, 534], "columns": 1, "column_fill": "balance" }
+        ]
+      },
+      "verso": {
+        "canvas": { "preset": "book-6x9", "bleed": "3mm" },
+        "side": "verso",
+        "margin": { "top": "54pt", "bottom": "60pt", "inside": "72pt", "outside": "54pt", "gutter": "9pt" },
+        "regions": [
+          { "id": "text", "box": [54, 54, 306, 534], "columns": 1 }
+        ]
+      }
+    }
+  },
+  "targets": [
+    {
+      "name": "press",
+      "canvas": { "preset": "book-6x9", "bleed": "3mm" },
+      "output": {
+        "format": "pdf",
+        "dpi": 300,
+        "output_intent": "press",
+        "color_space": "cmyk",
+        "color_profile": "fogra39",
+        "font_embedding": "subset",
+        "crop_marks": true,
+        "bleed_marks": true,
+        "registration_marks": true
+      }
+    },
+    { "name": "web", "output": { "format": "png", "dpi": 144 } }
+  ],
+  "pages": [
+    {
+      "mode": "page",
+      "id": "cover",
+      "side": "recto",
+      "canvas": { "preset": "book-6x9", "bleed": "3mm", "background": "screen_grey" },
+      "layers": [
+        {
+          "id": "art",
+          "objects": [
+            {
+              "type": "rect",
+              "id": "band",
+              "box": [0, 0, 432, 120],
+              "fill": "spot_blue",
+              "containment": "allowed"
+            },
+            {
+              "type": "text",
+              "id": "title",
+              "box": [54, 160, 324, 80],
+              "text": "Typed colour, bound work",
+              "style": { "font_size": "24pt", "color": "measured" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "page",
+      "id": "spread",
+      "canvas": { "preset": "book-6x9", "spread": true },
+      "layers": [
+        {
+          "id": "rules",
+          "objects": [
+            {
+              "type": "line",
+              "from": [54, 300],
+              "to": [810, 300],
+              "stroke": "spot_blue",
+              "stroke_style": "rule"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "flow",
+      "id": "body",
+      "master": "recto",
+      "story": [
+        { "type": "heading", "level": 1, "id": "ch1", "text": "Chapter One" },
+        {
+          "type": "paragraph",
+          "style": "body",
+          "widows": 2,
+          "orphans": 2,
+          "text": "A paragraph set in process black, flowing through a bound master whose margins are spine-relative so they mirror on every turn of the leaf."
+        },
+        {
+          "type": "paragraph",
+          "style": "body",
+          "spans": [
+            "Inline runs survive the widening too: ",
+            { "kind": "code", "text": "overprint: stroke" },
+            ", a ",
+            { "kind": "link", "href": "#ch1", "content": ["cross-reference"] },
+            ", and a footnote call.",
+            {
+              "kind": "footnote",
+              "id": "fn1",
+              "content": [
+                { "type": "paragraph", "text": "Footnotes hold block content, which holds inline content." }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

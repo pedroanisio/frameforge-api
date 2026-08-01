@@ -6,7 +6,7 @@ name = "frameforge-api"
 # them separate is what lets the package ship a packaging fix, a new helper or a
 # CLI change without pretending the document contract moved — and lets the
 # contract move without forcing a major bump here.
-version = "1.0.0"
+version = "1.2.0"
 description = "The FrameForge v2 document contract — authoritative Pydantic models and the JSON Schema generated from them"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -37,6 +37,10 @@ yaml = ["pyyaml>=6"]
 
 [project.scripts]
 ff-schema = "frameforge_api.schema:main"
+# The migration path the contract's own error messages point at. It used to be
+# `tooling/codemod.py` in the frameforge monorepo, which meant the advice was
+# unactionable for anyone who installed this package on its own.
+ff-codemod = "frameforge_api.deprecations:main"
 
 [project.urls]
 Repository = "https://github.com/pedroanisio/frameforge-api"

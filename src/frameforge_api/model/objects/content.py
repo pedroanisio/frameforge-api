@@ -2,10 +2,10 @@
 """
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Annotated, Literal, Optional, Union
 from pydantic import ConfigDict, Field, model_validator
 
-from ..base import Color, Length
+from ..base import Color, FG, Length
 from ..inline import Inline, Span
 from ..layout import Anchor, ClipSpec
 from .base import ObjBase
@@ -45,6 +45,68 @@ class Image(ObjBase):
         default=None, description="Clip the image to its box: bool, shape name, or ClipSpec.")
     radius: Optional[Length] = Field(default=None, description="Corner radius of the image frame.")
     label: Optional[str] = Field(default=None, description="Short caption/label drawn with the image.")
+
+
+class GenerationParams(FG):
+    """Portable parameters for a model-backed content-generation request.
+
+    Provider-specific request bodies do not belong in the durable document
+    contract. This closed vocabulary captures the parameters FrameForge can pin
+    and compare across providers while leaving endpoint adaptation to the
+    author-side generation tier.
+    """
+    seed: Optional[int] = Field(
+        default=None, description="Requested deterministic seed, when the selected model supports one.")
+    size: Optional[Union[
+        str,
+        Annotated[
+            list[Annotated[int, Field(gt=0)]],
+            Field(min_length=2, max_length=2),
+        ],
+    ]] = Field(
+        default=None, description="Requested output size: a provider name such as '1024x1024' "
+                                  "or positive [width, height] pixels.")
+    style: Optional[str] = Field(
+        default=None, min_length=1, pattern=r"\S",
+        description="Provider-neutral style hint recorded with the generation request.")
+
+
+class GenerativeObject(ObjBase):
+    """Unresolved authoring intent for content produced by a generative model.
+
+    A generation tier consumes this object once, verifies the result, lowers it
+    to an ordinary image/text/group object, and pins the resulting asset. A
+    renderer must never treat this object as permission to make a live model
+    call: model sampling is non-deterministic and outside the durable IR.
+    """
+    type: Literal["generative"] = Field(
+        description="Discriminator: unresolved model-generated authoring content.")
+    kind: Literal["image", "text", "diagram"] = Field(
+        description="Concrete content family the generation tier must produce.")
+    prompt: str = Field(
+        min_length=1, pattern=r"\S",
+        description="Nonblank source prompt supplied to the selected generative model.")
+    model: str = Field(
+        min_length=1, pattern=r"\S",
+        description="Model identifier recorded for reproducibility and provenance.")
+    params: Optional[GenerationParams] = Field(
+        default=None, description="Portable seed, size and style parameters for the request.")
+    alt: Optional[str] = Field(
+        default=None, description="Accessibility alternative text for image/diagram output.")
+    actual_text: Optional[str] = Field(
+        default=None, description="Full semantic replacement text for tagged/a11y export.")
+    regenerate: bool = Field(
+        default=False, description="Bypass a matching generation cache entry and request a fresh result.")
+
+    @model_validator(mode="after")
+    def _visual_output_has_accessible_text(self):
+        if self.kind in ("image", "diagram") and not any(
+                value is not None and value.strip()
+                for value in (self.alt, self.actual_text)):
+            raise ValueError(
+                "generative image/diagram output requires nonblank `alt` or `actual_text`"
+            )
+        return self
 
 
 class Icon(ObjBase):

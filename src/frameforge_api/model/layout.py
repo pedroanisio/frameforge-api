@@ -1,9 +1,12 @@
-"""Layout, content sizing, and the ordered effect/appearance stacks (P1 + P4).
+"""Layout, content sizing, the baseline grid, and the ordered effect/appearance
+stacks (P1 + P4 + 2.10.0).
 """
 from __future__ import annotations
 
+import re
+
 from typing import Annotated, Literal, Optional, Union
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from .base import Color, FG, Length, NumberFormat, Padding, Point, UnitInterval
 from .style import Paint, StrokeStyleRef
@@ -29,6 +32,55 @@ class Layout(FG):
         default=None, description="CROSS-axis alignment of children (default start).")
     justify: Optional[Literal["start", "center", "end", "space-between", "space-around", "space-evenly"]] = Field(
         default=None, description="MAIN-axis packing/distribution of children.")
+
+
+# --------------------------------------------------------------------------- #
+#  Baseline grid — the vertical rhythm the spatial grid is measured against    #
+# --------------------------------------------------------------------------- #
+class BaselineGrid(FG):
+    """The leading grid text baselines snap to.
+
+    `Layout(kind="grid")` places boxes; it says nothing about what those boxes
+    should be *divisible by*. That is what a baseline grid supplies, and its
+    absence is visible: if body text is 10pt on 13pt leading and a module's
+    height is not a multiple of 13, every row leaves a remainder at its foot and
+    the horizontal gutters stop looking equal. The same increment is what aligns
+    type across the gutter between columns and across the two leaves of a
+    spread — which is exactly where `FlowRegion.column_fill: balance` and
+    `CanvasObject.spread` need it.
+
+    Declared once at `defs.baseline_grid` (the document default, and the only
+    scope a flowed section has), overridden per page at
+    `RenderingContract.baseline_grid`. It is inert until something opts in:
+    a block snaps to it by setting `align_to_baseline` on its style.
+
+    The increment IS the body leading — set them to the same value.
+    """
+    increment: Length = Field(
+        description="Grid pitch: the distance between successive gridlines, and normally "
+                    "the body text's `line_height`. Must be positive.")
+    start: Optional[Length] = Field(
+        default=None, description="Offset of the first gridline from `relative_to` "
+                                  "(default 0).")
+    relative_to: Optional[Literal["page", "top_margin"]] = Field(
+        default=None, description="Datum the grid is measured from: the page edge, or the top "
+                                  "content margin (default top_margin, so the grid follows the "
+                                  "text block rather than the trim).")
+
+    @model_validator(mode="after")
+    def _increment_is_positive(self):
+        raw = self.increment
+        # The pattern is inlined rather than hoisted to a module constant: every
+        # top-level declaration in this package is part of the import surface
+        # (the surface golden enforces it), and this is an implementation detail.
+        # `LENGTH_STR_RE` has already guaranteed a leading numeric part.
+        number = float(raw) if isinstance(raw, (int, float)) else float(
+            re.match(r"-?(?:\d+\.?\d*|\.\d+)", raw).group())
+        if number <= 0:
+            raise ValueError(
+                "baseline_grid.increment must be positive: a zero pitch is infinitely "
+                "many gridlines and a negative one marches up the page")
+        return self
 
 
 SizeMode = Literal["fixed", "hug", "fill"]

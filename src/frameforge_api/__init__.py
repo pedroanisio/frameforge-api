@@ -51,6 +51,9 @@ Usage
 """
 from __future__ import annotations
 
+from frameforge_api import deprecations
+from frameforge_api.deprecations import migrate as migrate_document
+from frameforge_api.deprecations import scan as scan_document
 from frameforge_api.model import HEAD_VERSION, Document
 from frameforge_api.schema import SCHEMA_PATH
 from frameforge_api.schema import build as build_schema
@@ -72,21 +75,62 @@ from frameforge_api.schema import load as load_schema
 #: change must not force a major bump of a package whose API did not move. Pin
 #: the distribution with ``frameforge-api>=1.0``; branch on ``HEAD_VERSION``
 #: when you need to know what the *document* contract supports.
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 
 #: The FrameForge document-format revision carried by this package. Re-exported
 #: at the root because it, not `__version__`, is what document-level
 #: compatibility is decided against.
 CONTRACT_VERSION = HEAD_VERSION
 
+#: What a move of :data:`HEAD_VERSION` inside the 2.x line promises a DOCUMENT.
+#:
+#: SemVer says what the *numbers* mean; it does not answer the only question a
+#: consumer actually has, which is whether the file they wrote last year still
+#: parses. This does, in the schema-registry sense the term carries in Avro and
+#: Kafka:
+#:
+#:   ``backward`` — a document valid under ANY earlier 2.x revision stays valid
+#:   at HEAD. Within the line, a change may add an optional field, add a union
+#:   member, widen a type, relax a constraint, or make a required field
+#:   optional. It may not add a required field, remove or rename one, drop a
+#:   union member, narrow a type, tighten a constraint, or change what an
+#:   existing value means.
+#:
+#: The reverse (a HEAD document read by an older validator) is deliberately NOT
+#: promised: a reader that predates spot ink cannot interpret it.
+#:
+#: The 2.x line had held this property since 2.0.0 without stating it, which
+#: made it an accident rather than a guarantee. `tests/test_backward_compat.py`
+#: is what turns it into one — it replays a committed corpus of older documents,
+#: and the whole monorepo fixture corpus by declared revision, on every run.
+COMPATIBILITY = "backward"
+
+#: Every deprecated form in the contract, as data rather than as prose.
+#:
+#: Deprecation used to live only inside English ``description`` strings, which
+#: meant no tool could see it: a codegen pass, an editor, or a model reading the
+#: JSON Schema had nothing to key on. It is machine-readable now — here, and in
+#: the schema under ``x-frameforge-deprecations``.
+#:
+#: Backward compatibility puts a hard floor under what "deprecated" can mean in
+#: this line: a form valid under an earlier 2.x revision cannot start being
+#: rejected at HEAD, so these stay valid until 3.0. Discouraged, mechanically
+#: migratable (:func:`migrate_document` / ``ff-codemod``), and still accepted.
+DEPRECATIONS = deprecations.DEPRECATIONS
+
 __all__ = [
+    "COMPATIBILITY",
     "CONTRACT_VERSION",
+    "DEPRECATIONS",
     "HEAD_VERSION",
     "SCHEMA_PATH",
     "Document",
     "__version__",
     "build_schema",
     "check_schema",
+    "deprecations",
     "load_schema",
+    "migrate_document",
     "model",
+    "scan_document",
 ]

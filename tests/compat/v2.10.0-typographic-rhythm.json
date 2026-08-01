@@ -1,0 +1,154 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.10.0",
+  "title": "A book on a baseline grid — everything 2.10.0 added, in one document",
+  "description": "10pt type on 13pt leading, on a 13pt baseline grid, in two balanced columns across a spread — the case where cross-column baseline alignment is visible. Declares its intended measure and a press profile that caps total ink. Validated by tests/test_examples.py, so it cannot rot.",
+  "lang": "en",
+  "defs": {
+    "baseline_grid": {
+      "increment": "13pt",
+      "start": 0,
+      "relative_to": "top_margin"
+    },
+    "color_profiles": {
+      "fogra39": {
+        "space": "cmyk",
+        "name": "Coated FOGRA39 (ISO 12647-2:2004)",
+        "src": "profiles/CoatedFOGRA39.icc",
+        "hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "rendering_intent": "relative-colorimetric",
+        "total_ink_limit": 3.0
+      }
+    },
+    "tokens": {
+      "colors": {
+        "ink": { "space": "cmyk", "c": 0, "m": 0, "y": 0, "k": 1 },
+        "rule": { "space": "cmyk", "c": 0, "m": 0, "y": 0, "k": 0.25 }
+      },
+      "styles": {
+        "body": {
+          "font_size": "10pt",
+          "line_height": "13pt",
+          "color": "ink",
+          "text_align": "justify",
+          "hyphens": "auto",
+          "hyphenate_limit_chars": [6, 3, 3],
+          "hanging_punctuation": "allow-end",
+          "align_to_baseline": true
+        },
+        "chapter": {
+          "font_size": "26pt",
+          "line_height": "39pt",
+          "color": "ink",
+          "align_to_baseline": true
+        },
+        "caption": {
+          "font_size": "8pt",
+          "line_height": "13pt",
+          "color": "rule",
+          "align_to_baseline": false
+        }
+      }
+    },
+    "masters": {
+      "spread": {
+        "canvas": { "preset": "book-6x9", "spread": true, "bleed": "3mm" },
+        "margin": {
+          "top": "52pt",
+          "bottom": "65pt",
+          "inside": "72pt",
+          "outside": "54pt",
+          "gutter": "9pt"
+        },
+        "regions": [
+          {
+            "id": "text",
+            "box": [72, 52, 720, 520],
+            "columns": 2,
+            "column_gap": "18pt",
+            "column_fill": "balance",
+            "column_rule": { "width": "0.25pt", "style": "solid", "color": "rule" }
+          }
+        ]
+      }
+    }
+  },
+  "text_contract": {
+    "measure": [60, 72]
+  },
+  "targets": [
+    {
+      "name": "press",
+      "canvas": { "preset": "book-6x9", "bleed": "3mm" },
+      "output": {
+        "format": "pdf",
+        "dpi": 300,
+        "output_intent": "press",
+        "color_space": "cmyk",
+        "color_profile": "fogra39",
+        "font_embedding": "subset",
+        "crop_marks": true,
+        "registration_marks": true
+      }
+    }
+  ],
+  "pages": [
+    {
+      "mode": "page",
+      "id": "half-title",
+      "side": "recto",
+      "canvas": { "preset": "book-6x9" },
+      "rendering": {
+        "baseline_grid": { "increment": "18pt", "relative_to": "page" },
+        "text": { "measure": [30, 45] }
+      },
+      "layers": [
+        {
+          "id": "type",
+          "objects": [
+            {
+              "type": "text",
+              "id": "half-title-text",
+              "box": [72, 180, 288, 60],
+              "text": "A book on a baseline grid",
+              "style": { "font_size": "18pt", "line_height": "18pt", "align_to_baseline": true }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "flow",
+      "id": "body",
+      "master": "spread",
+      "story": [
+        {
+          "type": "heading",
+          "level": 1,
+          "id": "ch1",
+          "text": "The increment is the leading",
+          "style": "chapter"
+        },
+        {
+          "type": "paragraph",
+          "style": "body",
+          "widows": 2,
+          "orphans": 2,
+          "text": "A baseline grid fixes one number — the distance between successive gridlines — and every snapped baseline lands on a multiple of it. Set the increment to the body leading and the two columns of this spread line up across the gutter, and across the fold, without anyone measuring anything."
+        },
+        {
+          "type": "paragraph",
+          "style": "body",
+          "widows": 2,
+          "orphans": 2,
+          "text": "Module heights follow from the same number. A row whose height is not a multiple of the increment leaves a remainder at its foot, and the horizontal gutters stop looking equal even though every gap was authored identically. That is the failure the grid exists to prevent, and it is invisible in the source."
+        },
+        {
+          "type": "paragraph",
+          "style": "caption",
+          "text": "A caption opts out with align_to_baseline: false — it is set smaller than the grid and should sit tight to its figure rather than being pushed to the next gridline."
+        }
+      ]
+    }
+  ]
+}

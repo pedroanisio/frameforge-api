@@ -1,0 +1,98 @@
+{
+  "dsl": "FrameForge",
+  "version": "2.11.0",
+  "title": "Matte and star — the Lottie-parity graphics primitives",
+  "description": "A poster that knocks type out of a photograph with an alpha matte, fades a group under a luminance ramp, and draws a parametric star instead of ten hand-computed vertices. Validated by tests/test_examples.py.",
+
+  "defs": {
+    "symbols": {
+      "rosette": {
+        "content": [
+          {"type": "star", "center": [16, 16], "points": 12, "outer_radius": 16,
+           "inner_radius": 11, "outer_roundness": 0.4, "fill": "#fc0"}
+        ],
+        "viewbox": [0, 0, 32, 32],
+        "description": "A twelve-point rosette used as an award mark."
+      }
+    }
+  },
+
+  "pages": [{
+    "mode": "page",
+    "id": "poster",
+    "canvas": {"size": [600, 800], "units": "px"},
+    "layers": [{
+      "id": "main",
+      "objects": [
+        {
+          "type": "image",
+          "id": "photo",
+          "name": "Cover photograph",
+          "box": [0, 0, 600, 420],
+          "src": "cover.jpg",
+          "alt": "A harbour at dawn."
+        },
+        {
+          "type": "text",
+          "id": "masthead",
+          "name": "Masthead knocked out of the photograph",
+          "box": [40, 120, 520, 180],
+          "text": "HARBOUR",
+          "style": {"font_size": 128, "font_weight": 700, "text_align": "center"},
+          "matte": {"source": "photo", "mode": "alpha"}
+        },
+
+        {
+          "type": "rect",
+          "id": "ramp",
+          "name": "Luminance ramp driving the fade",
+          "decorative": true,
+          "box": [0, 440, 600, 200],
+          "fill": {
+            "kind": "linear",
+            "angle": 90,
+            "stops": [{"color": "#ffffff", "position": "0%"},
+                      {"color": "#000000", "position": "100%"}]
+          }
+        },
+        {
+          "type": "group",
+          "name": "Standfirst, faded out by the ramp",
+          "box": [40, 440, 520, 200],
+          "matte": {"source": "ramp", "mode": "luma"},
+          "children": [
+            {"type": "text", "box": [0, 0, 520, 60], "text": "Notes from the water"},
+            {"type": "text", "box": [0, 70, 520, 120],
+             "text": "Six months on a working quay, and what the tide left behind."}
+          ]
+        },
+
+        {
+          "type": "star",
+          "id": "award",
+          "name": "Award mark",
+          "center": [520, 720],
+          "points": 5,
+          "outer_radius": 48,
+          "inner_radius": 20,
+          "outer_roundness": 0.15,
+          "rotation": -18,
+          "direction": "counter-clockwise",
+          "fill": {"space": "spot", "name": "PANTONE 872 C", "system": "pantone"},
+          "stroke": "#000",
+          "stroke_style": {"stroke_width": "0.75pt"}
+        },
+        {
+          "type": "star",
+          "name": "Hexagonal rule ornament",
+          "star_type": "polygon",
+          "center": [80, 720],
+          "points": 6,
+          "outer_radius": 36,
+          "fill": "none",
+          "stroke": "#333"
+        }
+      ]
+    }]
+  }]
+}

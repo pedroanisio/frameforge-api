@@ -27,9 +27,21 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from frameforge_api.deprecations import registry_json
 from frameforge_api.model import HEAD_VERSION, Document
 
 __all__ = ["SCHEMA_PATH", "build", "check", "load", "main", "write"]
+
+#: Vendor extension carrying the deprecation registry.
+#:
+#: The three deprecated object types can use the standard 2020-12 ``deprecated``
+#: keyword, because they are `$defs`. The deprecated *keys* cannot: ``offset``,
+#: ``object``, ``type``, ``c1``/``c2`` and ``dash`` are normalised by
+#: ``mode="before"`` validators, so they are accepted by the models and never
+#: appear in the schema as properties — there is nothing for the keyword to
+#: annotate. Without this block a consumer reading the schema alone cannot learn
+#: either that those spellings are legal or that they are discouraged.
+DEPRECATIONS_KEY = "x-frameforge-deprecations"
 
 #: The generated schema as shipped in the wheel. Package data, not a repo path,
 #: so it resolves identically from a checkout and from an installed wheel.
@@ -55,6 +67,7 @@ def build() -> dict[str, Any]:
         f"FrameForge v2 (HEAD {HEAD_VERSION}) — generated from the Pydantic models "
         f"(core conformance profile)"
     )
+    schema[DEPRECATIONS_KEY] = registry_json()
     return schema
 
 

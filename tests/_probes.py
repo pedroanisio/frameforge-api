@@ -20,8 +20,10 @@ from __future__ import annotations
 from frameforge_api import HEAD_VERSION
 
 
-def doc(*objects, **over) -> dict:
+def doc(*objects, defs=None, **over) -> dict:
     """A minimal valid document wrapping `objects` on one page."""
+    if defs is not None:
+        over.setdefault("defs", defs)
     d = {
         "dsl": "FrameForge",
         "version": HEAD_VERSION,
@@ -185,4 +187,205 @@ PROBES: list[tuple[str, dict]] = [
     ("nested_groups_accepted", doc({
         "type": "group", "box": [0, 0, 100, 100],
         "children": [{"type": "group", "box": [0, 0, 50, 50], "children": [TEXT]}]})),
+
+    # ======================================================================== #
+    #  2.9.0 — print colour, book geometry, CJKV annotation, render output     #
+    # ======================================================================== #
+    # These are goldened for the same reason as everything above: the schema
+    # proves the SHAPE of the new models, and only a verdict proves the guards
+    # around them still fire.
+
+    # -- typed colour --------------------------------------------------------- #
+    ("cmyk_fill_accepted", doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "fill": {"space": "cmyk", "c": 0, "m": 0.9, "y": 0.8, "k": 0}})),
+    ("cmyk_component_above_one_rejected", doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "fill": {"space": "cmyk", "c": 0, "m": 90, "y": 0, "k": 0}})),
+    ("cmyk_missing_a_separation_rejected", doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "fill": {"space": "cmyk", "c": 0, "m": 0.5, "y": 0}})),
+    ("spot_ink_accepted", doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "fill": {"space": "spot", "name": "PANTONE 283 C", "system": "pantone", "tint": 0.4}})),
+    ("spot_ink_without_name_rejected", doc({
+        "type": "rect", "box": [0, 0, 10, 10], "fill": {"space": "spot", "tint": 0.4}})),
+    ("unknown_color_space_rejected", doc({
+        "type": "rect", "box": [0, 0, 10, 10], "fill": {"space": "hsv", "h": 1}})),
+    ("icc_color_with_declared_profile_accepted", doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "fill": {"space": "icc", "profile": "fogra39", "components": [0.1, 0.8, 0.7, 0]}},
+        defs={"color_profiles": {"fogra39": {"space": "cmyk"}}})),
+    ("color_profile_without_space_rejected",
+     doc(TEXT, defs={"color_profiles": {"fogra39": {"src": "x.icc"}}})),
+    ("overprint_accepted", doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "style": {"overprint": "both", "overprint_mode": "nonzero-cmyk"}})),
+    ("unknown_overprint_rejected", doc({
+        "type": "rect", "box": [0, 0, 10, 10], "style": {"overprint": "sometimes"}})),
+    ("hex_color_still_accepted", doc({
+        "type": "rect", "box": [0, 0, 10, 10], "fill": "#d4145a"})),
+
+    # -- book geometry -------------------------------------------------------- #
+    ("spine_relative_margin_accepted", doc(**{"pages": [{
+        "mode": "page", "id": "p1", "side": "verso",
+        "canvas": {"preset": "book-6x9", "margin": {
+            "top": "18mm", "bottom": "22mm", "inside": "20mm",
+            "outside": "14mm", "gutter": "5mm"}},
+        "layers": [{"id": "l", "objects": [TEXT]}]}]})),
+    ("mixed_margin_vocabularies_rejected", doc(**{"pages": [{
+        "mode": "page", "id": "p1",
+        "canvas": {"preset": "book-6x9", "margin": {"left": "20mm", "inside": "20mm"}},
+        "layers": [{"id": "l", "objects": [TEXT]}]}]})),
+    ("box_margin_still_accepted", doc(**{"pages": [{
+        "mode": "page", "id": "p1",
+        "canvas": {"size": [400, 200], "units": "px", "margin": [10, 10, 10, 10]},
+        "layers": [{"id": "l", "objects": [TEXT]}]}]})),
+    ("spread_canvas_accepted", doc(**{"pages": [{
+        "mode": "page", "id": "p1",
+        "canvas": {"preset": "book-6x9", "spread": True},
+        "layers": [{"id": "l", "objects": [TEXT]}]}]})),
+    ("unknown_page_side_rejected", doc(**{"pages": [{
+        "mode": "page", "id": "p1", "side": "left",
+        "canvas": {"preset": "book-6x9"},
+        "layers": [{"id": "l", "objects": [TEXT]}]}]})),
+
+    # -- CJKV annotation ------------------------------------------------------ #
+    ("ruby_group_annotation_accepted", doc({
+        "type": "text", "box": [0, 0, 100, 20],
+        "spans": [{"kind": "ruby", "base": "漢字", "text": "かんじ", "position": "over"}]})),
+    ("ruby_mono_annotation_accepted", doc({
+        "type": "text", "box": [0, 0, 100, 20],
+        "spans": [{"kind": "ruby", "base": "漢字", "text": ["かん", "じ"]}]})),
+    ("ruby_without_annotation_rejected", doc({
+        "type": "text", "box": [0, 0, 100, 20],
+        "spans": [{"kind": "ruby", "base": "漢字"}]})),
+    ("unknown_ruby_position_rejected", doc({
+        "type": "text", "box": [0, 0, 100, 20],
+        "spans": [{"kind": "ruby", "base": "a", "text": "b", "position": "beside"}]})),
+    ("warichu_accepted", doc({
+        "type": "text", "box": [0, 0, 100, 20],
+        "spans": ["本文", {"kind": "warichu", "content": ["割注"], "lines": 2,
+                           "brackets": "parenthesis"}]})),
+    ("warichu_with_one_line_rejected", doc({
+        "type": "text", "box": [0, 0, 100, 20],
+        "spans": [{"kind": "warichu", "content": ["x"], "lines": 1}]})),
+
+    # -- render output -------------------------------------------------------- #
+    ("render_output_press_accepted", doc(**{"targets": [{
+        "name": "press", "canvas": {"preset": "book-6x9"},
+        "output": {"format": "pdf", "dpi": 300, "output_intent": "press",
+                   "color_space": "cmyk", "font_embedding": "subset",
+                   "crop_marks": True, "registration_marks": True}}]})),
+    ("render_output_without_canvas_accepted", doc(**{"targets": [{
+        "name": "web", "output": {"format": "png", "dpi": 144}}]})),
+    ("unknown_output_format_rejected", doc(**{"targets": [{
+        "name": "x", "canvas": {"preset": "A4"}, "output": {"format": "docx"}}]})),
+    ("non_positive_dpi_rejected", doc(**{"targets": [{
+        "name": "x", "canvas": {"preset": "A4"}, "output": {"dpi": 0}}]})),
+    ("legacy_three_field_target_accepted", doc(**{"targets": [{
+        "name": "mobile", "canvas": {"preset": "phone"},
+        "adjustments": {"font_scale": 0.8}}]})),
+
+    # -- unresolved generative authoring intent ----------------------------- #
+    ("generative_image_with_alt_accepted", doc({
+        "type": "generative", "kind": "image",
+        "prompt": "A paper-cut forest", "model": "image-model-v1",
+        "params": {"seed": 42, "size": [1024, 1024]},
+        "box": [0, 0, 100, 100], "alt": "Layered paper trees."})),
+    ("generative_image_without_accessible_text_rejected", doc({
+        "type": "generative", "kind": "image",
+        "prompt": "A paper-cut forest", "model": "image-model-v1",
+        "box": [0, 0, 100, 100]})),
+
+    # -- typographic rhythm: the baseline grid (2.10.0) ---------------------- #
+    # The guards here are the whole value of the field. A grid with a zero or
+    # negative pitch is not a stricter grid, it is a non-terminating layout, and
+    # nothing downstream would report it — the renderer would divide by it.
+    ("baseline_grid_accepted", doc(defs={"baseline_grid": {
+        "increment": "13pt", "start": 0, "relative_to": "top_margin"}})),
+    ("baseline_grid_bare_increment_accepted", doc(defs={"baseline_grid": {"increment": 13}})),
+    ("baseline_grid_page_override_accepted", doc(**{"pages": [{
+        "mode": "page", "id": "p1", "canvas": {"size": [400, 200], "units": "px"},
+        "rendering": {"baseline_grid": {"increment": 15}},
+        "layers": [{"id": "main", "objects": [
+            {"type": "text", "box": [20, 20, 360, 40], "text": "Hello"}]}]}]})),
+    ("baseline_grid_zero_increment_rejected", doc(defs={"baseline_grid": {"increment": 0}})),
+    ("baseline_grid_negative_increment_rejected", doc(defs={"baseline_grid": {"increment": -13}})),
+    ("baseline_grid_negative_length_string_rejected",
+     doc(defs={"baseline_grid": {"increment": "-13pt"}})),
+    ("baseline_grid_bad_unit_rejected", doc(defs={"baseline_grid": {"increment": "13ptx"}})),
+    ("baseline_grid_without_increment_rejected", doc(defs={"baseline_grid": {"start": 0}})),
+    ("baseline_grid_unknown_datum_rejected",
+     doc(defs={"baseline_grid": {"increment": 13, "relative_to": "middle"}})),
+    ("align_to_baseline_on_a_token_style_accepted", doc(defs={
+        "baseline_grid": {"increment": 13},
+        "tokens": {"styles": {"body": {"line_height": 13, "align_to_baseline": True}}}})),
+    ("align_to_baseline_inline_accepted", doc({
+        "type": "text", "box": [0, 0, 100, 20], "text": "x",
+        "style": {"align_to_baseline": True}})),
+
+    # -- typographic rhythm: measure (2.10.0) -------------------------------- #
+    ("measure_accepted", doc(**{"text_contract": {"measure": [45, 75]}})),
+    ("measure_exact_accepted", doc(**{"text_contract": {"measure": [66, 66]}})),
+    ("measure_inverted_rejected", doc(**{"text_contract": {"measure": [75, 45]}})),
+    ("measure_zero_bound_rejected", doc(**{"text_contract": {"measure": [0, 75]}})),
+    ("measure_single_bound_rejected", doc(**{"text_contract": {"measure": [45]}})),
+
+    # -- prepress: the total ink cap (2.10.0) -------------------------------- #
+    # 400 is the percentage spelling of the same number. Accepting it would read
+    # as 40000% coverage and pass every downstream check.
+    ("total_ink_limit_accepted", doc(defs={"color_profiles": {"press": {
+        "space": "cmyk", "name": "Coated FOGRA39", "total_ink_limit": 3.0}}})),
+    ("total_ink_limit_percentage_form_rejected", doc(defs={"color_profiles": {"press": {
+        "space": "cmyk", "total_ink_limit": 300}}})),
+    ("total_ink_limit_above_four_separations_rejected", doc(defs={"color_profiles": {"press": {
+        "space": "cmyk", "total_ink_limit": 4.1}}})),
+    ("total_ink_limit_zero_rejected", doc(defs={"color_profiles": {"press": {
+        "space": "cmyk", "total_ink_limit": 0}}})),
+    # ======================================================================== #
+    #  Lottie-parity — matte, parametric star, winding, name, symbol shape     #
+    # ======================================================================== #
+    ("matte_alpha_accepted", doc(
+        {"type": "image", "id": "photo", "box": [0, 0, 100, 100], "src": "p.jpg"},
+        {"type": "text", "id": "knock", "box": [0, 0, 100, 100], "text": "M",
+         "matte": {"source": "photo", "mode": "alpha"}})),
+    ("matte_luma_inverted_accepted", doc(
+        {"type": "rect", "id": "ramp", "box": [0, 0, 10, 10], "fill": "#fff"},
+        {"type": "rect", "box": [0, 0, 10, 10], "fill": "#f00",
+         "matte": {"source": "ramp", "mode": "luma", "invert": True}})),
+    ("matte_without_source_rejected", doc({**TEXT, "matte": {"mode": "alpha"}})),
+    ("matte_unknown_mode_rejected", doc({**TEXT, "matte": {"source": "x", "mode": "stencil"}})),
+    ("matte_self_reference_rejected", doc(
+        {**TEXT, "id": "a", "matte": {"source": "a", "mode": "alpha"}})),
+
+    ("star_accepted", doc({"type": "star", "center": [50, 50], "points": 5,
+                           "outer_radius": 50, "inner_radius": 20})),
+    ("polygon_star_type_accepted", doc({"type": "star", "star_type": "polygon",
+                                        "center": [50, 50], "points": 6, "outer_radius": 40})),
+    ("star_without_inner_radius_rejected", doc({"type": "star", "center": [50, 50],
+                                                "points": 5, "outer_radius": 50})),
+    ("polygon_with_inner_radius_rejected", doc({"type": "star", "star_type": "polygon",
+                                                "center": [50, 50], "points": 6,
+                                                "outer_radius": 40, "inner_radius": 10})),
+    ("star_with_two_points_rejected", doc({"type": "star", "center": [50, 50], "points": 2,
+                                           "outer_radius": 50, "inner_radius": 20})),
+    ("star_with_zero_outer_radius_rejected", doc({"type": "star", "center": [50, 50],
+                                                  "points": 5, "outer_radius": 0,
+                                                  "inner_radius": 20})),
+    ("star_roundness_above_one_rejected", doc({"type": "star", "center": [50, 50], "points": 5,
+                                               "outer_radius": 50, "inner_radius": 20,
+                                               "outer_roundness": 2})),
+
+    ("shape_direction_accepted", doc({"type": "path", "d": "M 0 0 L 1 1",
+                                      "direction": "counter-clockwise"})),
+    ("unknown_shape_direction_rejected", doc({"type": "path", "d": "M 0 0 L 1 1",
+                                              "direction": "widdershins"})),
+
+    ("object_name_accepted", doc({**TEXT, "id": "h1", "name": "Chapter heading"})),
+
+    ("typed_symbol_def_accepted", doc(TEXT, defs={"symbols": {"badge": {
+        "content": [{"type": "circle", "center": [8, 8], "r": 8}],
+        "viewbox": [0, 0, 16, 16]}}})),
+    ("loose_symbol_body_still_accepted", doc(TEXT, defs={"symbols": {"legacy": {"x": [1]}}})),
 ]

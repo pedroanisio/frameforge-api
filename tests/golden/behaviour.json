@@ -1,4 +1,12 @@
 {
+  "align_to_baseline_inline_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "align_to_baseline_on_a_token_style_accepted": {
+    "errors": [],
+    "valid": true
+  },
   "bad_angle_unit_rejected": {
     "errors": [
       [
@@ -56,6 +64,10 @@
       [
         "string_type",
         "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ],
+      [
+        "union_tag_not_found",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...]"
       ]
     ],
     "valid": false
@@ -81,6 +93,84 @@
     ],
     "valid": false
   },
+  "baseline_grid_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "baseline_grid_bad_unit_rejected": {
+    "errors": [
+      [
+        "float_parsing",
+        "defs.baseline_grid.increment.float"
+      ],
+      [
+        "int_parsing",
+        "defs.baseline_grid.increment.int"
+      ],
+      [
+        "string_pattern_mismatch",
+        "defs.baseline_grid.increment.constrained-str"
+      ]
+    ],
+    "valid": false
+  },
+  "baseline_grid_bare_increment_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "baseline_grid_negative_increment_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "defs.baseline_grid"
+      ]
+    ],
+    "valid": false
+  },
+  "baseline_grid_negative_length_string_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "defs.baseline_grid"
+      ]
+    ],
+    "valid": false
+  },
+  "baseline_grid_page_override_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "baseline_grid_unknown_datum_rejected": {
+    "errors": [
+      [
+        "literal_error",
+        "defs.baseline_grid.relative_to"
+      ]
+    ],
+    "valid": false
+  },
+  "baseline_grid_without_increment_rejected": {
+    "errors": [
+      [
+        "missing",
+        "defs.baseline_grid.increment"
+      ]
+    ],
+    "valid": false
+  },
+  "baseline_grid_zero_increment_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "defs.baseline_grid"
+      ]
+    ],
+    "valid": false
+  },
+  "box_margin_still_accepted": {
+    "errors": [],
+    "valid": true
+  },
   "canvas_with_both_preset_and_size": {
     "errors": [
       [
@@ -103,6 +193,193 @@
       [
         "value_error",
         "pages.0.page.canvas.function-after[_preset_or_size(), CanvasObject]"
+      ]
+    ],
+    "valid": false
+  },
+  "cmyk_component_above_one_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.c"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.k"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.m"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.y"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.c"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.k"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.m"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.y"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].c"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].k"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].m"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].y"
+      ],
+      [
+        "less_than_equal",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...].cmyk.m"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].stops"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ]
+    ],
+    "valid": false
+  },
+  "cmyk_fill_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "cmyk_missing_a_separation_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.c"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.m"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.y"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.c"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.m"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.y"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].c"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].m"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].y"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].stops"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...].cmyk.k"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ]
+    ],
+    "valid": false
+  },
+  "color_profile_without_space_rejected": {
+    "errors": [
+      [
+        "missing",
+        "defs.color_profiles.fogra39.space"
       ]
     ],
     "valid": false
@@ -148,6 +425,19 @@
   "flow_section_accepted": {
     "errors": [],
     "valid": true
+  },
+  "generative_image_with_alt_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "generative_image_without_accessible_text_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.generative"
+      ]
+    ],
+    "valid": false
   },
   "good_length_unit_accepted": {
     "errors": [],
@@ -196,6 +486,10 @@
         "pages.0.page.layers.0.objects.0.rect.fill.str"
       ],
       [
+        "union_tag_not_found",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...]"
+      ],
+      [
         "value_error",
         "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient]"
       ]
@@ -239,6 +533,10 @@
       [
         "string_type",
         "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ],
+      [
+        "union_tag_not_found",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...]"
       ],
       [
         "value_error",
@@ -286,6 +584,10 @@
         "pages.0.page.layers.0.objects.0.rect.fill.str"
       ],
       [
+        "union_tag_not_found",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...]"
+      ],
+      [
         "value_error",
         "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient]"
       ]
@@ -313,6 +615,92 @@
     ],
     "valid": false
   },
+  "hex_color_still_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "icc_color_with_declared_profile_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "legacy_three_field_target_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "loose_symbol_body_still_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "matte_alpha_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "matte_luma_inverted_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "matte_self_reference_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.text"
+      ]
+    ],
+    "valid": false
+  },
+  "matte_unknown_mode_rejected": {
+    "errors": [
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.matte.mode"
+      ]
+    ],
+    "valid": false
+  },
+  "matte_without_source_rejected": {
+    "errors": [
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.matte.source"
+      ]
+    ],
+    "valid": false
+  },
+  "measure_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "measure_exact_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "measure_inverted_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "text_contract"
+      ]
+    ],
+    "valid": false
+  },
+  "measure_single_bound_rejected": {
+    "errors": [
+      [
+        "too_short",
+        "text_contract.measure"
+      ]
+    ],
+    "valid": false
+  },
+  "measure_zero_bound_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "text_contract"
+      ]
+    ],
+    "valid": false
+  },
   "minimal_document": {
     "errors": [],
     "valid": true
@@ -326,9 +714,35 @@
     ],
     "valid": false
   },
+  "mixed_margin_vocabularies_rejected": {
+    "errors": [
+      [
+        "list_type",
+        "pages.0.page.canvas.function-after[_preset_or_size(), CanvasObject].margin.list[union[float,int,constrained-str]]"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.canvas.literal['A3','A4','A5','Letter','Legal','Tabloid','deck-16x9','deck-4x3','square','phone','tablet','web','qhd','4k','uhd','8k','instagram-square','instagram-portrait','instagram-landscape','instagram-story','facebook-post','facebook-cover','facebook-story','twitter-post','twitter-header','linkedin-post','linkedin-cover','youtube-thumbnail','youtube-banner','tiktok-video','pinterest-pin','snapchat','story','1x1','4x5','5x4','9x16','16x9','2x3','3x2','1.91x1','3x1','book-pocket','book-mass-market','book-trade','book-novel','book-digest','book-6x9','book-7x10','book-8x10','book-textbook','book-square-8','book-picture','book-square-10','book-coffee-table','book-art-10x12','book-art-11x14']"
+      ],
+      [
+        "value_error",
+        "pages.0.page.canvas.function-after[_preset_or_size(), CanvasObject].margin.function-after[_one_horizontal_vocabulary(), PageMargin]"
+      ]
+    ],
+    "valid": false
+  },
   "nested_groups_accepted": {
     "errors": [],
     "valid": true
+  },
+  "non_positive_dpi_rejected": {
+    "errors": [
+      [
+        "greater_than",
+        "targets.0.output.dpi"
+      ]
+    ],
+    "valid": false
   },
   "non_semver_document_version_rejected": {
     "errors": [
@@ -338,6 +752,14 @@
       ]
     ],
     "valid": false
+  },
+  "object_name_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "overprint_accepted": {
+    "errors": [],
+    "valid": true
   },
   "p3_inline_stroke_geometry_rejected": {
     "errors": [
@@ -366,6 +788,257 @@
       [
         "value_error",
         "pages.0.flow.story.0.paragraph"
+      ]
+    ],
+    "valid": false
+  },
+  "polygon_star_type_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "polygon_with_inner_radius_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.star"
+      ]
+    ],
+    "valid": false
+  },
+  "render_output_press_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "render_output_without_canvas_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "ruby_group_annotation_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "ruby_mono_annotation_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "ruby_without_annotation_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.base"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.key"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.text"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.content"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.content"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.href"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.target"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.text"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.text"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.content"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.text.spans.0.str"
+      ]
+    ],
+    "valid": false
+  },
+  "shape_direction_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "spine_relative_margin_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "spot_ink_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "spot_ink_without_name_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.tint"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.tint"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].tint"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].stops"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...].spot.name"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ]
+    ],
+    "valid": false
+  },
+  "spread_canvas_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "star_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "star_roundness_above_one_rejected": {
+    "errors": [
+      [
+        "less_than_equal",
+        "pages.0.page.layers.0.objects.0.star.outer_roundness"
+      ]
+    ],
+    "valid": false
+  },
+  "star_with_two_points_rejected": {
+    "errors": [
+      [
+        "greater_than_equal",
+        "pages.0.page.layers.0.objects.0.star.points"
+      ]
+    ],
+    "valid": false
+  },
+  "star_with_zero_outer_radius_rejected": {
+    "errors": [
+      [
+        "greater_than",
+        "pages.0.page.layers.0.objects.0.star.outer_radius"
+      ]
+    ],
+    "valid": false
+  },
+  "star_without_inner_radius_rejected": {
+    "errors": [
+      [
+        "value_error",
+        "pages.0.page.layers.0.objects.0.star"
       ]
     ],
     "valid": false
@@ -409,6 +1082,98 @@
     "errors": [],
     "valid": true
   },
+  "total_ink_limit_above_four_separations_rejected": {
+    "errors": [
+      [
+        "less_than_equal",
+        "defs.color_profiles.press.total_ink_limit"
+      ]
+    ],
+    "valid": false
+  },
+  "total_ink_limit_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "total_ink_limit_percentage_form_rejected": {
+    "errors": [
+      [
+        "less_than_equal",
+        "defs.color_profiles.press.total_ink_limit"
+      ]
+    ],
+    "valid": false
+  },
+  "total_ink_limit_zero_rejected": {
+    "errors": [
+      [
+        "greater_than",
+        "defs.color_profiles.press.total_ink_limit"
+      ]
+    ],
+    "valid": false
+  },
+  "typed_symbol_def_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "unknown_color_space_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.h"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.h"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.space"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].h"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].space"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.Pattern.pattern"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.UrlImage.url"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.rect.fill.function-after[_check_user_space_geometry(), Gradient].stops"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.fill.str"
+      ],
+      [
+        "union_tag_invalid",
+        "pages.0.page.layers.0.objects.0.rect.fill.tagged-union[...,...,...]"
+      ]
+    ],
+    "valid": false
+  },
   "unknown_document_key": {
     "errors": [
       [
@@ -436,11 +1201,345 @@
     ],
     "valid": false
   },
+  "unknown_output_format_rejected": {
+    "errors": [
+      [
+        "literal_error",
+        "targets.0.output.format"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_overprint_rejected": {
+    "errors": [
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.rect.style.Style.overprint"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.rect.style.str"
+      ]
+    ],
+    "valid": false
+  },
   "unknown_page_key": {
     "errors": [
       [
         "extra_forbidden",
         "pages.0.page.not_a_field"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_page_side_rejected": {
+    "errors": [
+      [
+        "literal_error",
+        "pages.0.page.side"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_ruby_position_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.text"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.text"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.text"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.text"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.text"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.base"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.position"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.text"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.position"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.key"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.content"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.content"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.href"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.target"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.content"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.text.spans.0.str"
+      ]
+    ],
+    "valid": false
+  },
+  "unknown_shape_direction_rejected": {
+    "errors": [
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.path.direction"
+      ]
+    ],
+    "valid": false
+  },
+  "warichu_accepted": {
+    "errors": [],
+    "valid": true
+  },
+  "warichu_with_one_line_rejected": {
+    "errors": [
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.content"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.content"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.content"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.content"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.content"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.lines"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.content"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.kind"
+      ],
+      [
+        "extra_forbidden",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.lines"
+      ],
+      [
+        "greater_than_equal",
+        "pages.0.page.layers.0.objects.0.text.spans.0.WarichuInline.lines"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.MathInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.kind"
+      ],
+      [
+        "literal_error",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.kind"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CiteInline.key"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.CodeInline.text"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.LinkInline.href"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RefInline.target"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.base"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.RubyInline.text"
+      ],
+      [
+        "missing",
+        "pages.0.page.layers.0.objects.0.text.spans.0.Span.text"
+      ],
+      [
+        "model_attributes_type",
+        "pages.0.page.layers.0.objects.0.text.spans.0.FootnoteInline.content.0"
+      ],
+      [
+        "string_type",
+        "pages.0.page.layers.0.objects.0.text.spans.0.str"
       ]
     ],
     "valid": false

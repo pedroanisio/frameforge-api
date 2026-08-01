@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Optional, Union
 from pydantic import Field
 
-from .base import FG
+from .base import FG, Length
 from .style import StyleRef
 
 if TYPE_CHECKING:
@@ -79,7 +79,51 @@ class LinkInline(FG):
     title: Optional[str] = Field(default=None, description="Advisory tooltip/title text.")
 
 
-Inline = Union[str, RefInline, CiteInline, MathInline, CodeInline, FootnoteInline, LinkInline, Span]
+class RubyInline(FG):
+    """Ruby annotation: a pronunciation or gloss set alongside a base run.
+
+    The contract has carried `writing_mode`, `direction` and `unicode_bidi`
+    since 2.2.0, so vertical Japanese has always been expressible — and until
+    2.9.0 it could not be annotated, which is the single most common thing done
+    to it. `text` may be one annotation for the whole base (group ruby) or one
+    per base character (mono ruby); both are in daily use and the renderer
+    cannot infer which was meant, so the shape says it.
+    """
+    kind: Literal["ruby"] = Field(description="Discriminator: a ruby-annotated run.")
+    base: Union[str, list["Inline"]] = Field(
+        description="The annotated text: a plain string, or inline content.")
+    text: Union[str, list[str]] = Field(
+        description="The annotation. A string annotates the whole base (group ruby); a list "
+                    "annotates base characters one for one (mono ruby).")
+    position: Optional[Literal["over", "under", "inter-character"]] = Field(
+        default=None, description="Where the annotation sits relative to the base. Absent = over "
+                                  "for horizontal text, right for vertical (the CSS default).")
+    align: Optional[Literal["start", "center", "space-between", "space-around",
+                            "distribute-letter", "distribute-space"]] = Field(
+        default=None, description="Distribution of the annotation across the base (CSS ruby-align).")
+    size: Optional[Length] = Field(
+        default=None, description="Annotation type size; absent = the renderer's ruby default "
+                                  "(conventionally half the base size).")
+
+
+class WarichuInline(FG):
+    """Warichu: an inline note set as two or more short lines inside the text line.
+
+    Distinct from a footnote, which leaves the line and lands in the page's note
+    area. A warichu stays in the run and simply sets narrower, so it is inline
+    content, not block content.
+    """
+    kind: Literal["warichu"] = Field(description="Discriminator: an inline split-line note.")
+    content: list["Inline"] = Field(description="The note's inline content.")
+    lines: Optional[int] = Field(
+        default=None, ge=2, le=4,
+        description="Lines the note is split across; absent = 2, the convention.")
+    brackets: Optional[Literal["none", "parenthesis", "bracket", "tortoise", "lenticular"]] = Field(
+        default=None, description="Enclosing marks drawn around the note.")
+
+
+Inline = Union[str, RefInline, CiteInline, MathInline, CodeInline, FootnoteInline, LinkInline,
+               Span, RubyInline, WarichuInline]
 
 
 Caption = Union[str, list[Inline]]
