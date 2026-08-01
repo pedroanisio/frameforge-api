@@ -5,6 +5,66 @@ release line (`__version__`), while `HEAD_VERSION` is the FrameForge **document
 format** revision the package carries. A packaging release must not look like a
 format change, so they are never welded together.*
 
+## Unreleased
+
+*Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged.*
+
+A drift-risk audit found four CRITICAL couplings. All four are closed.
+
+### Fixed
+
+- **`ff-codemod` moved gradient stops from one end of the line to the other.**
+  `GradientStop._accept_offset` normalises `offset: true` to `"100%"` — the far
+  end — because `isinstance(True, int)` is True in Python. `_gradient_stop()` in
+  the codemod excluded bools and passed `true` through, and `position: true`
+  validates as a **Length of 1 unit** (`base.py`: "bare numbers are pt/px,
+  treated 1:1") — the near end. Both documents validated, so nothing fired, and
+  a test asserting the wrong behaviour had *pinned* the divergence.
+
+  The codemod now mirrors the validator, bools included. Fixing the validator to
+  reject the form instead was rejected: `COMPATIBILITY` is `backward`, and a
+  form valid under an earlier 2.x revision cannot start being rejected.
+
+  **`test_the_codemod_resolves_identically_to_the_validator`** replaces the
+  "mirrors exactly" comment with an executable assertion over twelve raw offset
+  values, comparing *resolved* positions rather than mere validity — the gap the
+  divergence lived in. `test_respelling_a_valid_document_does_not_change_what_it_resolves_to`
+  applies the same lens to whole documents, with a companion test asserting the
+  corpus actually exercises every `legacy-key` entry.
+
+- **`MIGRATION.md` shipped pin instructions for a release two minors old.** Its
+  `## Upgrading` section said the package was `1.1.0` and the contract `2.10.0`,
+  and told consumers to install `frameforge-api>=1.1`, while the shipped package
+  was `1.3.0`. `## Rollback` pinned a range predating `ff-codemod` without
+  saying so. `migration_currency_problems()` is the tenth doc gate; it checks
+  only the present-tense sections, so the historical body stays exempt, and it
+  compares versions as parsed tuples — the trap the file itself warns about.
+
+- **`CHANGELOG.md` could document a release that did not exist.**
+  `changelog_problems()` asserted the current version *has* a section but not
+  that no section runs *ahead* of it, so a reader could believe a version
+  shipped while `pip` disagreed.
+
+### Added
+
+- **`test_every_deprecation_code_is_one_the_engine_actually_emits`** — the
+  eleven `Deprecation.code` values hand-mirror the engine validator's finding
+  codes, and they are *published*: in the wheel, in `x-frameforge-deprecations`
+  inside the JSON Schema, and out of `ff-codemod --json`. A consumer joining
+  engine findings to contract lint joins on this string. Nothing checked it. The
+  test parses `Finding(...)` call sites out of the monorepo's validator with
+  `ast` and asserts our codes are a subset of the ones it really emits.
+
+- **`.github/workflows/fidelity.yml`** — the upstream mirrors could only be
+  checked on a developer laptop whose sibling happened to sit at the same
+  revision, and no such machine existed; three contract revisions had landed
+  with the vendored declarations unexamined. A weekly scheduled job checks out
+  both repositories, sets `FRAMEFORGE_REPO` (which turns divergence from a skip
+  into a failure), and then asserts the skip count was zero — because a green
+  run in which everything skipped is the failure mode it exists to prevent. It
+  never runs on `pull_request`, so a lagging sibling cannot wedge this package's
+  release path.
+
 ## 1.3.1 — the test suite runs on the Pythons the package claims (2026-08-01)
 
 *Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged. The

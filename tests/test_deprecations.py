@@ -56,6 +56,7 @@ from frameforge_api.deprecations import (
     registry_json,
     scan,
 )
+from frameforge_api.model import GradientStop
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -874,12 +875,162 @@ def test_a_gradient_offset_above_one_is_carried_through_unscaled():
     assert stops[1]["position"] == "12pt"
 
 
-def test_a_boolean_is_not_treated_as_a_unit_interval_offset():
-    """REGRESSION: `isinstance(True, int)` is True in Python, so `offset: true`
-    would become `"100%"` — a nonsense value invented out of a nonsense one."""
+def test_a_boolean_offset_is_migrated_the_way_the_validator_reads_it():
+    """REGRESSION: this test used to assert the opposite, and pinned a bug.
+
+    `isinstance(True, int)` is True in Python, so `GradientStop._accept_offset`
+    normalises `offset: true` to `"100%"` — the far end of the gradient line.
+    The codemod excluded bools and passed `true` through, and `position: true`
+    validates as a *Length* of 1 unit (`base.py`: "bare numbers are pt/px,
+    treated 1:1") — the near end. Both documents validated, so no gate fired,
+    and `ff-codemod --write` moved the stop from one end to the other.
+
+    The old test called `"100%"` "a nonsense value invented out of a nonsense
+    one". That is a fair reading of `offset: true` — but the codemod does not get
+    to hold a different opinion from the validator, because its entire contract
+    is that migrating changes spelling and not appearance. Rejecting the form
+    outright is unavailable: `COMPATIBILITY` is `backward`.
+    """
     document = doc({"type": "rect", "box": [0, 0, 10, 10], "fill": {
         "kind": "linear", "stops": [{"color": "#000", "offset": True}]}})
-    assert obj(migrate(document).document)["fill"]["stops"][0]["position"] is True
+    assert obj(migrate(document).document)["fill"]["stops"][0]["position"] == "100%"
+
+
+#: Raw `offset` values spanning every branch of the normalisation: below/at/above
+#: the unit interval, both bools, both string spellings, a unit-bearing length
+#: and a negative. The bools are the pair that diverged.
+_OFFSETS = [0, 0.5, 1, 1.5, True, False, "0%", "50%", "12pt", -0.2, 0.001, 2]
+
+
+@pytest.mark.parametrize("raw", _OFFSETS, ids=lambda v: f"{type(v).__name__}:{v}")
+def test_the_codemod_resolves_identically_to_the_validator(raw):
+    """The real contract: migrating changes spelling, never appearance.
+
+    The comment on `_gradient_stop` claims it "mirrors `_accept_offset` exactly".
+    Asserting that the *output validates* — which the suite already did — is much
+    weaker than asserting the two agree, and it is precisely the gap the boolean
+    divergence lived in for three contract revisions.
+
+    So compare what a renderer would actually receive: the resolved `position`
+    of the raw document, and the resolved `position` of the migrated one.
+    """
+    raw_stop = {"color": "#000", "offset": raw}
+    document = doc({"type": "rect", "box": [0, 0, 10, 10], "fill": {
+        "kind": "linear", "stops": [raw_stop]}})
+    migrated_stop = obj(migrate(document).document)["fill"]["stops"][0]
+
+    direct = GradientStop.model_validate(raw_stop).position
+    through_codemod = GradientStop.model_validate(migrated_stop).position
+
+    assert direct == through_codemod, (
+        f"offset={raw!r}: the validator resolves it to {direct!r}, but the "
+        f"codemod emits {migrated_stop!r} which resolves to {through_codemod!r}. "
+        f"Migrating must not change what is drawn.")
+    assert type(direct) is type(through_codemod), (
+        f"offset={raw!r}: same value, different type "
+        f"({type(direct).__name__} vs {type(through_codemod).__name__}) — a "
+        f"Length and a Percentage are not interchangeable downstream.")
+
+
+#: Deprecation kinds whose migration is a pure RESPELLING: the same object, the
+#: same type, written the canonical way. For these the resolved document must be
+#: identical before and after — that is the whole promise of the codemod.
+#:
+#: `object-type` is excluded because those three entries (`circle` -> `ellipse`,
+#: `polygon` -> `path`, `curve` -> `path`) deliberately change `type` and
+#: redistribute geometry across differently-named fields; a resolved-equality
+#: assertion would be asserting the migration does not happen. `removed-form`
+#: and `namespace` are excluded for the same reason — they restructure by design.
+_RESPELLING_KINDS = {"legacy-key"}
+
+
+#: One object per respelling form, in the spelling `examples/legacy-shortcuts.before.json`
+#: uses. Built here rather than read from that file because every committed
+#: document mixes respellings with type-changing forms, and mixing them makes
+#: resolved-equality untestable.
+_RESPELLING_OBJECTS = [
+    # gradient-stop-offset — the form that diverged.
+    {"type": "rect", "id": "grad", "box": [0, 0, 100, 100],
+     "fill": {"kind": "linear", "angle": 90, "stops": [
+         {"color": "#ffffff", "offset": 0},
+         {"color": "#eeeae1", "offset": 0.5},
+         {"color": "#d5d0c6", "offset": 1}]}},
+    # style-dash-shorthand
+    {"type": "text", "id": "caption", "box": [220, 130, 180, 40],
+     "text": "Deprecated, not removed.",
+     "stroke_style": {"dash": "2 2", "stroke_width": 0.5}},
+    # connector-endpoint-object + connector-route-type
+    {"type": "connector", "id": "link",
+     "from": {"object": "grad", "side": "east"},
+     "to": {"object": "caption", "side": "west"},
+     "route": {"type": "orthogonal"}, "stroke": "#1d1d1b"},
+]
+
+
+def _respelling_document() -> dict:
+    return doc(*_RESPELLING_OBJECTS)
+
+
+def test_the_respelling_corpus_covers_every_legacy_key_deprecation():
+    """The equivalence test below is only as good as what it exercises.
+
+    If a `legacy-key` entry is added to the registry and no object here carries
+    it, the equivalence test would pass while covering nothing — the exact
+    failure mode this whole finding is about.
+    """
+    found = {f.id for f in scan(_respelling_document())}
+    expected = {d.id for d in DEPRECATIONS if d.kind in _RESPELLING_KINDS}
+    # `curve-control-shorthand` only ever occurs inside a `curve`, which is
+    # itself an `object-type` deprecation, so it cannot appear in a
+    # respelling-only document. It is covered by the type-changing test instead.
+    expected -= {"curve-control-shorthand"}
+    assert expected <= found, (
+        f"respelling corpus does not exercise {sorted(expected - found)}; "
+        f"add an object to _RESPELLING_OBJECTS carrying that form")
+
+
+def test_respelling_a_valid_document_does_not_change_what_it_resolves_to():
+    """The same equivalence as the offset table, one level up: whole documents.
+
+    A per-field property test only covers the fields someone parameterised.
+    This one asserts migration is appearance-preserving across the entire model
+    — every field, every nested object, at once.
+
+    It is the assertion that would have caught the boolean-offset divergence
+    without anyone thinking to test booleans.
+    """
+    data = _respelling_document()
+    assert scan(data), "the respelling document carries no deprecated forms"
+
+    before = Document.model_validate(data)
+    after = Document.model_validate(migrate(data).document)
+    assert before.model_dump(mode="json") == after.model_dump(mode="json"), (
+        "respelling changed the resolved document")
+
+
+def test_a_type_changing_migration_still_produces_a_valid_document():
+    """The `object-type` / `removed-form` / `namespace` entries, which the
+    equivalence test above deliberately excludes, are not left unguarded.
+
+    They restructure on purpose — `circle` becomes an `ellipse`, `curve` becomes
+    a `path` — so resolved equality is the wrong lens. What must hold is that the
+    result validates and that migrating twice changes nothing more.
+    """
+    corpus = sorted((REPO / "tests" / "compat").glob("*.json"))
+    corpus += [REPO / "examples" / "legacy-shortcuts.before.json"]
+
+    checked = 0
+    for path in corpus:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not scan(data):
+            continue
+        once = migrate(data).document
+        Document.model_validate(once)
+        twice = migrate(once).document
+        assert once == twice, f"{path.name}: migration is not idempotent"
+        assert not scan(once), f"{path.name}: findings survive their own migration"
+        checked += 1
+    assert checked, "no type-changing documents exercised"
 
 
 def test_a_radial_and_a_conic_gradient_are_migrated_too():

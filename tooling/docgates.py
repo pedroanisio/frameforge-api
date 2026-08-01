@@ -225,6 +225,93 @@ def package_version_problems() -> list[str]:
     return []
 
 
+def _precedence(version: str) -> tuple[int, ...]:
+    """`(major, minor, patch)` for ordering. NEVER compare these as strings.
+
+    `"2.2.0" < "2.10.0"` is False lexicographically — `'2'` sorts after `'1'`.
+    MIGRATION.md warns consumers about exactly this trap, so a gate over
+    MIGRATION.md that fell into it would be its own punchline.
+    """
+    return tuple(int(p) for p in version.split("."))
+
+
+#: Headings whose contents make PRESENT-TENSE claims about the shipped package.
+#: Everything else in MIGRATION.md is a historical record and correctly names
+#: superseded revisions, which is why the file as a whole stays out of
+#: VERSION_SCOPE.
+_CURRENT_STATE_SECTIONS = ("## Upgrading", "## Rollback")
+
+_PIN = re.compile(r"frameforge-api>=(\d+\.\d+(?:\.\d+)?)(?:,<(\d+\.\d+(?:\.\d+)?))?")
+
+
+def _section(text: str, heading: str) -> str:
+    """The body under `heading`, up to the next `##`."""
+    start = text.find(heading)
+    if start == -1:
+        return ""
+    nxt = text.find("\n## ", start + len(heading))
+    return text[start:nxt if nxt != -1 else len(text)]
+
+
+def migration_currency_problems() -> list[str]:
+    """MIGRATION.md's present-tense claims match the shipped package.
+
+    The defect this catches, verbatim: the `## Upgrading` section said the
+    package was `1.1.0` and the contract `2.10.0`, and told consumers to
+    `pip install "frameforge-api>=1.1"`, while the package was `1.2.0` and the
+    contract `2.11.0`. The `## Rollback` section pinned `>=1.0,<1.1` — a range
+    that **excludes the release the same document tells you to install**, and
+    that resolves to a wheel with no `ff-codemod` in it.
+
+    Those sections were written for 1.1.0 and carried through two package minors.
+    MIGRATION.md is deliberately outside `VERSION_SCOPE` because most of it is
+    history; this gate covers only the parts that claim to describe *now*.
+    """
+    text = (ROOT / "MIGRATION.md").read_text(encoding="utf-8")
+    version = frameforge_api.__version__
+    head = frameforge_api.HEAD_VERSION
+    problems = []
+
+    upgrading = _section(text, "## Upgrading")
+    if not upgrading:
+        return ["MIGRATION.md has no `## Upgrading` section to check"]
+
+    # The install pin must actually admit the shipped version.
+    for lower, upper in _PIN.findall(upgrading):
+        if _precedence(version) < _precedence(lower):
+            problems.append(
+                f"MIGRATION.md `## Upgrading` tells consumers to install "
+                f"frameforge-api>={lower}, which excludes the shipped {version}")
+        if upper and _precedence(version) >= _precedence(upper):
+            problems.append(
+                f"MIGRATION.md `## Upgrading` pins <{upper}, which excludes the "
+                f"shipped {version}")
+
+    # The bolded package/contract literals must be the current ones.
+    for literal in re.findall(r"\*\*(\d+\.\d+\.\d+)\*\*", upgrading):
+        if literal not in (version, head):
+            problems.append(
+                f"MIGRATION.md `## Upgrading` states **{literal}**; the package "
+                f"is {version} and the contract is {head}")
+    if f"**{version}**" not in upgrading:
+        problems.append(
+            f"MIGRATION.md `## Upgrading` never names the shipped package "
+            f"version ({version})")
+    if f"**{head}**" not in upgrading:
+        problems.append(
+            f"MIGRATION.md `## Upgrading` never names the current contract "
+            f"revision ({head})")
+
+    # Rollback ranges are allowed to exclude the current version — that is what
+    # rolling back means — but the lower bound must still be a real release.
+    for lower, _upper in _PIN.findall(_section(text, "## Rollback")):
+        if _precedence(lower) > _precedence(version):
+            problems.append(
+                f"MIGRATION.md `## Rollback` pins >={lower}, which is ahead of "
+                f"the shipped {version}")
+    return problems
+
+
 # --------------------------------------------------------------------------
 # 4. CHANGELOG sectioning
 # --------------------------------------------------------------------------
@@ -243,12 +330,23 @@ def changelog_problems() -> list[str]:
     text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     versions = _CHANGELOG_HEADING.findall(text)
     current = frameforge_api.__version__
+    problems = []
     if current not in versions:
-        return [f"CHANGELOG.md has no `## {current}` section, but that is the "
-                f"version in pyproject.toml (sections found: "
-                f"{', '.join(versions) or 'none'}). Cut the section before "
-                f"releasing, or move the bump back to `## Unreleased`."]
-    return []
+        problems.append(
+            f"CHANGELOG.md has no `## {current}` section, but that is the "
+            f"version in pyproject.toml (sections found: "
+            f"{', '.join(versions) or 'none'}). Cut the section before "
+            f"releasing, or move the bump back to `## Unreleased`.")
+    # The mirror image, which the original gate let through: a section for a
+    # release that does not exist yet. A reader believes it shipped; pip
+    # disagrees. Unreleased work belongs under `## Unreleased`.
+    ahead = [v for v in versions if _precedence(v) > _precedence(current)]
+    if ahead:
+        problems.append(
+            f"CHANGELOG.md documents {', '.join(ahead)} as released, but the "
+            f"shipped version is {current}. Bump pyproject.toml, or move those "
+            f"sections back under `## Unreleased`.")
+    return problems
 
 
 # --------------------------------------------------------------------------
@@ -429,6 +527,7 @@ GATES = (
     ("disclaimer frontmatter", disclaimer_problems),
     ("version literals", version_literal_problems),
     ("package version", package_version_problems),
+    ("MIGRATION.md currency", migration_currency_problems),
     ("changelog sections", changelog_problems),
     ("CLI flag coverage", cli_flag_problems),
     ("quoted counts", deprecation_count_problems),

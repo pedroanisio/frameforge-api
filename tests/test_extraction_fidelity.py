@@ -13,6 +13,7 @@ extraction was faithful.
 """
 from __future__ import annotations
 
+import ast
 import json
 import os
 import sys
@@ -24,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from _introspect import declarations
 
-from frameforge_api import HEAD_VERSION, Document, build_schema
+from frameforge_api import DEPRECATIONS, HEAD_VERSION, Document, build_schema
 
 #: The sibling monorepo checkout, if this is a developer machine rather than CI.
 MONOREPO = Path(
@@ -203,3 +204,73 @@ def test_every_declaration_still_matches_the_monorepos():
         f"only here={sorted(set(ours) - set(up))} only upstream={sorted(set(up) - set(ours))}")
     changed = sorted(k for k in up if ours[k] != up[k])
     assert not changed, f"declarations diverged from the monorepo's source of truth: {changed}"
+
+
+# --------------------------------------------------------------------------- #
+#  The engine's error codes                                                    #
+# --------------------------------------------------------------------------- #
+#: Where the engine's validator declares its findings, relative to the monorepo.
+VALIDATOR = MONOREPO / "tooling" / "validate.py"
+
+
+def _upstream_finding_codes(path: Path) -> set[str]:
+    """Every literal code passed to `Finding(...)` in the engine's validator.
+
+    Parsed with `ast` rather than grepped: the call sites span several lines and
+    a regex over them is its own drift risk. Call sites whose code is a variable
+    (`Finding(sev, code, ...)`) contribute nothing and are skipped — this builds
+    the set of codes we can *prove* exist, and the assertion below is a subset
+    check, so an unparseable site can only make the test stricter, never wronger.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    codes: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = func.id if isinstance(func, ast.Name) else getattr(func, "attr", None)
+        if name != "Finding":
+            continue
+        # Finding(severity, code, message, path) — code is the second argument.
+        if (len(node.args) >= 2 and isinstance(node.args[1], ast.Constant)
+                and isinstance(node.args[1].value, str)):
+            codes.add(node.args[1].value)
+        for kw in node.keywords:
+            if (kw.arg == "code" and isinstance(kw.value, ast.Constant)
+                    and isinstance(kw.value.value, str)):
+                codes.add(kw.value.value)
+    return codes
+
+
+@needs_monorepo
+def test_every_deprecation_code_is_one_the_engine_actually_emits():
+    """`Deprecation.code` is a hand-written mirror of the engine's finding codes.
+
+    Its own docstring states the purpose: *"the engine validator's error code for
+    the same form, so the contract's lint and the engine's report name one thing
+    one way."* Nothing enforced it. The values are **published** — they ship in
+    the wheel, in `x-frameforge-deprecations` inside the generated JSON Schema,
+    and out of `ff-codemod --json` — and a consumer building a unified report
+    joins engine findings to contract lint on this string.
+
+    If the engine renames a code, this package keeps emitting the old one
+    forever: `make check` stays green, the schema regenerates identically, and
+    the downstream join silently produces two unrelated finding classes where
+    there was one. The failure surfaces as a dashboard that under-counts.
+
+    Subset, not equality: the engine emits many codes that have no deprecation
+    behind them (`out-of-profile`, `containment`, `overlap`, …). What must hold
+    is that every code *we* publish is one the engine really uses.
+    """
+    if not VALIDATOR.is_file():
+        _unusable(f"monorepo validator not present at {VALIDATOR}")
+
+    upstream = _upstream_finding_codes(VALIDATOR)
+    assert upstream, f"no Finding(...) codes parsed out of {VALIDATOR}"
+
+    ours = {d.code for d in DEPRECATIONS if d.code}
+    orphaned = sorted(ours - upstream)
+    assert not orphaned, (
+        f"these Deprecation.code values name findings the engine does not emit: "
+        f"{orphaned}. Either the engine renamed them, or this registry invented "
+        f"them. Upstream codes: {sorted(upstream)}")

@@ -1,0 +1,119 @@
+name: Upstream fidelity
+
+# The gate that never runs, given somewhere to run.
+#
+# `src/frameforge_api/model/` is a VENDORED copy of the monorepo's
+# `src/frameforge/model.py`, and `Deprecation.code` hand-mirrors the engine
+# validator's finding codes. Both are manual mirrors across a repository
+# boundary, and no gate inside this repository can reach the other side.
+#
+# tests/test_extraction_fidelity.py already knows how to check them — it just
+# needs both checkouts. The normal CI deliberately never provides one, because
+# the package must build and test standalone, so those tests skip there. That is
+# correct for CI and useless as coverage, which is why this workflow exists.
+#
+# Setting FRAMEFORGE_REPO explicitly is the switch: `_unusable()` turns a
+# revision divergence from a SKIP into a FAILURE, because naming a checkout is a
+# request for the gate. A lagging sibling therefore shows up as a red scheduled
+# run rather than as silence.
+#
+# This never runs on pull_request, so a monorepo that is legitimately a revision
+# behind cannot wedge this package's own release path.
+
+on:
+  schedule:
+    # Mondays, 06:00 UTC. The contract moves here first and upstream catches up,
+    # so daily would mostly report a lag that is expected.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      monorepo_ref:
+        description: "Ref of pedroanisio/frameforge to compare against"
+        required: false
+        default: "main"
+
+concurrency:
+  group: fidelity
+  cancel-in-progress: false
+
+jobs:
+  fidelity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out frameforge-api
+        uses: actions/checkout@v4
+        with:
+          path: frameforge-api
+
+      - name: Check out the frameforge monorepo
+        id: monorepo
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: pedroanisio/frameforge
+          ref: ${{ github.event.inputs.monorepo_ref || 'main' }}
+          path: frameforge
+          # A private sibling needs a token with read access; without one the
+          # step fails and the job reports "could not check out" rather than
+          # silently passing on an absent tree.
+          token: ${{ secrets.FRAMEFORGE_REPO_TOKEN || github.token }}
+
+      - name: Fail loudly if the sibling could not be checked out
+        if: steps.monorepo.outcome != 'success'
+        run: |
+          echo "::error::could not check out pedroanisio/frameforge — the fidelity" \
+               "gate cannot run. If the repository is private, set the" \
+               "FRAMEFORGE_REPO_TOKEN secret to a token with read access."
+          exit 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install the dev environment
+        working-directory: frameforge-api
+        run: uv sync --all-groups
+
+      - name: Report both contract revisions
+        working-directory: frameforge-api
+        run: |
+          ours=$(uv run python -c "import frameforge_api; print(frameforge_api.HEAD_VERSION)")
+          theirs=$(python -c "import json,sys; print(json.load(open('../frameforge/docs/schema/frameforge-v2.schema.json')).get('version'))" 2>/dev/null || echo "unknown")
+          echo "frameforge-api contract: $ours"
+          echo "monorepo contract:       $theirs"
+          echo "### Contract revisions" >> "$GITHUB_STEP_SUMMARY"
+          echo "| side | revision |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| \`frameforge-api\` | \`$ours\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| \`frameforge\` | \`$theirs\` |" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$ours" != "$theirs" ]; then
+            echo "::warning::contract revisions differ ($ours vs $theirs) — the" \
+                 "declaration and schema comparisons will fail below. That is the" \
+                 "point of this workflow: it makes the lag visible."
+          fi
+
+      - name: Fidelity gate — declarations, schema, corpus, engine error codes
+        working-directory: frameforge-api
+        env:
+          # THE switch. With this set, `_unusable()` fails instead of skipping.
+          FRAMEFORGE_REPO: ${{ github.workspace }}/frameforge
+        run: uv run pytest tests/test_extraction_fidelity.py -v -rs
+
+      - name: Assert the gate actually asserted something
+        if: always()
+        working-directory: frameforge-api
+        env:
+          FRAMEFORGE_REPO: ${{ github.workspace }}/frameforge
+        # A green run with every test skipped is the failure mode this whole
+        # workflow exists to eliminate. Count them explicitly rather than
+        # trusting that `_unusable()` was reached on every path.
+        run: |
+          skipped=$(uv run pytest tests/test_extraction_fidelity.py -q -rs 2>&1 \
+                    | grep -c '^SKIPPED' || true)
+          echo "skipped fidelity tests: $skipped"
+          if [ "$skipped" != "0" ]; then
+            echo "::error::$skipped fidelity test(s) skipped while FRAMEFORGE_REPO" \
+                 "was set — the gate did not cover what it claims to cover."
+            exit 1
+          fi

@@ -52,6 +52,14 @@ def test_the_package_version_agrees_with_itself():
     assert not problems, _report(problems)
 
 
+def test_migration_md_describes_the_shipped_release():
+    """`## Upgrading` said the package was 1.1.0 and pinned >=1.1 while 1.2.0
+    shipped; `## Rollback` pinned a range excluding the release the same
+    document told you to install."""
+    problems = docgates.migration_currency_problems()
+    assert not problems, "MIGRATION.md is stale:\n" + _report(problems)
+
+
 def test_the_current_version_has_a_changelog_section():
     """1.2.0 shipped with its entries still under `## Unreleased`, and a 1.1.0
     wheel was built from a state that was never committed."""

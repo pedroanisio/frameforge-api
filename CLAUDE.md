@@ -102,6 +102,25 @@ and their gates are not implemented in this tree.
 | `make test` | the contract, golden, compat, example and doc-gate suites |
 | `make check` | all of the above — run this before claiming work is done |
 
+Two mirrors cross a repository boundary and no gate in this tree can reach them:
+the vendored declarations in `src/frameforge_api/model/`, and the engine finding
+codes that `Deprecation.code` restates. `tests/test_extraction_fidelity.py`
+checks both, but only when a sibling checkout is available, so it skips by
+default and in normal CI. The scheduled `Upstream fidelity` workflow
+(`.github/workflows/fidelity.yml`) is what actually runs it: it checks out both
+repositories, sets `FRAMEFORGE_REPO` — which turns a divergence from a skip into
+a failure — and then asserts the skip count was zero, because a green run in
+which everything skipped is the exact failure it exists to prevent.
+
+> **The codemod is a second implementation of contract semantics.**
+> `src/frameforge_api/deprecations.py` re-derives normalisation rules that the
+> model validators already own, and the two silently disagreed about
+> `offset: true` for three contract revisions. When you touch either side, the assertion that matters is
+> `test_the_codemod_resolves_identically_to_the_validator`: migrating changes
+> spelling, never appearance. Do not "fix" a divergence by making the validator
+> reject a form — `COMPATIBILITY` is `backward`, and a form that validates today
+> cannot start failing.
+
 ---
 
 ## LLM Output Verification — Architectural Requirement (PALS's LAW)

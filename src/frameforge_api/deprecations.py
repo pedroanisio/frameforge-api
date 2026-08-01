@@ -510,9 +510,24 @@ def _gradient_stop(stop: Any, path: str, pas: _Pass) -> Any:
     value = out.pop("offset")
     # Mirrors `GradientStop._accept_offset` exactly: a 0..1 unit-interval number
     # is a fraction of the gradient line, and becomes the percentage spelling.
+    #
+    # "Exactly" includes bools, and that is deliberate rather than sloppy.
+    # `isinstance(True, int)` is True in Python, so the validator normalises
+    # `offset: true` to `"100%"` — the far end of the line. This function used to
+    # exclude bools and pass `true` through, where `position: true` validates as
+    # a *Length* of 1 unit (base.py: "bare numbers are pt/px, treated 1:1") —
+    # the near end. Both documents validated, so nothing caught it, and
+    # `ff-codemod --write` silently moved the stop from one end of the gradient
+    # to the other.
+    #
+    # Rejecting `offset: true` in the validator would be the tidier reading, but
+    # it is not available: COMPATIBILITY is `backward`, the form validates today,
+    # and a form valid under an earlier 2.x revision cannot start being rejected.
+    # So the codemod matches the validator, and
+    # `test_the_codemod_resolves_identically_to_the_validator` proves it for the
+    # whole input table rather than for the cases someone thought to enumerate.
     out["position"] = (
-        f"{value * 100:g}%" if isinstance(value, (int, float)) and not isinstance(value, bool)
-        and value <= 1 else value
+        f"{value * 100:g}%" if isinstance(value, (int, float)) and value <= 1 else value
     )
     return out
 

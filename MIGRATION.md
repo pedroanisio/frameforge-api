@@ -152,16 +152,18 @@ not go green on a half-done migration.
 ## Upgrading
 
 ```bash
-pip install --upgrade "frameforge-api>=1.1"
+pip install --upgrade "frameforge-api>=1.3"
 ```
 
-Two clocks moved. The package is **1.1.0** (new importable models); the contract
-is **2.10.0** (new optional fields). Neither is a major.
+Two clocks moved. The package is **1.3.1** (new importable models, then the doc
+and codemod gates); the contract is **2.11.0** (new optional fields, then
+machine-readable deprecation). Neither is a major.
 
 You do **not** need to bump the `version:` line in your documents. It states the
-revision the document was authored against, and 2.10.0 reads all of them. Bump it
-only when you start using something 2.9.0 or 2.10.0 added — at which point older
-validators will correctly refuse the file, which is the point of the field.
+revision the document was authored against, and 2.11.0 reads all of them. Bump it
+only when you start using something 2.9.0, 2.10.0 or 2.11.0 added — at which
+point older validators will correctly refuse the file, which is the point of the
+field.
 
 > **If you compare revision strings anywhere, stop.** `"2.2.0" < "2.10.0"` is
 > `False` in every language that compares strings lexicographically — `'2'`
@@ -474,7 +476,10 @@ the renderer lands its half.
 
 ## Rollback
 
-Pin `frameforge-api>=1.0,<1.1`. Documents authored against 2.9.0 or 2.10.0 that
-use any of the new fields will fail there — correctly, since 1.0.x cannot
-interpret them. Forward compatibility is explicitly not promised; see
-`frameforge_api.COMPATIBILITY`.
+Pin `frameforge-api>=1.0,<1.1`. Documents authored against 2.9.0, 2.10.0 or
+2.11.0 that use any of the new fields will fail there — correctly, since 1.0.x
+carries contract 2.8.2 and cannot interpret them. Forward compatibility is
+explicitly not promised; see `frameforge_api.COMPATIBILITY`.
+
+Note that rolling back this far also gives up `ff-codemod`, which did not exist
+before 1.2.0 — so migrate *before* you pin, not after.
