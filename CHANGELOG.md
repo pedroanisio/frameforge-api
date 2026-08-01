@@ -5,6 +5,45 @@ release line (`__version__`), while `HEAD_VERSION` is the FrameForge **document
 format** revision the package carries. A packaging release must not look like a
 format change, so they are never welded together.*
 
+## 1.3.1 — the test suite runs on the Pythons the package claims (2026-08-01)
+
+*Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged. The
+generated schema is byte-identical; `tests/golden/schema.json`,
+`surface.json` and `behaviour.json` did not move.*
+
+### Fixed
+
+- **The suite could not run on Python 3.10**, while `requires-python` claimed
+  `>=3.10` and the classifiers listed 3.10, 3.11 and 3.12.
+  `test_every_declaration_survives_the_move_unedited` failed on *every one* of
+  the 203 declarations.
+
+  The cause is that **`ast.dump` is not stable across Python versions**, so a
+  golden taken through it is pinned to whichever interpreter wrote it. Two
+  divergences, both real: 3.13 omits a field whose value equals its default
+  while 3.10 emits it — every `Field(...)` in the contract is a `Call` with no
+  positional arguments, so 3.10 wrote `args=[]` and 3.13 wrote nothing — and
+  3.12 added `type_params` to `ClassDef`/`FunctionDef`.
+
+  `_introspect.canonical_dump` replaces `ast.dump` and drops empty lists and
+  `None`, which collapses both divergences at once. Verified by generating the
+  full corpus under 3.10 and 3.13 and diffing: **384,301 bytes, byte-identical**.
+  `tests/golden/declarations.json` was regenerated in the new encoding; the
+  other three goldens are untouched, which is the evidence that this changed the
+  *encoding* and not the *contract*.
+
+  `test_the_declaration_lens_is_python_version_independent` pins it, against a
+  hardcoded expected string rather than a recomputed one, plus an assertion over
+  the real corpus that no `=[]` or `=None` survives normalisation.
+
+  **This is the first defect the CI matrix added in 1.3.0 would have caught**,
+  and it was found by running that matrix by hand because GitHub Actions is
+  billing-blocked on this account.
+
+- **Three counts written by hand in test prose had drifted**: "183 declarations"
+  (twice) where the corpus is 203, and "105 `$defs`" where the schema has 119.
+  `golden_count_problems()` is the ninth doc gate.
+
 ## 1.3.0 — the docs are gated now (2026-08-01)
 
 *Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged. This

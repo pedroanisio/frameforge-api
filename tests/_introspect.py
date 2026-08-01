@@ -11,7 +11,8 @@ bake in a file layout — `__module__`, `repr()` of a class, a source line numbe
 is normalised away. What survives is what a consumer can actually observe:
 
   * DECLARATIONS — the source text of every top-level declaration, as an AST.
-    Immune to which file a class lives in, to import statements, and to ordering.
+    Immune to which file a class lives in, to import statements, to ordering,
+    and (see `canonical_dump`) to which Python parsed it.
   * SURFACE — the names importable from the package, plus the per-model facts
     (base classes, config, validator names) the JSON Schema cannot show.
   * BEHAVIOUR — accept/reject outcomes, with pydantic's error type and location,
@@ -51,6 +52,41 @@ def model_sources() -> list[Path]:
     return [origin]                                  # a single module
 
 
+def canonical_dump(node: ast.AST) -> str:
+    """`ast.dump` that means the same thing on every supported Python.
+
+    `ast.dump` itself does not. Two things move under it between 3.10 and 3.13:
+
+      * **Default-valued fields.** 3.13 omits a field whose value equals its
+        default; 3.10 always emits it. Every ``Field(...)`` call in the contract
+        is a ``Call`` with no positional arguments, so 3.10 writes ``args=[]``
+        and 3.13 writes nothing — and *every* declaration differs between them.
+      * **New fields.** 3.12 added ``type_params`` to ``ClassDef`` and
+        ``FunctionDef``. It is empty for every declaration here, but it exists
+        in ``_fields`` on 3.12+ and does not on 3.10.
+
+    Omitting empty lists and ``None`` handles both at once: the new field
+    disappears where it is empty, and the old field stops being written where it
+    is defaulted. The result is keyed on what the declaration actually *says*.
+
+    `Constant(value=None)` renders as ``Constant()``. That is unambiguous —
+    a bare ``Constant()`` can only be the literal ``None`` — and it is the one
+    place this normalisation drops something a reader might expect to see.
+    """
+    if isinstance(node, ast.AST):
+        parts = []
+        for field in node._fields:
+            value = getattr(node, field, None)
+            # The two version-dependent shapes, collapsed to one.
+            if value is None or (isinstance(value, list) and not value):
+                continue
+            parts.append(f"{field}={canonical_dump(value)}")
+        return f"{type(node).__name__}({', '.join(parts)})"
+    if isinstance(node, list):
+        return "[" + ", ".join(canonical_dump(v) for v in node) + "]"
+    return repr(node)
+
+
 def _key(node: ast.AST) -> str | None:
     """The declared name, or None for statements that declare nothing."""
     if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -77,7 +113,7 @@ def declarations(paths: list[Path] | None = None) -> dict[str, str]:
             name = _key(node)
             if name is None:
                 continue
-            dumped = ast.dump(node, annotate_fields=True, include_attributes=False)
+            dumped = canonical_dump(node)
             if name in out and out[name] != dumped:
                 raise AssertionError(
                     f"{name!r} is declared twice with different bodies "

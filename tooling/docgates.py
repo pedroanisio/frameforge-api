@@ -18,6 +18,7 @@ this repository on 2026-08-01, not because it seemed prudent.
 """
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -358,7 +359,42 @@ def deprecation_count_problems() -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# 7. Markdown link integrity
+# 7. Counts quoted in test prose
+# --------------------------------------------------------------------------
+
+_DECL_COUNT = re.compile(r"\b(\d{2,4}) (?:top-level )?declarations\b")
+
+
+def golden_count_problems() -> list[str]:
+    """`tests/test_golden.py` quotes the size of the declaration corpus.
+
+    The defect this catches, verbatim: two docstrings said "183 declarations"
+    while the golden held 203 — the corpus grew at 2.9.0, 2.10.0 and 2.11.0 and
+    the prose did not follow. Harmless on its own, and exactly the drift that
+    teaches a reader to stop trusting the numbers around it.
+    """
+    golden = ROOT / "tests" / "golden" / "declarations.json"
+    if not golden.is_file():
+        return ["tests/golden/declarations.json is missing"]
+    actual = len(json.loads(golden.read_text(encoding="utf-8")))
+
+    doc = ROOT / "tests" / "test_golden.py"
+    problems = []
+    for found in _DECL_COUNT.findall(doc.read_text(encoding="utf-8")):
+        # 183 is the corpus size at the split, named as history. Only a claim
+        # about the *current* corpus can be stale.
+        if int(found) not in (actual, 183):
+            problems.append(
+                f"tests/test_golden.py says `{found} declarations`; the golden "
+                f"holds {actual}")
+    if str(actual) not in doc.read_text(encoding="utf-8"):
+        problems.append(
+            f"tests/test_golden.py never names the current corpus size ({actual})")
+    return problems
+
+
+# --------------------------------------------------------------------------
+# 8. Markdown link integrity
 # --------------------------------------------------------------------------
 
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
@@ -396,5 +432,6 @@ GATES = (
     ("changelog sections", changelog_problems),
     ("CLI flag coverage", cli_flag_problems),
     ("quoted counts", deprecation_count_problems),
+    ("golden corpus size", golden_count_problems),
     ("markdown links", link_problems),
 )

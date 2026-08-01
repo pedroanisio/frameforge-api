@@ -72,6 +72,12 @@ def test_counts_quoted_in_prose_match_the_registry():
     assert not problems, "quoted counts drifted:\n" + _report(problems)
 
 
+def test_the_golden_corpus_size_in_prose_is_current():
+    """Two docstrings said "183 declarations" while the golden held 203."""
+    problems = docgates.golden_count_problems()
+    assert not problems, _report(problems)
+
+
 def test_relative_links_resolve():
     """CLAUDE.md linked to PURPOSE.md, which exists only in the monorepo."""
     problems = docgates.link_problems()

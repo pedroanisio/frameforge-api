@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 """test_golden.py — the interfaces, frozen at t0.
 
-These are the tests that make it safe to move `model.py`'s 183 declarations into
-a package. Every other test in this suite asserts a *property* ("unknown keys are
-rejected"); these assert **identity** — that the contract observable from outside
-is bit-for-bit what it was before the refactor started.
+These are the tests that made it safe to move `model.py`'s declarations into a
+package, and that keep the contract honest now that it has. Every other test in
+this suite asserts a *property* ("unknown keys are rejected"); these assert
+**identity** — that the contract observable from outside is bit-for-bit what the
+committed golden says it is.
+
+The corpus was 183 declarations at the split and is **203** today; the goldens
+have moved with the contract, deliberately, at 2.9.0, 2.10.0 and 2.11.0.
+`golden_count_problems()` in `tooling/docgates.py` fails the build if the number
+written here stops matching `tests/golden/declarations.json`.
+
+One caveat on the DECLARATIONS lens: `ast.dump` is not stable across Python
+versions (3.13 omits default-valued fields that 3.10 emits, and 3.12 added
+`type_params`), so a golden taken with it is pinned to whichever interpreter
+wrote it. `_introspect.canonical_dump` normalises that away —
+`test_the_declaration_lens_is_python_version_independent` is what holds the line.
 
 Four independent lenses, because no single one is sufficient:
 
@@ -24,12 +36,20 @@ Regenerate with `make goldens` — and only when the contract is meant to move.
 """
 from __future__ import annotations
 
+import ast
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from _introspect import behaviour, declarations, dump, read_golden, surface
+from _introspect import (
+    behaviour,
+    canonical_dump,
+    declarations,
+    dump,
+    read_golden,
+    surface,
+)
 from _probes import PROBES
 
 from frameforge_api import build_schema
@@ -41,7 +61,7 @@ REGEN = "regenerate deliberately with `make goldens`, and review the diff"
 #  SCHEMA — the contract as every non-Python consumer sees it                 #
 # --------------------------------------------------------------------------- #
 def test_the_generated_schema_is_byte_identical_to_t0():
-    """The strongest single gate: same models in, same 105 `$defs` out.
+    """The strongest single gate: same models in, same 119 `$defs` out.
 
     Compared as canonical text rather than as parsed JSON, so a change in `$defs`
     ordering — which a module split can plausibly cause, and which downstream
@@ -54,11 +74,12 @@ def test_the_generated_schema_is_byte_identical_to_t0():
 #  DECLARATIONS — the source of the contract, wherever it now lives           #
 # --------------------------------------------------------------------------- #
 def test_every_declaration_survives_the_move_unedited():
-    """183 top-level declarations, keyed by name, compared as normalised ASTs.
+    """203 top-level declarations, keyed by name, compared as normalised ASTs.
 
     File layout, ordering and import statements are invisible to this lens by
     construction — so it stays green through a pure move and goes red the moment
-    a move turns into an edit.
+    a move turns into an edit. `_introspect.canonical_dump` also makes it blind
+    to which Python parsed the source, which `ast.dump` on its own is not.
     """
     now, then = declarations(), read_golden("declarations.json")
     assert sorted(now) == sorted(then), (
@@ -66,6 +87,46 @@ def test_every_declaration_survives_the_move_unedited():
         f"removed={sorted(set(then) - set(now))}")
     changed = sorted(k for k in then if now[k] != then[k])
     assert not changed, f"declarations edited, not moved: {changed}"
+
+
+def test_the_declaration_lens_is_python_version_independent():
+    """A golden taken through `ast.dump` is pinned to the Python that wrote it.
+
+    This is not hypothetical: it made the suite unrunnable on 3.10 while
+    `requires-python` claimed `>=3.10`, and it went unnoticed because there was
+    no CI matrix. Two divergences, both real:
+
+      * 3.10 writes ``args=[]`` for a call with no positional arguments; 3.13
+        omits it. Every ``Field(...)`` in the contract is such a call, so *every*
+        declaration differed.
+      * 3.12 added ``type_params`` to ``ClassDef`` / ``FunctionDef``.
+
+    `canonical_dump` drops empty lists and ``None``, which collapses both. The
+    expected string below is pinned rather than recomputed: recomputing it with
+    the same function it is meant to check would assert nothing.
+    """
+    snippet = "Box = Annotated[list[Length], Field(min_length=4, description=None)]\n"
+    node = ast.parse(snippet).body[0]
+
+    expected = (
+        "Assign(targets=[Name(id='Box', ctx=Store())], "
+        "value=Subscript(value=Name(id='Annotated', ctx=Load()), "
+        "slice=Tuple(elts=[Subscript(value=Name(id='list', ctx=Load()), "
+        "slice=Name(id='Length', ctx=Load()), ctx=Load()), "
+        "Call(func=Name(id='Field', ctx=Load()), "
+        "keywords=[keyword(arg='min_length', value=Constant(value=4)), "
+        "keyword(arg='description', value=Constant())])], ctx=Load()), ctx=Load()))"
+    )
+    assert canonical_dump(node) == expected, (
+        f"the declaration lens changed shape on Python "
+        f"{sys.version_info.major}.{sys.version_info.minor}; every golden taken "
+        f"with it is now unreadable by the other supported versions")
+
+    # The two version-dependent artifacts, asserted absent over the real corpus
+    # rather than over the snippet — this is what actually ships in the golden.
+    for name, dumped in declarations().items():
+        assert "=[]" not in dumped, f"{name}: empty list survived normalisation"
+        assert "=None" not in dumped, f"{name}: None survived normalisation"
 
 
 # --------------------------------------------------------------------------- #
