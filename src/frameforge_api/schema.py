@@ -101,8 +101,12 @@ def check(path: Path | None = None) -> bool:
     return target.read_text(encoding="utf-8") == _serialize(build())
 
 
-def main(argv: list[str] | None = None) -> int:
-    """``ff-schema`` — regenerate, verify, or validate against the contract."""
+def parser() -> argparse.ArgumentParser:
+    """The ``ff-schema`` parser, built separately so a gate can read it.
+
+    `tooling/docgates.py` introspects this to assert every flag is documented in
+    README.md. Constructing the parser must therefore stay free of side effects.
+    """
     ap = argparse.ArgumentParser(
         prog="ff-schema", description="Generate/verify the FrameForge v2 JSON Schema.")
     ap.add_argument("document", nargs="?",
@@ -114,6 +118,12 @@ def main(argv: list[str] | None = None) -> int:
                     help=f"write the schema here instead of {SCHEMA_PATH}")
     ap.add_argument("--print", dest="to_stdout", action="store_true",
                     help="write the schema to stdout instead of a file")
+    return ap
+
+
+def main(argv: list[str] | None = None) -> int:
+    """``ff-schema`` — regenerate, verify, or validate against the contract."""
+    ap = parser()
     args = ap.parse_args(argv)
 
     rc = 0

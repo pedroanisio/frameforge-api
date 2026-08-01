@@ -1,3 +1,13 @@
+---
+disclaimer:
+  notice: >-
+    No information within this document should be taken for granted.
+    Any statement or premise not backed by a real logical definition
+    or verifiable reference may be invalid, erroneous, or a hallucination.
+  generated_by: "Claude Opus 5 via Claude Code"
+  date: "2026-08-01"
+---
+
 # Runtime font-closure boundary
 
 FrameForge documents declare which font identity they intend to use; a render

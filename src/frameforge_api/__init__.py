@@ -65,7 +65,7 @@ from frameforge_api.schema import load as load_schema
 #:
 #: Two different clocks, and conflating them was the mistake worth avoiding:
 #:
-#:   * :data:`HEAD_VERSION` (``2.8.x``) is the FrameForge **document format**
+#:   * :data:`HEAD_VERSION` (``2.11.0``) is the FrameForge **document format**
 #:     revision. It moves when the *contract* moves — a new field, a retyped
 #:     one — and every FrameForge package must agree on it.
 #:   * :data:`__version__` (``1.x.y``) is the **wheel**. It moves when this

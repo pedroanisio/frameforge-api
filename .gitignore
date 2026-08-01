@@ -10,3 +10,7 @@ build/
 htmlcov/
 .coverage
 .agent-tasks/
+quarantine-summaries.md
+quarantine-manifest.json
+doc-quarantine.sh
+doc-hygiene-report.md

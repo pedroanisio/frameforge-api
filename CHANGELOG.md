@@ -7,7 +7,77 @@ format change, so they are never welded together.*
 
 ## Unreleased
 
-*Package `1.2.0`; carries FrameForge document contract `HEAD_VERSION = 2.11.0`.*
+*Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged. This
+is packaging, docs and gates only; the contract did not move.*
+
+### The docs are gated now (`tooling`, `tests`)
+
+A documentation audit found that the accuracy of this repository's prose was
+entirely a matter of whoever last edited it. The product docs happened to be
+right; the agent operating guide was wrong in every path it named.
+
+- **`tooling/docgates.py` + `make doc-check`** — eight gates, each written
+  against drift that had actually occurred, not against drift that seemed
+  plausible: CLAUDE.md path references, rule-5 disclaimer frontmatter,
+  `HEAD_VERSION` literals, the package version, CHANGELOG sectioning, CLI flag
+  coverage, counts quoted in prose, and relative-link integrity.
+  `tests/test_doc_gates.py` asserts on each one separately, so `pytest` names
+  the kind of drift rather than reporting one opaque failure.
+
+  They **verify** prose rather than **generating** it. Injecting `--help` output
+  or a rendered tree would have traded accurate prose for accurate-but-worse
+  prose; a gate buys the same protection and costs the reader nothing.
+
+- **`CLAUDE.md` rewritten.** It was a near-verbatim copy of the monorepo's
+  (`diff` = 2 lines) and all fifteen filesystem paths it named were absent here
+  — it pointed agents at `src/frameforge/model.py`, `tooling/check_disclaimers.py`,
+  `AGENTS.md`, `FIXTURE-STATUS.md` and `mkdocs.yml`, none of which exist in this
+  tree. The behavioural half (PALS's LAW, the eight ranked constraints, TDD,
+  English-default) was correct and is preserved verbatim; the structural half
+  now describes this repository and `claude_path_problems()` fails the build if
+  that stops being true.
+
+- **`ff-schema.parser()` and `ff-codemod.parser()`** are built separately from
+  `main()`, so a gate can enumerate the flags without executing anything.
+
+### Fixed
+
+- **The fidelity gate was silently not running.** `tests/test_extraction_fidelity.py`
+  skipped when the sibling monorepo's contract revision differed from
+  `HEAD_VERSION`, which is correct when the sibling merely happens to be on disk
+  — but it also skipped when `FRAMEFORGE_REPO` had been set explicitly, which is
+  a request for the gate. The suite reported green while covering nothing.
+  Divergence is now a **failure** when the checkout was named, and a skip that
+  says so otherwise.
+- **Two source files documented the wrong contract version.** `pyproject.toml`
+  and `frameforge_api/__init__.py` both described `HEAD_VERSION` as `2.8.x` when
+  it was `2.11.0` — three revisions stale. Comments, so no schema gate or test
+  saw them; `version_literal_problems()` does now.
+- **`ff-schema --out` and `ff-codemod --stdout` shipped undocumented.** Both are
+  in `README.md`, and `test_every_cli_flag_is_documented` keeps it that way.
+- **README described the fidelity suite as having two outcomes**; it has three,
+  and the third (sibling present, contract diverged) was the live one.
+- **`docs/adr/0001-flat-document-model.md` and
+  `docs/runtime-font-closure-boundary.md` carried no disclaimer frontmatter.**
+  Rule 5 had been policy with no enforcement in this repository, because the
+  script it named lives in the monorepo.
+- **`1.2.0`'s entries were still under `## Unreleased`**, with no tag. Sectioned
+  and tagged `v1.2.0` at the commit that bumped it. There is deliberately no
+  `v1.1.0`: `pyproject.toml` went `1.0.0` → `1.2.0` in one commit, so no commit
+  ever declared that version, though a `1.1.0` wheel was built from it.
+
+### Added
+
+- **`.github/workflows/ci.yml`** — the repository had no CI at all, so every
+  gate it documented ran only on a developer's laptop. Runs `schema-check`,
+  `doc-check`, `lint` and the suite on Python 3.10 and 3.13, then builds and
+  asserts the generated schema is actually inside the wheel. `FRAMEFORGE_REPO`
+  is deliberately never set: the package must build and test standalone.
+- `make doc-check`; `make lint` now covers `tooling/` too.
+
+## 1.2.0 — deprecation, made actionable (2026-08-01)
+
+*Carries FrameForge document contract `HEAD_VERSION = 2.11.0`.*
 
 ### Deprecation, made actionable — contract `2.11.0` (`deprecations`, `schema`)
 
@@ -98,9 +168,17 @@ this package exists to prevent.
   change is the one that change can most easily break.
 - The `$defs` count moves 115 → 119.
 
----
+## 1.1.0 — compatibility stated, typographic rhythm, print and bound work (2026-08-01)
 
-*Previously in this release line: package `1.1.0`, contract `2.10.0`.*
+*Carries FrameForge document contract `HEAD_VERSION = 2.10.0`; bundles contract
+`2.9.0` and `2.10.0`.*
+
+> **Never tagged.** This version was built locally (a `1.1.0` wheel exists under
+> the gitignored `dist/`) but the bump reached git only as part of `1.2.0`:
+> `pyproject.toml` went `1.0.0` → `1.2.0` in a single commit. The section is
+> kept because the work is real and the contract revisions it carries are
+> referenced elsewhere; there is deliberately no `v1.1.0` tag, because no commit
+> ever declared that version.
 
 Both clocks move: new importable models are a package minor, and a contract
 widening is a contract minor. Neither is a major, because **every addition is

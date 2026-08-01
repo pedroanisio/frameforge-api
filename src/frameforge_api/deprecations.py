@@ -712,11 +712,11 @@ def _report(path: Path, findings: Iterable[Finding], migrated: bool) -> None:
             print("      ^ NOT rewritten — resolve this one by hand")
 
 
-def main(argv: list[str] | None = None) -> int:
-    """``ff-codemod`` — find and migrate deprecated FrameForge forms.
+def parser() -> argparse.ArgumentParser:
+    """The ``ff-codemod`` parser, built separately so a gate can read it.
 
-    Exit status: ``0`` nothing left to do, ``1`` deprecated forms remain (or were
-    found, in the read-only default mode), ``2`` a document could not be read.
+    `tooling/docgates.py` introspects this to assert every flag is documented in
+    README.md. Constructing the parser must therefore stay free of side effects.
     """
     ap = argparse.ArgumentParser(
         prog="ff-codemod",
@@ -731,6 +731,16 @@ def main(argv: list[str] | None = None) -> int:
                     help="emit findings as JSON")
     ap.add_argument("--list", dest="list_registry", action="store_true",
                     help="print the deprecation registry and exit")
+    return ap
+
+
+def main(argv: list[str] | None = None) -> int:
+    """``ff-codemod`` — find and migrate deprecated FrameForge forms.
+
+    Exit status: ``0`` nothing left to do, ``1`` deprecated forms remain (or were
+    found, in the read-only default mode), ``2`` a document could not be read.
+    """
+    ap = parser()
     args = ap.parse_args(argv)
 
     if args.list_registry:

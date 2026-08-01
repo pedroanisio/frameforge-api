@@ -1,19 +1,24 @@
-# CLAUDE.md — FrameForge Project Guidelines
+# CLAUDE.md — frameforge-api Project Guidelines
 
 ---
 
 ## Scope
 
-This file is the AI-agent operating guide for FrameForge v2 in this repository.
-The technical source of truth is the live tree: `src/frameforge/model.py`, the
-generated schema, the validator/tooling gates, committed fixtures, and the docs
-that are generated from those sources.
+This file is the AI-agent operating guide for **frameforge-api** — the standalone
+FrameForge v2 document contract. The technical source of truth is the live tree:
+the Pydantic models under `src/frameforge_api/model/`, the JSON Schema generated
+from them, the gates in `tests/`, and the committed corpora those gates replay.
+
+> **This repository is not the `frameforge` monorepo.** The engine, SDK, MCP
+> server, renderer and site live there; this package is the contract they all
+> agree on and nothing else. If an instruction here names a path, it is a path in
+> *this* tree — `tooling/check_docs.py` fails the build if that stops being true.
 
 ## Disclaimer Reference
 
 `DISCLAIMER.md` is the repository-level methodological caveat. New
 agent-authored analysis reports should include explicit provenance/disclaimer
-frontmatter. Product READMEs may link to `DISCLAIMER.md` when they make
+frontmatter. Product docs may link to `DISCLAIMER.md` when they make
 methodological claims, but there is no blanket requirement that every README
 repeat the disclaimer block.
 
@@ -21,48 +26,81 @@ repeat the disclaimer block.
 
 ## MANDATORY
 
-- Do not-dramatized a small thing.
+- Do not dramatize a small thing.
 - Meta processing IS NEVER to be documented unless requested.
 - Treat generated artifacts as generated: edit source inputs or generators, then
   rerun the corresponding check.
-- Do not hand-edit `FIXTURE-STATUS.md`, generated MkDocs pages, or generated
-  schema output except as part of a generator refresh.
+- **Never hand-edit the generated schema.** `src/frameforge_api/schema/frameforge-v2.schema.json`
+  is emitted from the models by `src/frameforge_api/schema.py`. Change the model,
+  then run `make schema`.
+- **Never hand-edit the goldens.** `tests/golden/` is rewritten only by
+  `make goldens`, and only when the contract is deliberately moving.
 - Ground architectural claims in live files, tests, or generated outputs.
 
 ---
 
 ## Project Overview
 
-FrameForge v2 is a proposed **agent-native visual-authoring substrate**: a
-structured, programmable foundation for producing professional visual assets —
-documents, decks, diagrams, books, and letters today, extending toward UIs,
-wireframes, vector graphics, logos, and design systems — for people,
-applications, and AI agents. See [`PURPOSE.md`](PURPOSE.md) for the full why and
-scope. The Python Pydantic models are the source of truth; schema, validation,
-fixture status, and most site pages are generated from or checked against those
-models and fixtures.
+frameforge-api answers one question — *what is a FrameForge document?* — and
+answers it for every consumer: the authoring SDK, the render engine, the MCP
+server, an editor plugin, a CI validator, a TypeScript client. It renders
+nothing, lays out nothing, and authors nothing.
+
+The models are a **leaf**: they import `re`, `typing` and `pydantic`, and nothing
+else. `test_the_model_imports_nothing_from_frameforge` fails the build if that
+ever stops being true — it is the property the whole package split rests on.
 
 ```
 .
-├── CLAUDE.md          # This file — project guidelines for AI agents
-├── DISCLAIMER.md      # Methodological caveats (see Disclaimer Reference above)
-├── README.md
-├── src/frameforge/           # the Python package (model, rendering, sdk, mcp, vision, coach, live)
-│   └── model.py              #   authoritative Pydantic model (SOURCE OF TRUTH; in-package since 2.5.0)
-├── docs/                     # MkDocs pages + reference sources:
-│   ├── schema/               #   generated JSON schema + generator
-│   ├── spec/  grammar/       #   normative prose + EBNF views
-│   └── *.md                  #   site pages, design records, generated snapshots
-├── static/examples/          # runnable SDK clients (the cookbook)
-├── tooling/                  # validation, render, codemod, docs generators
-├── tests/                    # regression and sync gates
-│   └── fixtures/             # gated fixture corpus (b1/ = the oracle)
+├── CLAUDE.md              # This file — project guidelines for AI agents
+├── README.md              # WHAT the package is and how to use it
+├── CHANGELOG.md           # package release line (__version__), not the contract's
+├── MIGRATION.md           # consumer-facing upgrade path, per contract revision
+├── DISCLAIMER.md          # methodological caveats (bilingual)
+├── Makefile               # every local gate; `make check` runs them all
+├── src/frameforge_api/
+│   ├── model/             #   THE SOURCE OF TRUTH — authoritative Pydantic models
+│   │   ├── version.py     #     HEAD_VERSION, the document-format revision
+│   │   ├── base.py  style.py  assets.py  layout.py  inline.py  humanize.py
+│   │   ├── objects/       #     the visual-object union
+│   │   └── flow.py  page.py  document.py
+│   ├── schema.py          #   schema generator + `ff-schema` CLI
+│   ├── schema/            #   the GENERATED schema (ships inside the wheel)
+│   └── deprecations.py    #   the registry + `ff-codemod` CLI
+├── docs/
+│   ├── adr/               #   architecture decision records
+│   └── runtime-font-closure-boundary.md
+├── examples/              # worked documents, validated on every test run
+├── tooling/               # doc-vs-code gates (`make doc-check`)
+└── tests/
+    ├── compat/            #   older documents, replayed by declared revision
+    └── golden/            #   frozen interfaces; rewritten only by `make goldens`
 ```
 
-The standalone [frameforge-viewer](https://github.com/pedroanisio/frameforge-viewer) and [frameforge-fonts](https://github.com/pedroanisio/frameforge-fonts) projects are sibling repositories. They are integrations, not directories or gate implementations in this tree.
+**Two version clocks, deliberately independent.** `__version__` is this wheel's
+release line; `HEAD_VERSION` is the FrameForge document-format revision it
+carries. They are not the same number and a test asserts they stay apart. A
+packaging fix must not claim the document format moved.
 
-Non-core content (brand assets, demo media, scratch experiments) stays **out of
-the codebase tree** by operator direction (2026-07-02 folder refactor).
+**`COMPATIBILITY = "backward"`** — a document valid under any earlier 2.x
+revision stays valid at HEAD. This constrains every change: a new field must be
+optional, a union may be extended but not narrowed, and no deprecated form can
+be *removed* before 3.0.
+
+The `frameforge` monorepo, [frameforge-viewer](https://github.com/pedroanisio/frameforge-viewer)
+and [frameforge-fonts](https://github.com/pedroanisio/frameforge-fonts) are
+sibling repositories. They consume this contract; they are not directories here
+and their gates are not implemented in this tree.
+
+### The gates
+
+| Command | What it enforces |
+|---|---|
+| `make schema-check` | the committed schema has not drifted from the models |
+| `make doc-check` | the docs have not drifted from the code (see `tooling/docgates.py`) |
+| `make lint` | ruff, with the vendored-model exceptions in `pyproject.toml` |
+| `make test` | the contract, golden, compat, example and doc-gate suites |
+| `make check` | all of the above — run this before claiming work is done |
 
 ---
 
@@ -107,6 +145,11 @@ ARCHITECTURAL REQUIREMENT (PALS's LAW): LLMs will always produce some form of er
 Absence of output verification is a design defect, not a runtime bug.
 All LLM output must be treated as untrusted and validated explicitly.
 ```
+
+> This package is one instance of the law: `Document.model_validate` is the
+> verification layer for anything — human or model — that emits a FrameForge
+> document. `extra="forbid"` everywhere means a misspelled key is an error, not
+> a silently dropped field.
 
 ---
 
@@ -153,11 +196,11 @@ when two conflict.
 - Default output format for prose documents is Markdown (`.md`).
   Use DOCX only when the user explicitly requests it or when the deliverable
   requires it (e.g., a client-facing report with Word-specific formatting).
-- The project core is Python (the Pydantic model is the source of truth). For
-  web/viewer code, the default language is TypeScript (`.ts` / `.tsx`);
-  use JavaScript only when: (a) the user explicitly requests it,
-  (b) the existing codebase is JavaScript and migration is out of scope, or
-  (c) the target runtime does not support TypeScript (e.g., inline browser scripts).
+- This package is Python: the Pydantic models are the source of truth. For any
+  web/viewer code (which lives in sibling repositories), the default language is
+  TypeScript (`.ts` / `.tsx`); use JavaScript only when: (a) the user explicitly
+  requests it, (b) the existing codebase is JavaScript and migration is out of
+  scope, or (c) the target runtime does not support TypeScript.
 - When editing existing JavaScript files, do not convert to TypeScript
   unless asked. When creating new files in a mixed codebase, prefer TypeScript.
 
@@ -179,13 +222,15 @@ disclaimer:
 ```
 
 - The `generated_by` field must identify the model and tool that produced
-  the document (e.g., `Claude Opus 4.6 via claude.ai`).
+  the document (e.g., `Claude Opus 5 via Claude Code`).
 - The `date` field must reflect the generation date.
 - This applies to agent-authored `.md` documents: reports, specs, ADRs,
-  session logs, concept documents. The enforced gate
-  (`tooling/check_disclaimers.py`, the `disclaimer-check` target) exempts an
-  explicit named set (READMEs, `CHANGELOG.md`, `CLAUDE.md`, generated
-  snapshots); a user opt-out for a specific file is also honored.
+  session logs, concept documents.
+- **The enforced gate is `disclaimer_problems()` in `tooling/docgates.py`**, run
+  by `make doc-check` and by `tests/test_doc_gates.py`. Its exemption set is the
+  `DISCLAIMER_EXEMPT` dict in that file: `README.md`, `CHANGELOG.md`,
+  `CLAUDE.md` and `MIGRATION.md`, each with a stated reason. To exempt a new
+  file, add it there with a reason — never by weakening the check.
 
 ### 6. Feedback is not a source of truth
 
@@ -202,6 +247,10 @@ never blindly applied.
   has not opted out, the disclaimer stays — and the agent explains why.
 - Document the feedback-processing decision in the response so the user
   can audit the reasoning.
+- **This applies to an agent's own prior output**, including audit reports and
+  their recommendations. A recommendation that turns out to destroy something
+  valuable — flattening hand-written prose into generated output, say — is
+  refuted and replaced, not executed because it was written down.
 
 ### 7. Skill assertion gate
 
@@ -266,6 +315,16 @@ This project ships **no** FLAM reader (`lib/` does not exist): check for the
 metadata blocks above by reading the file directly before editing. If a metadata
 reader is ever added, document its real entry point here.
 
+### The de facto frozen region
+
+`src/frameforge_api/model/` carries no `__file_meta__` block, but it is
+effectively frozen and must be treated that way. The declarations were vendored
+from the monorepo and `tests/test_extraction_fidelity.py` compares them
+AST-by-AST against upstream. Restyling them — `Optional[X]` → `X | None`,
+resorting imports, adding docstrings — breaks that identity check and can shift
+the emitted schema bytes. `pyproject.toml` turns the ruff *style* rules off there
+for exactly this reason, and leaves the correctness rules on.
+
 ---
 
 ## Core Principles
@@ -287,22 +346,33 @@ These principles have zero exceptions:
 - Unit, integration, and E2E tests.
 - Tests must be deterministic, isolated, and realistic.
 - Run tests after every change — don't batch validation to the end.
+- **A skipped gate is not a passing gate.** Run `pytest -rs` and read the skip
+  reasons. The fidelity suite skips when the sibling monorepo checkout is absent
+  *or* when its contract revision differs from `HEAD_VERSION`; in the second case
+  it is covering nothing while reporting green. Setting `FRAMEFORGE_REPO`
+  explicitly turns that divergence into a failure.
 
 ### Code Quality
 
 - Typed errors in libraries, graceful handling in applications.
 - Automated formatting and linting.
-- No unnecessary dependencies.
+- No unnecessary dependencies. **The contract has exactly one runtime
+  dependency (`pydantic>=2`) and a test pins that** — adding a second is a
+  design decision, not a convenience.
 - Prefer TypeScript over JavaScript; prefer Markdown over DOCX.
 
 ### Version Control
 
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`.
 - Versioning and AI-artifact labeling rules: see General Conventions.
+- **Cut the `CHANGELOG.md` section when you bump `pyproject.toml`, and tag it.**
+  `changelog_problems()` fails the build if the current `__version__` has no
+  section. A built wheel with no changelog entry and no tag is a release that
+  exists as an artifact and nowhere else.
 
 ### Architecture Decisions
 
-- Document significant decisions with rationale.
+- Document significant decisions with rationale, as an ADR under `docs/adr/`.
 - When approaches genuinely diverge (Behavioral Constraint 8: the
   interpretations produce incompatible outputs), state the trade-offs and ask
   one targeted question; otherwise pick the correct approach and proceed.
@@ -314,8 +384,10 @@ These principles have zero exceptions:
 
 ### Context Management
 
-- Priority reading order: `CLAUDE.md` → `AGENTS.md` → `__file_meta__` / FLAM → Tests → Code.
-- Read `AGENTS.md` for any programmatic CLI reference before running project tooling.
+- Priority reading order: `CLAUDE.md` → `__file_meta__` / FLAM → `README.md` →
+  Tests → Code.
+- The programmatic CLI reference is `README.md` plus `make help`; this package
+  has no separate agent-facing CLI document.
 - Read existing code before suggesting modifications.
 - Check metadata constraints before editing any file.
 
@@ -331,6 +403,7 @@ These principles have zero exceptions:
 - Deliver complete, atomic work — no batching across responses.
 - Break large work into complete subtasks, each independently useful.
 - For M / L / XL tasks: plan first, then execute.
+- Finish with `make check`. Report what it said, including failures.
 
 ---
 
@@ -350,5 +423,7 @@ These principles have zero exceptions:
 |---|---|---|
 | `DISCLAIMER.md` | Everyone | Epistemic integrity commitments |
 | `CLAUDE.md` | AI agents + devs | HOW to build (process, standards, enforcement) |
-| `AGENTS.md` | AI agents | Programmatic CLI/tooling reference |
-| `README.md` | Humans | WHAT the project does (usage, overview) |
+| `README.md` | Humans | WHAT the package does (usage, overview, CLI reference) |
+| `MIGRATION.md` | Consumers | What each contract revision requires of downstream code |
+| `CHANGELOG.md` | Consumers | The package release line, per version |
+| `docs/adr/` | AI agents + devs | WHY a structural decision was made, and what was rejected |

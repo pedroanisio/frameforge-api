@@ -1,7 +1,7 @@
 [project]
 name = "frameforge-api"
 # The PACKAGE version, which is deliberately NOT the contract version.
-# `HEAD_VERSION` (2.8.x) is the FrameForge *document format* revision this
+# `HEAD_VERSION` (2.11.0) is the FrameForge *document format* revision this
 # package carries; this number is the distribution's own release line. Keeping
 # them separate is what lets the package ship a packaging fix, a new helper or a
 # CLI change without pretending the document contract moved — and lets the

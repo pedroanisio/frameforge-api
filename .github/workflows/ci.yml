@@ -1,0 +1,86 @@
+name: CI
+
+# Every gate this repository documents used to run only on a developer's
+# laptop: `make check` existed and nothing enforced it. This is what enforces it.
+#
+# The suite must pass with NO sibling `frameforge` checkout — that is the whole
+# point of extracting the contract into a leaf package, and the fidelity suite
+# skips cleanly here by design. FRAMEFORGE_REPO is deliberately never set: it
+# would turn those skips into failures (see tests/test_extraction_fidelity.py).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The floor declared by `requires-python`, and current.
+        python-version: ["3.10", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The doc gates shell out to `git ls-files`; a shallow clone is fine,
+          # but the checkout must be a real repository, not an export.
+          fetch-depth: 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install the dev environment
+        run: uv sync --all-groups --python ${{ matrix.python-version }}
+
+      - name: Schema drift gate
+        run: uv run ff-schema --check
+
+      - name: Doc drift gate
+        run: uv run python tooling/check_docs.py
+
+      - name: Lint
+        run: uv run ruff check src tests tooling
+
+      - name: Tests
+        # -rs prints skip reasons: a skipped gate is not a passing gate, and
+        # the reason belongs in the log where someone can read it.
+        run: uv run pytest -q -rs
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build the wheel and sdist
+        run: uv build
+
+      - name: The schema must ship inside the wheel
+        # A consumer that never runs Python (a TS client, an editor linter, a CI
+        # validator) gets the contract from the wheel. If force-include ever
+        # breaks, the package still imports and this is the only thing that fails.
+        run: |
+          python -m zipfile -l dist/*.whl \
+            | grep -q 'frameforge_api/schema/frameforge-v2.schema.json' \
+            || { echo "::error::the generated schema is missing from the wheel"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

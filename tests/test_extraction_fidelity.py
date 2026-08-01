@@ -37,6 +37,36 @@ needs_monorepo = pytest.mark.skipif(
     reason=f"sibling FrameForge checkout not found at {MONOREPO} "
            f"(set FRAMEFORGE_REPO to point at one)")
 
+#: True when the operator named a checkout, rather than one merely happening to
+#: sit next to this one on disk. It is the difference between "no gate was
+#: asked for" and "the gate that was asked for did not run".
+EXPLICIT_MONOREPO = "FRAMEFORGE_REPO" in os.environ
+
+
+def _unusable(reason: str) -> None:
+    """Skip, or fail if this gate was explicitly requested.
+
+    Skipping is correct when the sibling checkout merely happens to be absent or
+    behind: the contract moves in this package first and the monorepo catches
+    up, so a revision or two of lag is the normal state and must never fail a
+    standalone build or CI, where there is no sibling at all.
+
+    It is wrong when `FRAMEFORGE_REPO` was set. That is an explicit request for
+    this gate, and a silent skip then reports green while covering nothing —
+    which is exactly how this suite spent 2026-08-01 not running.
+    """
+    if EXPLICIT_MONOREPO:
+        pytest.fail(
+            f"FRAMEFORGE_REPO={os.environ['FRAMEFORGE_REPO']} was set explicitly, "
+            f"so the fidelity gate was requested — but it cannot run: {reason}")
+    pytest.skip(f"{reason} (the fidelity gate is covering nothing)")
+
+
+def _upstream_schema_version() -> str | None:
+    if not MONOREPO_SCHEMA.is_file():
+        return None
+    return json.loads(MONOREPO_SCHEMA.read_text(encoding="utf-8")).get("version")
+
 
 def _fixtures() -> list[Path]:
     return sorted(FIXTURES.rglob("*.fg.yaml"))
@@ -51,11 +81,12 @@ def test_the_extracted_schema_matches_the_monorepos_committed_schema():
     masquerades as a contract change.
     """
     if not MONOREPO_SCHEMA.is_file():
-        pytest.skip(f"no committed schema at {MONOREPO_SCHEMA}")
+        _unusable(f"no committed schema at {MONOREPO_SCHEMA}")
     theirs = json.loads(MONOREPO_SCHEMA.read_text(encoding="utf-8"))
     ours = build_schema()
     if theirs.get("version") != HEAD_VERSION:
-        pytest.skip(f"monorepo is at {theirs.get('version')}, this package at {HEAD_VERSION}")
+        _unusable(f"monorepo is at {theirs.get('version')}, "
+                  f"this package at {HEAD_VERSION}")
     assert json.dumps(ours, sort_keys=True) == json.dumps(theirs, sort_keys=True)
 
 
@@ -155,13 +186,11 @@ def test_every_declaration_still_matches_the_monorepos():
     """
     theirs = MONOREPO / "src" / "frameforge" / "model.py"
     if not theirs.is_file():
-        pytest.skip("monorepo model.py not present")
-    if MONOREPO_SCHEMA.is_file():
-        upstream_version = json.loads(
-            MONOREPO_SCHEMA.read_text(encoding="utf-8")).get("version")
-        if upstream_version != HEAD_VERSION:
-            pytest.skip(
-                f"monorepo is at {upstream_version}, this package at {HEAD_VERSION}")
+        _unusable(f"monorepo model.py not present at {theirs}")
+    upstream_version = _upstream_schema_version()
+    if upstream_version is not None and upstream_version != HEAD_VERSION:
+        _unusable(f"monorepo is at {upstream_version}, "
+                  f"this package at {HEAD_VERSION}")
 
     ours = declarations()
     up = declarations([theirs])

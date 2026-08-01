@@ -73,12 +73,18 @@ are one artifact in two forms.
 ff-schema                      # regenerate the committed schema
 ff-schema --check              # CI gate: fail if stale
 ff-schema --print              # write it to stdout
+ff-schema --out path.json      # regenerate to somewhere else
 ff-schema doc.fg.yaml          # validate a document against the models
 
 ff-codemod doc.fg.yaml         # report deprecated forms; writes nothing
 ff-codemod --write doc.fg.yaml # migrate in place
+ff-codemod --stdout doc.fg.yaml# migrated document to stdout; original untouched
+ff-codemod --json doc.fg.yaml  # findings as JSON, for CI
 ff-codemod --list              # the deprecation registry, with reasons
 ```
+
+Every flag either parser accepts is listed here, and
+`test_every_cli_flag_is_documented` fails the build if a new one is not.
 
 YAML input needs a parser: `pip install "frameforge-api[yaml]"`. JSON always
 works with no extra.
@@ -367,6 +373,7 @@ fixable by a command.
 ```bash
 ff-codemod doc.fg.yaml          # report; writes nothing; exit 1 if anything found
 ff-codemod --write doc.fg.yaml  # rewrite in place
+ff-codemod --stdout doc.fg.yaml # migrated document to stdout; original untouched
 ff-codemod --json doc.json      # findings as JSON, for CI
 ff-codemod --list               # the registry, with reasons
 ```
@@ -517,9 +524,27 @@ uv run ff-schema --check      # the drift gate
 ```
 
 The fidelity suite validates the real FrameForge fixture corpus against these
-models when a sibling checkout is present (set `FRAMEFORGE_REPO` to point at
-one); it skips cleanly when it is absent, because the package must build and
-test standalone.
+models when a sibling monorepo checkout is present (set `FRAMEFORGE_REPO` to
+point at one). It has three outcomes, and the difference between the last two
+matters:
+
+| Sibling checkout | Its contract | Outcome |
+|---|---|---|
+| absent | — | **skips** — the package must build and test standalone |
+| present | `== HEAD_VERSION` | **runs** — the real gate |
+| present | `!= HEAD_VERSION` | **skips**, and says so loudly |
+
+The third row is the one worth watching. The contract moves in this package
+first and the monorepo catches up, so a sibling that is a revision or two
+behind is normal — but while it is behind, the fidelity gate is covering
+nothing, and a green run must not be read as a passing gate. Setting
+`FRAMEFORGE_REPO` explicitly is a statement that you *want* the gate, so in
+that case the divergence is a **failure**, not a skip.
+
+```bash
+uv run pytest -rs                    # -rs prints the skip reasons
+FRAMEFORGE_REPO=../frameforge uv run pytest tests/test_extraction_fidelity.py
+```
 
 ## Related
 
