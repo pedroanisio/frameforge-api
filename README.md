@@ -1,6 +1,6 @@
 # frameforge-api
 
-The **FrameForge v2 document contract**, standalone: the authoritative Pydantic
+The **FrameForge document contract**, standalone: the authoritative Pydantic
 models and the JSON Schema generated from them.
 
 Nothing here renders, lays out, or authors anything. This package answers one

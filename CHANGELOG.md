@@ -5,10 +5,12 @@ release line (`__version__`), while `HEAD_VERSION` is the FrameForge **document
 format** revision the package carries. A packaging release must not look like a
 format change, so they are never welded together.*
 
-## Unreleased
+## 1.3.0 — the docs are gated now (2026-08-01)
 
 *Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged. This
-is packaging, docs and gates only; the contract did not move.*
+is packaging, docs and gates only; the contract did not move, which is the two
+clocks doing exactly what they exist for: a package minor that a downstream
+validator must not read as a format change.*
 
 ### The docs are gated now (`tooling`, `tests`)
 

@@ -5,7 +5,7 @@
 ## Scope
 
 This file is the AI-agent operating guide for **frameforge-api** — the standalone
-FrameForge v2 document contract. The technical source of truth is the live tree:
+FrameForge document contract. The technical source of truth is the live tree:
 the Pydantic models under `src/frameforge_api/model/`, the JSON Schema generated
 from them, the gates in `tests/`, and the committed corpora those gates replay.
 

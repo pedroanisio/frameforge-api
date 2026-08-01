@@ -75,7 +75,7 @@ from frameforge_api.schema import load as load_schema
 #: change must not force a major bump of a package whose API did not move. Pin
 #: the distribution with ``frameforge-api>=1.0``; branch on ``HEAD_VERSION``
 #: when you need to know what the *document* contract supports.
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 #: The FrameForge document-format revision carried by this package. Re-exported
 #: at the root because it, not `__version__`, is what document-level
