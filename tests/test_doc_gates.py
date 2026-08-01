@@ -68,6 +68,35 @@ def test_the_migration_deprecation_table_matches_the_registry():
     assert not problems, "MIGRATION.md's table drifted:\n" + _report(problems)
 
 
+def test_the_pythons_claimed_tested_and_linted_are_the_same_set():
+    """The trove classifiers advertised 3.10-3.12 while CI tested 3.13 — the
+    package was tested on an interpreter it did not claim, and advertised two
+    it never ran."""
+    problems = docgates.python_support_problems()
+    assert not problems, "Python support drifted:\n" + _report(problems)
+
+
+def test_the_wheel_ships_the_schema_where_the_code_looks_for_it():
+    """SCHEMA_PATH and the force-include mapping are two spellings of one
+    location. Diverging breaks only PyPI installs, never a source checkout."""
+    problems = docgates.packaging_path_problems()
+    assert not problems, _report(problems)
+
+
+def test_claude_md_documents_every_gate_and_only_real_ones():
+    """An agent that runs the documented gates and misses one added later
+    reports a success it did not earn."""
+    problems = docgates.claude_gate_table_problems()
+    assert not problems, "CLAUDE.md's gate table drifted:\n" + _report(problems)
+
+
+def test_the_font_closure_doc_describes_the_real_model():
+    """Its ownership table names exact FontDef fields and asserts two names are
+    absent from Document. Both halves are hand-written against a live model."""
+    problems = docgates.font_boundary_problems()
+    assert not problems, _report(problems)
+
+
 def test_ci_invokes_makefile_targets_rather_than_restating_them():
     """ci.yml listed four steps that respelled `make check` command by command.
     Adding a fifth gate to the Makefile left CI running the old four."""

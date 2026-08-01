@@ -21,6 +21,10 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    # 3.13 was tested by CI before it was advertised here. `python_support_problems()`
+    # in tooling/docgates.py now fails the build when the matrix and the trove
+    # classifiers disagree, in either direction.
+    "Programming Language :: Python :: 3.13",
     "Topic :: Text Processing :: Markup",
     "Typing :: Typed",
 ]

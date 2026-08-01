@@ -190,6 +190,18 @@ VERSION_SCOPE = (
 _HEAD_NEARBY = re.compile(
     r"HEAD_VERSION[^\n]{0,80}?`{0,2}(\d+\.\d+(?:\.\d+|\.x))`{0,2}")
 
+#: Any 2.x contract revision literal, anywhere. Used only for the
+#: "not ahead of HEAD" invariant, which needs no proximity window.
+_ANY_2X = re.compile(r"\b(2\.\d+\.\d+)\b")
+
+#: Files swept for future revisions. CHANGELOG and MIGRATION are included here
+#: (unlike in VERSION_SCOPE) because naming a revision that does not exist is
+#: wrong even in a historical record — history cannot run ahead of HEAD.
+_NO_FUTURE_REVISION_SCOPE = (
+    "README.md", "CLAUDE.md", "MIGRATION.md", "CHANGELOG.md",
+    "pyproject.toml", "src/frameforge_api/__init__.py",
+)
+
 
 def version_literal_problems() -> list[str]:
     """A version literal written next to `HEAD_VERSION` must be the real one.
@@ -210,6 +222,21 @@ def version_literal_problems() -> list[str]:
             if found != head:
                 problems.append(
                     f"{rel} names HEAD_VERSION as `{found}`; it is `{head}`")
+
+    # The window above only sees literals written within 80 characters after the
+    # token `HEAD_VERSION`, which is most of them and not all. This second sweep
+    # needs no window because it checks an invariant that holds everywhere: no
+    # document may name a 2.x revision that does not exist yet. A stale literal
+    # is a judgement call about context; a FUTURE one is always wrong.
+    for rel in _NO_FUTURE_REVISION_SCOPE:
+        path = ROOT / rel
+        if not path.is_file():
+            continue
+        for found in _ANY_2X.findall(path.read_text(encoding="utf-8")):
+            if _precedence(found) > _precedence(head):
+                problems.append(
+                    f"{rel} names contract revision `{found}`, which is ahead of "
+                    f"HEAD_VERSION `{head}` — that revision does not exist")
     return problems
 
 
@@ -518,12 +545,27 @@ def deprecation_count_problems() -> list[str]:
         text = (ROOT / rel).read_text(encoding="utf-8")
 
         # Totals: "eleven entries", "the eleven forms", "all eleven".
-        for phrase in (r"(\w+) entries", r"the (\w+) forms", r"all (\w+)\b"):
+        for phrase in (r"(\w+) entries", r"the (\w+) forms", r"all (\w+)\b",
+                       r"(\w+) deprecated forms", r"(\w+) registry entries",
+                       r"(\w+) deprecations\b"):
             for word, _window in _counted_in_registry_context(text, phrase):
                 if word != _spelled(total):
                     problems.append(
                         f"{rel} says `{word}` where the registry has "
                         f"{total} entries (`{_spelled(total)}`)")
+
+        # The same claims written as digits. Prose in this repo spells small
+        # numbers out, but nothing enforces that, and "11 entries" drifting to
+        # "12 entries" is the identical defect in a spelling the word-form
+        # patterns above cannot see.
+        for phrase in (r"\b(\d{1,3}) entries", r"\b(\d{1,3}) deprecated forms",
+                       r"\b(\d{1,3}) deprecations\b", r"\bthe (\d{1,3}) forms"):
+            for m in re.finditer(phrase, text):
+                window = text[max(0, m.start() - _CONTEXT):m.end() + _CONTEXT]
+                if _REGISTRY_CONTEXT.search(window) and int(m.group(1)) != total:
+                    problems.append(
+                        f"{rel} says `{m.group(1)}` where the registry has "
+                        f"{total} entries")
 
         # The split: "nine forms still parse, two … are rejected".
         m = re.search(r"(\w+) forms? still parse", text)
@@ -706,7 +748,223 @@ def ci_mirrors_the_makefile_problems() -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# 9. Markdown link integrity
+# 9. Python support: manifest vs CI matrix vs lint target
+# --------------------------------------------------------------------------
+
+_REQUIRES_PYTHON = re.compile(r'^requires-python\s*=\s*"[><=~!]*(\d+\.\d+)"', re.MULTILINE)
+_CLASSIFIER_PY = re.compile(r'"Programming Language :: Python :: (\d+\.\d+)"')
+_MATRIX_PY = re.compile(r'python-version:\s*\[([^\]]+)\]')
+_RUFF_TARGET = re.compile(r'^target-version\s*=\s*"py(\d)(\d+)"', re.MULTILINE)
+
+
+def python_support_problems() -> list[str]:
+    """The Pythons the package claims, tests and lints for are the same set.
+
+    The defect this catches, verbatim: the trove classifiers advertised 3.10,
+    3.11 and 3.12 while the CI matrix tested 3.10 and **3.13**. The package was
+    being tested on an interpreter it did not claim to support, and advertising
+    two it never ran. Nothing compared the two lists.
+
+    Three sources have to agree:
+      * `requires-python` — the floor, enforced by pip at install time;
+      * the trove classifiers — what PyPI displays;
+      * the CI matrix — what is actually executed.
+
+    The matrix is deliberately allowed to be a *subset* of the classifiers:
+    testing the floor and the ceiling catches the version-dependent breakage
+    that 1.3.1 shipped, and testing every point release in between costs minutes
+    to prove nothing. What it may not do is test a version the package does not
+    claim, or skip the floor.
+    """
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    ci_path = ROOT / ".github" / "workflows" / "ci.yml"
+    if not ci_path.is_file():
+        return [".github/workflows/ci.yml is missing"]
+    ci = ci_path.read_text(encoding="utf-8")
+
+    floor_m = _REQUIRES_PYTHON.search(pyproject)
+    if not floor_m:
+        return ["pyproject.toml has no parseable requires-python"]
+    floor = floor_m.group(1)
+
+    classifiers = set(_CLASSIFIER_PY.findall(pyproject)) - {"3"}
+    matrix_m = _MATRIX_PY.search(ci)
+    if not matrix_m:
+        return ["ci.yml has no parseable python-version matrix"]
+    matrix = {v.strip().strip('"\'') for v in matrix_m.group(1).split(",")}
+
+    problems = []
+    for version in sorted(matrix - classifiers):
+        problems.append(
+            f"CI tests Python {version} but pyproject.toml has no "
+            f'"Programming Language :: Python :: {version}" classifier — the '
+            f"package is tested on an interpreter it does not claim to support")
+    if floor not in matrix:
+        problems.append(
+            f"requires-python floor is {floor} but the CI matrix "
+            f"({sorted(matrix)}) does not test it — the oldest supported "
+            f"interpreter is the one most likely to break")
+    for version in sorted(classifiers):
+        if _precedence(version) < _precedence(floor):
+            problems.append(
+                f"pyproject.toml claims Python {version} but requires-python "
+                f"is >={floor}; pip would refuse to install there")
+
+    ruff_m = _RUFF_TARGET.search(pyproject)
+    if ruff_m:
+        target = f"{ruff_m.group(1)}.{ruff_m.group(2)}"
+        if target != floor:
+            problems.append(
+                f"ruff target-version is py{ruff_m.group(1)}{ruff_m.group(2)} "
+                f"({target}) but requires-python floor is {floor}; lint would "
+                f"allow syntax the floor cannot parse")
+    return problems
+
+
+# --------------------------------------------------------------------------
+# 10. Packaging: the schema path the code reads vs the one the wheel ships
+# --------------------------------------------------------------------------
+
+_FORCE_INCLUDE = re.compile(
+    r'^\s*"([^"]+)"\s*=\s*"([^"]+)"', re.MULTILINE)
+
+
+def packaging_path_problems() -> list[str]:
+    """`SCHEMA_PATH` and the wheel's `force-include` mapping name one file.
+
+    `frameforge_api.schema.SCHEMA_PATH` is where the code looks for the shipped
+    schema at runtime. The `[tool.hatch.build.targets.wheel.force-include]`
+    stanza declares where the build puts it. They are two spellings of the same
+    location, written by hand in two files.
+
+    If they diverge, the wheel builds, imports and passes every other gate; the
+    only symptom is `load_schema()` raising FileNotFoundError for a consumer who
+    installed from PyPI — never for a developer running from a source checkout,
+    where the file is found regardless.
+    """
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    section = pyproject.split("[tool.hatch.build.targets.wheel.force-include]")
+    if len(section) < 2:
+        # No force-include is legitimate — hatchling ships everything under the
+        # packaged directory anyway. Then there is nothing to disagree.
+        return []
+    body = section[1].split("\n[", 1)[0]
+
+    # Where the runtime expects the file, relative to the package directory.
+    from frameforge_api import schema as schema_module
+    package_root = Path(schema_module.__file__).parent
+    runtime_rel = schema_module.SCHEMA_PATH.relative_to(package_root.parent)
+
+    problems = []
+    mapped = dict(_FORCE_INCLUDE.findall(body))
+    if not mapped:
+        return ["force-include stanza present but no mappings parsed from it"]
+
+    for source in mapped:
+        if not (ROOT / source).is_file():
+            problems.append(
+                f"pyproject.toml force-includes `{source}`, which does not exist")
+    if str(runtime_rel) not in mapped.values():
+        problems.append(
+            f"SCHEMA_PATH resolves to `{runtime_rel}` inside the wheel, but the "
+            f"force-include stanza maps to {sorted(mapped.values())}. A consumer "
+            f"installing from PyPI would not find the schema where the code looks.")
+    return problems
+
+
+# --------------------------------------------------------------------------
+# 11. CLAUDE.md's gate table vs the Makefile
+# --------------------------------------------------------------------------
+
+_MAKE_MENTION = re.compile(r"`make ([a-z][a-z-]*)`")
+_DOCUMENTED_TARGET = re.compile(r"^([a-z][a-z-]*):.*?##", re.MULTILINE)
+
+#: Targets deliberately absent from CLAUDE.md's gate table. `help` documents
+#: itself; `sync`, `build`, `goldens` and `schema` are described in prose
+#: elsewhere in the file rather than as gates.
+_GATE_TABLE_EXEMPT = {"help", "sync", "build", "goldens", "schema", "clean"}
+
+
+def claude_gate_table_problems() -> list[str]:
+    """CLAUDE.md's gate table names every gate, and only real ones.
+
+    The path gate covers backticked *paths*; this covers the other half of
+    CLAUDE.md that restates the tree — the table telling an agent which commands
+    constitute "done". An agent that runs the documented gates and misses one
+    added later reports success it did not earn.
+    """
+    claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+
+    real = set(_MAKE_TARGET.findall(makefile))
+    documented_targets = set(_DOCUMENTED_TARGET.findall(makefile))
+    mentioned = set(_MAKE_MENTION.findall(claude))
+
+    problems = []
+    for target in sorted(mentioned - real):
+        problems.append(
+            f"CLAUDE.md tells an agent to run `make {target}`, which is not a "
+            f"Makefile target")
+    for target in sorted(documented_targets - mentioned - _GATE_TABLE_EXEMPT):
+        problems.append(
+            f"Makefile documents `{target}` but CLAUDE.md never mentions it — an "
+            f"agent following CLAUDE.md would skip that gate. Add it to the gate "
+            f"table, or to _GATE_TABLE_EXEMPT with a reason.")
+    return problems
+
+
+# --------------------------------------------------------------------------
+# 12. The font-closure boundary doc vs the model
+# --------------------------------------------------------------------------
+
+_FONTDEF_FIELD = re.compile(r"`FontDef\.([a-z_]+)`")
+
+#: Fields the boundary doc asserts are NOT on Document. The whole point of the
+#: document is that these are runtime configuration, not serialised contract.
+_NOT_DOCUMENT_FIELDS = ("font_closure", "font_generics")
+
+
+def font_boundary_problems() -> list[str]:
+    """`docs/runtime-font-closure-boundary.md` describes the real FontDef.
+
+    Its ownership table names the exact fields that carry document-side font
+    identity, and asserts two names are absent from the contract. Both halves
+    are hand-written against a model that can change underneath them: renaming
+    `FontDef.hash` would leave the published boundary document describing a
+    field nobody can set.
+    """
+    doc_path = ROOT / "docs" / "runtime-font-closure-boundary.md"
+    if not doc_path.is_file():
+        return ["docs/runtime-font-closure-boundary.md is missing"]
+    text = doc_path.read_text(encoding="utf-8")
+
+    from frameforge_api.model import Document, FontDef
+    real = set(FontDef.model_fields)
+
+    problems = []
+    named = set(_FONTDEF_FIELD.findall(text))
+    for field in sorted(named - real):
+        problems.append(
+            f"the font-closure doc names `FontDef.{field}`, which is not a "
+            f"FontDef field (real fields: {sorted(real)})")
+    # The table claims to cover family, src and the content pin. If one of those
+    # stops being named, the doc has quietly narrowed.
+    for required in ("family", "src", "hash"):
+        if required in real and required not in named:
+            problems.append(
+                f"the font-closure doc no longer names `FontDef.{required}`, "
+                f"which it exists to describe")
+
+    for absent in _NOT_DOCUMENT_FIELDS:
+        if absent in Document.model_fields:
+            problems.append(
+                f"the font-closure doc asserts `{absent}` is not a Document "
+                f"field, but it is now — the boundary moved and the doc did not")
+    return problems
+
+
+# --------------------------------------------------------------------------
+# 13. Markdown link integrity
 # --------------------------------------------------------------------------
 
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
@@ -747,6 +1005,10 @@ GATES = (
     ("CLI flag coverage", cli_flag_problems),
     ("quoted counts", deprecation_count_problems),
     ("golden corpus size", golden_count_problems),
+    ("python support", python_support_problems),
+    ("packaging paths", packaging_path_problems),
+    ("CLAUDE.md gate table", claude_gate_table_problems),
+    ("font-closure boundary", font_boundary_problems),
     ("CI mirrors the Makefile", ci_mirrors_the_makefile_problems),
     ("markdown links", link_problems),
 )

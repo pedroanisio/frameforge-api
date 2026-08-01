@@ -1073,3 +1073,115 @@ def test_an_empty_text_styles_map_beside_a_real_one_leaves_it_alone():
     document = doc(TEXT, defs={"tokens": {"text_styles": {}, "styles": {"a": {"font_size": 9}}}})
     assert migrate(document).document["defs"]["tokens"] == {
         "styles": {"a": {"font_size": 9}}}
+
+
+# =========================================================================== #
+#  5. THE VOCABULARY MIRRORS — the codemod's key tables vs the real models     #
+# =========================================================================== #
+# `deprecations.py` walks raw dicts, so it cannot ask a model what a key means.
+# It carries hand-written tables of the contract's vocabulary instead, each with
+# a comment claiming exactness. Those claims were unchecked: a renamed field
+# leaves the table naming something that no longer exists, the codemod stops
+# firing (or fires wrongly) on that shape, and every existing regression test
+# still passes because they exercise the shapes someone already thought of.
+
+def test_the_style_map_keys_are_real_token_namespaces():
+    """`_STYLE_MAPS` names keys whose values are name -> Style maps.
+
+    Every one must be a real `Tokens` field. Renaming `Tokens.text_styles`
+    without updating this set silently disables the shadowing lint that
+    `tokens-text-styles` exists to provide — the one deprecation in the registry
+    that can render a document *wrong* rather than merely verbose.
+    """
+    from frameforge_api.deprecations import _STYLE_MAPS
+    from frameforge_api.model import Tokens
+
+    unknown = sorted(set(_STYLE_MAPS) - set(Tokens.model_fields))
+    assert not unknown, (
+        f"_STYLE_MAPS names {unknown}, which are not Tokens fields "
+        f"(real: {sorted(Tokens.model_fields)})")
+
+
+def test_the_style_bundle_keys_are_real_object_fields():
+    """`_STYLE_KEYS` names keys whose value IS a Style bundle."""
+    from frameforge_api.deprecations import _STYLE_KEYS
+    from frameforge_api.model import ObjBase
+
+    unknown = sorted(set(_STYLE_KEYS) - set(ObjBase.model_fields))
+    assert not unknown, (
+        f"_STYLE_KEYS names {unknown}, which are not ObjBase fields")
+
+
+def test_the_p3_geometry_map_targets_real_style_fields():
+    """`_P3_GEOMETRY_TO_STYLE` rewrites pre-P3 inline stroke geometry into
+    CSS-named `Style` properties.
+
+    `Style` is `extra="forbid"`, so a target that is not a real field produces a
+    migrated document that does not validate — the single worst outcome for a
+    codemod, and the one its own module docstring names.
+    """
+    from frameforge_api.deprecations import _P3_GEOMETRY_TO_STYLE
+    from frameforge_api.model import Style
+
+    unknown = sorted(set(_P3_GEOMETRY_TO_STYLE.values()) - set(Style.model_fields))
+    assert not unknown, (
+        f"_P3_GEOMETRY_TO_STYLE rewrites into {unknown}, which are not Style "
+        f"fields; migrating would emit a document that fails validation")
+
+
+def test_the_p3_markers_are_a_subset_of_the_geometry_map():
+    """`_P3_GEOMETRY_MARKERS` decides *whether* a stroke bundle is pre-P3;
+    `_P3_GEOMETRY_TO_STYLE` decides what each key becomes. A marker with no
+    mapping would detect the form and then fail to migrate it."""
+    from frameforge_api.deprecations import _P3_GEOMETRY_MARKERS, _P3_GEOMETRY_TO_STYLE
+
+    unmapped = sorted(set(_P3_GEOMETRY_MARKERS) - set(_P3_GEOMETRY_TO_STYLE))
+    assert not unmapped, (
+        f"_P3_GEOMETRY_MARKERS contains {unmapped} with no entry in "
+        f"_P3_GEOMETRY_TO_STYLE — detected but not migratable")
+
+
+def test_the_opaque_keys_are_real_free_form_fields():
+    """`_OPAQUE` names subtrees the codemod must not walk into.
+
+    They are author-controlled bags — `meta.offset` beside a `meta.color` is an
+    ordinary annotation, indistinguishable by shape from a gradient stop. If one
+    of these stops being a real field the exclusion is protecting nothing, and
+    if a NEW free-form field is added without being listed here the codemod will
+    happily rewrite user data.
+    """
+    from pydantic import BaseModel
+
+    import frameforge_api.model as model_module
+    from frameforge_api.deprecations import _OPAQUE
+
+    # These keys live on different models — `meta` on ObjBase and most objects,
+    # `data` on Defs, `params` on Defs and GenerativeObject — so the check is
+    # "owned by SOMETHING in the contract", not by one class.
+    owners: dict[str, set[str]] = {}
+    for name in dir(model_module):
+        obj = getattr(model_module, name)
+        if isinstance(obj, type) and issubclass(obj, BaseModel):
+            for field in obj.model_fields:
+                owners.setdefault(field, set()).add(name)
+
+    unknown = sorted(k for k in _OPAQUE if k not in owners)
+    assert not unknown, (
+        f"_OPAQUE excludes {unknown}, which no model in the contract declares — "
+        f"the exclusion protects nothing")
+
+
+def test_walking_an_opaque_subtree_leaves_it_alone():
+    """The exclusion, asserted behaviourally rather than by name.
+
+    A `meta` bag carrying a key that *looks* exactly like a deprecated form must
+    come through migration untouched — this is the difference between a codemod
+    and a corruption.
+    """
+    document = doc({
+        "type": "rect", "box": [0, 0, 10, 10],
+        "meta": {"offset": 0.5, "route": {"type": "orthogonal"},
+                 "stops": [{"color": "#000", "offset": 0.25}]}})
+    assert not scan(document), "the codemod reported findings inside an opaque bag"
+    migrated = migrate(document)
+    assert migrated.document == document, "migration rewrote an opaque subtree"

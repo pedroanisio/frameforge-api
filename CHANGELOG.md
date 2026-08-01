@@ -9,8 +9,10 @@ format change, so they are never welded together.*
 
 *Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged.*
 
-A drift-risk audit found four CRITICAL and four HIGH couplings. All eight are
-closed. The doc gates go from eight to twelve.
+A drift-risk audit found 22 couplings: 4 CRITICAL, 4 HIGH, 7 MODERATE, 7 LOW.
+The fifteen that were not already guarded are closed. The doc gates go from
+eight to **sixteen**, and the LOW tier needed nothing — it was already covered
+by generation, golden lenses or contract tests.
 
 ### Fixed
 
@@ -102,6 +104,56 @@ closed. The doc gates go from eight to twelve.
   otherwise deleting the numbers would silence the gate rather than satisfy it.
 
 - **CHANGELOG could document a release that did not exist** — closed above.
+
+### The seven MODERATE couplings
+
+- **The package was tested on a Python it did not claim.** The trove classifiers
+  advertised 3.10, 3.11 and 3.12 while the CI matrix ran 3.10 and **3.13**.
+  `3.13` is now advertised, and `python_support_problems()` holds three sources
+  together: `requires-python`, the classifiers, and the matrix — plus ruff's
+  `target-version`, which silently permits syntax the floor cannot parse if it
+  drifts above it. The matrix may remain a *subset* of the classifiers (testing
+  floor and ceiling is what caught the 1.3.1 `ast.dump` bug); it may not test a
+  version the package does not claim, or skip the floor.
+
+- **`SCHEMA_PATH` and the wheel's `force-include` mapping are two spellings of
+  one location.** If they diverge the wheel builds, imports and passes every
+  other gate — the only symptom is `load_schema()` raising `FileNotFoundError`
+  for someone who installed from PyPI, never for a developer running from a
+  source checkout. `packaging_path_problems()` compares them.
+
+- **The codemod's vocabulary tables were unchecked claims.** `deprecations.py`
+  walks raw dicts, so it cannot ask a model what a key means; it carries
+  hand-written tables (`_STYLE_MAPS`, `_STYLE_KEYS`, `_OPAQUE`,
+  `_P3_GEOMETRY_MARKERS`, `_P3_GEOMETRY_TO_STYLE`), each with a comment claiming
+  exactness. Six tests now assert them against real model fields. The sharpest:
+  `Style` is `extra="forbid"`, so a `_P3_GEOMETRY_TO_STYLE` target that stops
+  being a field makes the codemod emit documents that fail validation — the
+  worst thing a migration can do, and the outcome its own docstring warns about.
+  A behavioural test also proves an opaque `meta` bag carrying a key that *looks*
+  like a deprecated form comes through migration byte-identical.
+
+- **CLAUDE.md's gate table was prose.** The path gate covered backticked paths;
+  the table telling an agent which commands constitute "done" was unguarded, so
+  a gate added to the Makefile would be skipped by every agent following the
+  file. `claude_gate_table_problems()` checks both directions.
+
+- **The font-closure boundary doc names exact `FontDef` fields** and asserts two
+  names are absent from `Document`. Both halves were hand-written against a live
+  model. `font_boundary_problems()` checks them, including that the doc has not
+  quietly *narrowed* by dropping a field it exists to describe.
+
+- **`version_literal_problems()` only saw an 80-character window** after the
+  token `HEAD_VERSION`. Widening the window would produce false positives, since
+  the docs legitimately name superseded revisions as history — so the new sweep
+  checks a different invariant that needs no window and is always true: **no
+  document may name a 2.x revision ahead of `HEAD_VERSION`.** A stale literal is
+  a judgement call about context; a future one is unambiguously wrong.
+
+- **`deprecation_count_problems()` matched spelled-out numbers only.** "11
+  entries" drifting to "12 entries" is the identical defect in a spelling the
+  word-form patterns could not see. Digit forms and three more phrasings are
+  covered.
 
 ## 1.3.1 — the test suite runs on the Pythons the package claims (2026-08-01)
 
