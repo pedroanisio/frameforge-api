@@ -57,12 +57,30 @@ from frameforge_api.schema import build as build_schema
 from frameforge_api.schema import check as check_schema
 from frameforge_api.schema import load as load_schema
 
-#: Distribution version. Tracks :data:`HEAD_VERSION` — the package *is* the
-#: contract, so shipping a different number than the contract it carries would
-#: be the first thing to drift.
-__version__ = HEAD_VERSION
+#: The PACKAGE version — this distribution's own release line, independent of
+#: the contract it carries.
+#:
+#: Two different clocks, and conflating them was the mistake worth avoiding:
+#:
+#:   * :data:`HEAD_VERSION` (``2.8.x``) is the FrameForge **document format**
+#:     revision. It moves when the *contract* moves — a new field, a retyped
+#:     one — and every FrameForge package must agree on it.
+#:   * :data:`__version__` (``1.x.y``) is the **wheel**. It moves when this
+#:     package changes: a packaging fix, a new helper, a CLI flag.
+#:
+#: A packaging bug fix must not claim the document format changed, and a format
+#: change must not force a major bump of a package whose API did not move. Pin
+#: the distribution with ``frameforge-api>=1.0``; branch on ``HEAD_VERSION``
+#: when you need to know what the *document* contract supports.
+__version__ = "1.0.0"
+
+#: The FrameForge document-format revision carried by this package. Re-exported
+#: at the root because it, not `__version__`, is what document-level
+#: compatibility is decided against.
+CONTRACT_VERSION = HEAD_VERSION
 
 __all__ = [
+    "CONTRACT_VERSION",
     "HEAD_VERSION",
     "SCHEMA_PATH",
     "Document",

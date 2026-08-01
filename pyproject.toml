@@ -1,6 +1,12 @@
 [project]
 name = "frameforge-api"
-version = "2.8.2"
+# The PACKAGE version, which is deliberately NOT the contract version.
+# `HEAD_VERSION` (2.8.x) is the FrameForge *document format* revision this
+# package carries; this number is the distribution's own release line. Keeping
+# them separate is what lets the package ship a packaging fix, a new helper or a
+# CLI change without pretending the document contract moved — and lets the
+# contract move without forcing a major bump here.
+version = "1.0.0"
 description = "The FrameForge v2 document contract — authoritative Pydantic models and the JSON Schema generated from them"
 readme = "README.md"
 requires-python = ">=3.10"

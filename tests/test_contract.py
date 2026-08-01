@@ -11,9 +11,10 @@ properties that make that true:
     than silent data loss (the failure mode a permissive schema hides).
   * GENERATED — the JSON Schema is emitted from the models and gated for
     staleness; they are one artifact in two forms.
-  * PINNED — the distribution version and the contract version are the same
-    number, because shipping a wheel that claims a different revision than the
-    models it carries is the first thing that would drift.
+  * TWO CLOCKS — the distribution version and the contract version are
+    deliberately independent: `__version__` is the wheel's release line,
+    `HEAD_VERSION` is the FrameForge document-format revision it carries.
+    Welding them together makes one of the two unshippable.
 """
 from __future__ import annotations
 
@@ -152,14 +153,41 @@ def test_the_schema_covers_the_whole_model():
 
 
 # --------------------------------------------------------------------------- #
-#  4. PINNED — the wheel and the contract are the same revision                #
+#  4. TWO CLOCKS — the wheel and the document format release separately        #
 # --------------------------------------------------------------------------- #
-def test_distribution_version_tracks_the_contract_version():
-    assert frameforge_api.__version__ == HEAD_VERSION
+def test_the_package_version_and_the_contract_version_are_independent():
+    """Two clocks, deliberately not synchronised.
+
+    `__version__` is the wheel's release line; `HEAD_VERSION` is the FrameForge
+    document-format revision the wheel carries. A packaging fix must not claim
+    the document format changed, and a format change must not force a major bump
+    of a package whose API did not move. Asserting they are EQUAL — which an
+    earlier draft of this package did — silently welds the two release cycles
+    together and makes one of them unshippable.
+    """
+    assert frameforge_api.__version__ != HEAD_VERSION, (
+        "package and contract versions have collided; if that is genuinely "
+        "intended, delete this test rather than letting it pass by accident")
     pyproject = (Path(__file__).parent.parent / "pyproject.toml").read_text(encoding="utf-8")
-    declared = pyproject.split('version = "', 1)[1].split('"', 1)[0]
-    assert declared == HEAD_VERSION, (
-        f"pyproject version {declared!r} != contract HEAD_VERSION {HEAD_VERSION!r}")
+    declared = pyproject.split('\nversion = "', 1)[1].split('"', 1)[0]
+    assert declared == frameforge_api.__version__, (
+        f"pyproject version {declared!r} != __version__ {frameforge_api.__version__!r}")
+
+
+def test_the_contract_version_is_reachable_under_both_names():
+    """Document-level compatibility is decided against the CONTRACT version, so
+    it must be obvious at the package root which number that is."""
+    assert frameforge_api.CONTRACT_VERSION == HEAD_VERSION
+    assert HEAD_VERSION.startswith("2."), "the v2 document line"
+
+
+def test_the_schema_carries_the_contract_version_not_the_package_version():
+    """The schema describes the document format; stamping the wheel's version
+    into `$id` would make a packaging release look like a format change to every
+    downstream validator."""
+    schema = build_schema()
+    assert schema["version"] == HEAD_VERSION
+    assert frameforge_api.__version__ not in schema["$id"]
 
 
 def test_public_surface_is_importable_from_the_package_root():

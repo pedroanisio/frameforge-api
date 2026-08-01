@@ -1,9 +1,13 @@
 # frameforge-api — CHANGELOG
 
-*The distribution version tracks the contract version (`HEAD_VERSION`): this
-package **is** the contract, so the two never differ.*
+*Two version clocks, deliberately independent: these headings are the **package**
+release line (`__version__`), while `HEAD_VERSION` is the FrameForge **document
+format** revision the package carries. A packaging release must not look like a
+format change, so they are never welded together.*
 
-## 2.8.2 — extracted from the frameforge monorepo (2026-07-31)
+## 1.0.0 — extracted from the frameforge monorepo (2026-07-31)
+
+*Carries FrameForge document contract `HEAD_VERSION = 2.8.2`.*
 
 First standalone release. The models are unchanged: this is a move, not a
 rewrite, and the generated JSON Schema is semantically identical to the one the

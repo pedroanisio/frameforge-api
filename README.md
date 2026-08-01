@@ -113,14 +113,29 @@ Two boundaries worth knowing:
 
 ---
 
-## Versioning
+## Versioning — two clocks, on purpose
 
-The distribution version **is** the contract version (`HEAD_VERSION`) — shipping
-a wheel that claims a different revision than the models it carries is the first
-thing that would drift, so a test pins them together.
+| | what it is | moves when |
+|---|---|---|
+| `__version__` — **1.0.0** | this wheel's release line | the package changes: packaging, a new helper, a CLI flag |
+| `HEAD_VERSION` / `CONTRACT_VERSION` — **2.8.2** | the FrameForge **document format** revision | the *contract* changes: a new field, a retyped one |
 
-Semantic versioning applies to the *contract*: a new optional field is a minor
-bump, a removed or retyped field is a major one.
+They are deliberately **not** the same number, and a test asserts they stay
+apart. Welding them together means a packaging bug fix has to claim the document
+format changed, and a format change has to major-bump a package whose API never
+moved — one of the two release cycles becomes unshippable.
+
+```python
+import frameforge_api
+frameforge_api.__version__        # '1.0.0'  → pin the dependency: frameforge-api>=1.0
+frameforge_api.HEAD_VERSION       # '2.8.2'  → branch on this for document compatibility
+```
+
+Semantic versioning applies to each independently. For the contract, a new
+optional field is a minor bump and a removed or retyped field is a major one;
+the JSON Schema's `$id` and `version` carry the **contract** version, never the
+package version, so a packaging release never looks like a format change to a
+downstream validator.
 
 ---
 
