@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: help sync test schema schema-check doc-check goldens lint check build clean
+.PHONY: help sync test schema schema-check doc-check goldens lint check build build-check clean
 
 help:  ## show this help
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -30,6 +30,17 @@ check: schema-check doc-check lint test  ## every local gate
 
 build:  ## build the wheel + sdist
 	$(UV) build
+
+build-check: build  ## GATE: the generated schema really ships inside the wheel
+	@# A consumer that never runs Python (a TS client, an editor linter, a CI
+	@# validator) gets the contract from the wheel. If `force-include` in
+	@# pyproject.toml ever breaks, the package still imports and every other gate
+	@# stays green — this is the only thing that fails. It lived in CI alone,
+	@# which meant `make check` could not catch it; now both run the same command.
+	@python3 -m zipfile -l dist/*.whl \
+	  | grep -q 'frameforge_api/schema/frameforge-v2.schema.json' \
+	  && echo "wheel OK — the schema ships inside it" \
+	  || { echo "FAIL: the generated schema is missing from the wheel"; exit 1; }
 
 clean:
 	rm -rf dist build .pytest_cache .ruff_cache htmlcov .coverage

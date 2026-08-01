@@ -60,6 +60,21 @@ def test_migration_md_describes_the_shipped_release():
     assert not problems, "MIGRATION.md is stale:\n" + _report(problems)
 
 
+def test_the_migration_deprecation_table_matches_the_registry():
+    """The old guard asserted each id appeared *somewhere* in the file — row
+    existence, not row content. Flipping a `valid_at_head` left it green while
+    the published table told consumers the opposite of `ff-codemod --list`."""
+    problems = docgates.migration_table_problems()
+    assert not problems, "MIGRATION.md's table drifted:\n" + _report(problems)
+
+
+def test_ci_invokes_makefile_targets_rather_than_restating_them():
+    """ci.yml listed four steps that respelled `make check` command by command.
+    Adding a fifth gate to the Makefile left CI running the old four."""
+    problems = docgates.ci_mirrors_the_makefile_problems()
+    assert not problems, "CI and the Makefile disagree:\n" + _report(problems)
+
+
 def test_the_current_version_has_a_changelog_section():
     """1.2.0 shipped with its entries still under `## Unreleased`, and a 1.1.0
     wheel was built from a state that was never committed."""

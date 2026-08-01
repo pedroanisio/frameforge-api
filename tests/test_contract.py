@@ -157,8 +157,14 @@ def test_the_committed_schema_equals_a_fresh_build():
 
 
 def test_the_schema_covers_the_whole_model():
-    """105 `$defs` at extraction time. A collapse to a handful means the union
-    stopped being walked — the schema would still be 'valid' and useless."""
+    """119 `$defs` today (105 at extraction). A collapse to a handful means the
+    union stopped being walked — the schema would still be 'valid' and useless.
+
+    The assertion stays a floor rather than an equality on purpose: the exact set
+    is already pinned byte-for-byte by `tests/golden/schema.json`, and a second
+    exact check here would just be a second thing to regenerate. The *narrated*
+    figure is what drifts, and `golden_count_problems()` owns that.
+    """
     assert len(build_schema()["$defs"]) >= 100
 
 

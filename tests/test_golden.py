@@ -169,10 +169,12 @@ def test_every_model_keeps_its_bases_config_fields_and_validators():
 def test_every_probe_still_gets_the_same_verdict():
     """A dropped validator is invisible to all three lenses above.
 
-    36 probes: 14 that must be ACCEPTED (the legacy-key normalisations — losing
-    one silently breaks existing documents) and 22 that must be REJECTED (the
+    102 probes: 45 that must be ACCEPTED (the legacy-key normalisations — losing
+    one silently breaks existing documents) and 57 that must be REJECTED (the
     guards — losing one silently widens the contract, which nothing downstream
-    reports).
+    reports). The corpus was 36 at the split and has grown with the contract;
+    `golden_count_problems()` fails the build if these figures stop matching
+    `tests/golden/behaviour.json`.
     """
     now, then = behaviour(PROBES), read_golden("behaviour.json")
     assert sorted(now) == sorted(then), (

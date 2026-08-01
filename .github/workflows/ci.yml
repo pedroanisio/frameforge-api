@@ -45,19 +45,31 @@ jobs:
       - name: Install the dev environment
         run: uv sync --all-groups --python ${{ matrix.python-version }}
 
+      # Each step invokes a Makefile TARGET rather than respelling its command.
+      # Spelling them out here meant `make check` and CI were two hand-written
+      # lists of the same thing: adding a gate to the Makefile left CI running
+      # the old set, and the new gate protected only whoever remembered to type
+      # `make check`. `ci_mirrors_the_makefile_problems()` in tooling/docgates.py
+      # fails the build if a step here stops being a `make` invocation.
+      #
+      # The targets are listed separately rather than as a single `make check`
+      # so the matrix log shows which gate failed without opening the step.
       - name: Schema drift gate
-        run: uv run ff-schema --check
+        run: make schema-check
 
       - name: Doc drift gate
-        run: uv run python tooling/check_docs.py
+        run: make doc-check
 
       - name: Lint
-        run: uv run ruff check src tests tooling
+        run: make lint
 
       - name: Tests
-        # -rs prints skip reasons: a skipped gate is not a passing gate, and
-        # the reason belongs in the log where someone can read it.
-        run: uv run pytest -q -rs
+        # PYTEST_ADDOPTS rather than an argument, because the command belongs to
+        # the Makefile. -rs prints skip reasons: a skipped gate is not a passing
+        # gate, and the reason belongs in the log where someone can read it.
+        env:
+          PYTEST_ADDOPTS: -rs
+        run: make test
 
   build:
     runs-on: ubuntu-latest
@@ -68,17 +80,12 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-      - name: Build the wheel and sdist
-        run: uv build
-
-      - name: The schema must ship inside the wheel
-        # A consumer that never runs Python (a TS client, an editor linter, a CI
-        # validator) gets the contract from the wheel. If force-include ever
-        # breaks, the package still imports and this is the only thing that fails.
-        run: |
-          python -m zipfile -l dist/*.whl \
-            | grep -q 'frameforge_api/schema/frameforge-v2.schema.json' \
-            || { echo "::error::the generated schema is missing from the wheel"; exit 1; }
+      # `build-check` builds and then asserts the generated schema is inside the
+      # wheel. The assertion used to live only here, which meant `make check`
+      # could not catch a broken `force-include`; it is a Makefile target now,
+      # so both environments run identical logic.
+      - name: Build and verify the wheel contents
+        run: make build-check
 
       - uses: actions/upload-artifact@v4
         with:

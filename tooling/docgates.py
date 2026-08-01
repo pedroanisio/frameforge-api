@@ -312,6 +312,91 @@ def migration_currency_problems() -> list[str]:
     return problems
 
 
+#: A row of the deprecation table in MIGRATION.md:
+#: `| id | form | becomes | valid at HEAD |`
+_TABLE_ROW = re.compile(r"^\|\s*`([a-z0-9-]+)`\s*\|(.+?)\|(.+?)\|(.+?)\|\s*$", re.MULTILINE)
+
+#: Parenthetical asides in a `replacement` string — "(paint)", "(closed: true)".
+#: They are commentary, not identifiers a table row has to repeat.
+_ASIDE = re.compile(r"\([^)]*\)")
+
+
+def _replacement_identifiers(replacement: str) -> set[str]:
+    """The names a table row must mention for it to be describing this entry.
+
+    `Style.stroke_dasharray` -> {"stroke_dasharray"}: the class prefix is the
+    registry's addressing, and the table names the field. `stroke (paint) +
+    stroke_style (geometry)` -> {"stroke", "stroke_style"}: the asides are prose.
+    """
+    cleaned = _ASIDE.sub(" ", replacement)
+    out = set()
+    for part in re.split(r"[/+,]", cleaned):
+        part = part.strip()
+        if not part:
+            continue
+        # `tokens.styles` is a path the table repeats verbatim; `Style.dash` is
+        # a class-qualified field where only the field is repeated. Keep the
+        # last segment either way — it is present in both spellings.
+        out.add(part.split(".")[-1])
+    return {o for o in out if o}
+
+
+def migration_table_problems() -> list[str]:
+    """The deprecation table in MIGRATION.md is a checked projection of the registry.
+
+    The defect this catches: the existing guard
+    (`test_every_deprecation_is_documented_for_a_human_too`) asserts each `id`
+    appears *somewhere* in the file — row existence, not row content. Changing an
+    entry's `replacement`, or flipping its `valid_at_head`, leaves the id present
+    and the test green while the published table tells a consumer the opposite of
+    what `ff-codemod --list` prints.
+
+    `valid at HEAD` is the column the document itself calls "the field to branch
+    on", so a stale **no** -> **yes** there is advice to ignore a form that will
+    in fact refuse to load.
+    """
+    text = (ROOT / "MIGRATION.md").read_text(encoding="utf-8")
+    rows = {m.group(1): (m.group(3), m.group(4))
+            for m in _TABLE_ROW.finditer(text)}
+    by_id = {d.id: d for d in frameforge_api.DEPRECATIONS}
+
+    problems = []
+    missing = sorted(set(by_id) - set(rows))
+    if missing:
+        problems.append(
+            f"MIGRATION.md's deprecation table has no row for: {missing}")
+    unknown = sorted(set(rows) - set(by_id))
+    if unknown:
+        problems.append(
+            f"MIGRATION.md's deprecation table has rows for entries not in the "
+            f"registry: {unknown}")
+
+    for dep_id, (becomes, valid_cell) in rows.items():
+        dep = by_id.get(dep_id)
+        if dep is None:
+            continue
+
+        for name in _replacement_identifiers(dep.replacement):
+            if name not in becomes:
+                problems.append(
+                    f"MIGRATION.md row `{dep_id}`: the registry replacement is "
+                    f"`{dep.replacement}` but the 'becomes' cell "
+                    f"({becomes.strip()!r}) does not mention `{name}`")
+
+        says_yes = "yes" in valid_cell.lower()
+        says_no = "no" in valid_cell.lower()
+        if says_yes == says_no:
+            problems.append(
+                f"MIGRATION.md row `{dep_id}`: cannot read the 'valid at HEAD' "
+                f"cell ({valid_cell.strip()!r}) as yes or no")
+        elif says_yes is not dep.valid_at_head:
+            problems.append(
+                f"MIGRATION.md row `{dep_id}`: the table says valid at HEAD = "
+                f"{'yes' if says_yes else 'no'}, the registry says "
+                f"{dep.valid_at_head}. This is the column consumers branch on.")
+    return problems
+
+
 # --------------------------------------------------------------------------
 # 4. CHANGELOG sectioning
 # --------------------------------------------------------------------------
@@ -460,39 +545,168 @@ def deprecation_count_problems() -> list[str]:
 # 7. Counts quoted in test prose
 # --------------------------------------------------------------------------
 
-_DECL_COUNT = re.compile(r"\b(\d{2,4}) (?:top-level )?declarations\b")
+def _golden_facts() -> dict[str, int]:
+    """The figures the test docstrings narrate, read from the goldens."""
+    gold = ROOT / "tests" / "golden"
+    behaviour = json.loads((gold / "behaviour.json").read_text(encoding="utf-8"))
+    accepted = sum(1 for v in behaviour.values() if v["valid"])
+    return {
+        "declarations": len(json.loads(
+            (gold / "declarations.json").read_text(encoding="utf-8"))),
+        "defs": len(json.loads(
+            (gold / "schema.json").read_text(encoding="utf-8"))["$defs"]),
+        "probes": len(behaviour),
+        "accepted": accepted,
+        "rejected": len(behaviour) - accepted,
+    }
+
+
+#: (regex over the prose, key into `_golden_facts()`, historical values that are
+#: named deliberately as history rather than as a current claim).
+#:
+#: The historical allowlist is what lets a docstring say "183 at the split and
+#: 203 today" without the gate treating the first number as drift. Every entry
+#: is a t0 figure recorded in `CHANGELOG.md` 1.0.0.
+_NARRATED_COUNTS = (
+    (re.compile(r"\b(\d{2,4}) (?:top-level )?declarations\b"), "declarations", {183}),
+    (re.compile(r"\b(\d{2,4}) `?\$defs`?"), "defs", {105}),
+    (re.compile(r"\b(\d{2,4}) probes\b"), "probes", {36}),
+    (re.compile(r"\b(\d{2,4}) that must be ACCEPTED\b"), "accepted", {14}),
+    (re.compile(r"\b(\d{2,4}) that must be REJECTED\b"), "rejected", {22}),
+)
+
+#: Modules whose prose narrates the golden corpus.
+_NARRATING_MODULES = ("tests/test_golden.py", "tests/test_contract.py")
 
 
 def golden_count_problems() -> list[str]:
-    """`tests/test_golden.py` quotes the size of the declaration corpus.
+    """The figures the test suite narrates match the goldens it is describing.
 
-    The defect this catches, verbatim: two docstrings said "183 declarations"
-    while the golden held 203 — the corpus grew at 2.9.0, 2.10.0 and 2.11.0 and
-    the prose did not follow. Harmless on its own, and exactly the drift that
-    teaches a reader to stop trusting the numbers around it.
+    The defect this catches, verbatim: five figures across two modules were
+    stale by 11-180%. Two docstrings said "183 declarations" while the golden
+    held 203; one said "105 `$defs`" against 119; one said "36 probes: 14
+    ACCEPTED ... 22 REJECTED" against 102: 45 and 57. The contract had grown
+    through three revisions and the prose still described t0.
+
+    These docstrings are the primary explanation of *why* the golden suite
+    exists and *what* it covers. A reader reconciling "36 probes" against a
+    102-entry `behaviour.json` has to decide which to believe, and the natural
+    conclusion — that the goldens were regenerated carelessly — is the opposite
+    of what happened.
+
+    The adjacent *assertions* are deliberately loose (`>= 100`), which is right:
+    the exact sets are already pinned byte-for-byte by the goldens themselves.
+    It is the narrated figures that were unowned.
     """
-    golden = ROOT / "tests" / "golden" / "declarations.json"
-    if not golden.is_file():
-        return ["tests/golden/declarations.json is missing"]
-    actual = len(json.loads(golden.read_text(encoding="utf-8")))
-
-    doc = ROOT / "tests" / "test_golden.py"
+    facts = _golden_facts()
     problems = []
-    for found in _DECL_COUNT.findall(doc.read_text(encoding="utf-8")):
-        # 183 is the corpus size at the split, named as history. Only a claim
-        # about the *current* corpus can be stale.
-        if int(found) not in (actual, 183):
+    for rel in _NARRATING_MODULES:
+        path = ROOT / rel
+        if not path.is_file():
+            problems.append(f"{rel} is in _NARRATING_MODULES but does not exist")
+            continue
+        text = path.read_text(encoding="utf-8")
+        for pattern, key, historical in _NARRATED_COUNTS:
+            for found in pattern.findall(text):
+                if int(found) != facts[key] and int(found) not in historical:
+                    problems.append(
+                        f"{rel} narrates `{found}` {key}; the golden holds "
+                        f"{facts[key]}")
+
+    # A module may legitimately narrate none of these, but `test_golden.py`
+    # describes all four lenses — if it stops naming the current figures at all,
+    # the numbers were deleted rather than corrected and the gate would go quiet.
+    golden_text = (ROOT / "tests" / "test_golden.py").read_text(encoding="utf-8")
+    for key in ("declarations", "probes"):
+        if str(facts[key]) not in golden_text:
             problems.append(
-                f"tests/test_golden.py says `{found} declarations`; the golden "
-                f"holds {actual}")
-    if str(actual) not in doc.read_text(encoding="utf-8"):
-        problems.append(
-            f"tests/test_golden.py never names the current corpus size ({actual})")
+                f"tests/test_golden.py never names the current {key} count "
+                f"({facts[key]})")
     return problems
 
 
 # --------------------------------------------------------------------------
-# 8. Markdown link integrity
+# 8. CI runs the Makefile rather than restating it
+# --------------------------------------------------------------------------
+
+_MAKE_TARGET = re.compile(r"^([a-z][a-z-]*):", re.MULTILINE)
+_RUN_STEP = re.compile(r"^\s*run:\s*(.+?)$", re.MULTILINE)
+
+#: Commands a workflow step may run without going through the Makefile. These
+#: are environment setup and reporting, not gates — putting them in the Makefile
+#: would mean the Makefile knew about GitHub Actions.
+_CI_ALLOWED = (
+    "uv python install",     # interpreter provisioning, matrix-specific
+    "uv sync",               # environment setup
+    "echo",                  # step summaries and annotations
+    "ours=",                 # the fidelity workflow's revision report
+    "skipped=",              # the fidelity workflow's skip-count assertion
+)
+
+#: Workflows whose gate steps must invoke Makefile targets.
+_GATED_WORKFLOWS = (".github/workflows/ci.yml",)
+
+
+def ci_mirrors_the_makefile_problems() -> list[str]:
+    """Every gate CI runs is a Makefile target, not a re-spelling of one.
+
+    The defect this catches: `ci.yml` listed four steps that restated
+    `make check`'s command line by command line — `uv run ff-schema --check`,
+    `uv run python tooling/check_docs.py`, and so on. The two lists agreed on the
+    day they were written and nothing kept them agreeing. Adding a fifth gate to
+    the Makefile left CI running the old four, so the new gate protected only
+    whoever remembered to type `make check` — which is the exact hole the CI
+    workflow was written to close, re-created for every gate added after it.
+
+    The mirror ran the other way too: the wheel-contents assertion existed only
+    in CI, so `make check` could not catch a broken `force-include`. It is
+    `make build-check` now.
+    """
+    makefile = ROOT / "Makefile"
+    if not makefile.is_file():
+        return ["Makefile is missing"]
+    targets = set(_MAKE_TARGET.findall(makefile.read_text(encoding="utf-8")))
+
+    problems = []
+    for rel in _GATED_WORKFLOWS:
+        path = ROOT / rel
+        if not path.is_file():
+            problems.append(f"{rel} is in _GATED_WORKFLOWS but does not exist")
+            continue
+        for raw in _RUN_STEP.findall(path.read_text(encoding="utf-8")):
+            command = raw.strip().strip("|").strip()
+            if not command or command.startswith(("|", ">")):
+                continue
+            if command.startswith(_CI_ALLOWED):
+                continue
+            if not command.startswith("make "):
+                problems.append(
+                    f"{rel} runs `{command}` directly. Gate commands belong to "
+                    f"the Makefile — add a target and call `make <target>`, so "
+                    f"CI and a developer laptop cannot run different things.")
+                continue
+            target = command.split()[1]
+            if target not in targets:
+                problems.append(
+                    f"{rel} runs `make {target}`, which is not a target in the "
+                    f"Makefile (targets: {', '.join(sorted(targets))})")
+
+    # The other direction: every gate in `make check` must actually be reached by
+    # CI. A target that exists and is never invoked is a gate nobody runs.
+    ci = (ROOT / _GATED_WORKFLOWS[0]).read_text(encoding="utf-8")
+    check_line = re.search(r"^check:\s*(.+?)(?:\s*##|$)",
+                           makefile.read_text(encoding="utf-8"), re.MULTILINE)
+    if check_line:
+        for dep in check_line.group(1).split():
+            if f"make {dep}" not in ci:
+                problems.append(
+                    f"`make check` depends on `{dep}`, but {_GATED_WORKFLOWS[0]} "
+                    f"never invokes it — that gate would run only on a laptop.")
+    return problems
+
+
+# --------------------------------------------------------------------------
+# 9. Markdown link integrity
 # --------------------------------------------------------------------------
 
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
@@ -528,9 +742,11 @@ GATES = (
     ("version literals", version_literal_problems),
     ("package version", package_version_problems),
     ("MIGRATION.md currency", migration_currency_problems),
+    ("MIGRATION.md deprecation table", migration_table_problems),
     ("changelog sections", changelog_problems),
     ("CLI flag coverage", cli_flag_problems),
     ("quoted counts", deprecation_count_problems),
     ("golden corpus size", golden_count_problems),
+    ("CI mirrors the Makefile", ci_mirrors_the_makefile_problems),
     ("markdown links", link_problems),
 )

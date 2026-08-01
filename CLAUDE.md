@@ -101,6 +101,15 @@ and their gates are not implemented in this tree.
 | `make lint` | ruff, with the vendored-model exceptions in `pyproject.toml` |
 | `make test` | the contract, golden, compat, example and doc-gate suites |
 | `make check` | all of the above — run this before claiming work is done |
+| `make build-check` | builds, then asserts the schema really ships inside the wheel |
+
+**CI invokes these targets; it does not respell them.** `.github/workflows/ci.yml`
+runs `make schema-check`, `make doc-check`, `make lint`, `make test` and
+`make build-check` rather than the commands behind them, because two
+hand-written lists of the same gates drift the moment a fifth gate is added.
+`ci_mirrors_the_makefile_problems()` fails the build if a workflow step stops
+being a `make` invocation, or if a `make check` dependency is never reached by
+CI. Add a gate by adding a Makefile target — then CI gets it for free.
 
 Two mirrors cross a repository boundary and no gate in this tree can reach them:
 the vendored declarations in `src/frameforge_api/model/`, and the engine finding

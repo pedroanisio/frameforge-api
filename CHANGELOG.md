@@ -9,7 +9,8 @@ format change, so they are never welded together.*
 
 *Carries FrameForge document contract `HEAD_VERSION = 2.11.0` — unchanged.*
 
-A drift-risk audit found four CRITICAL couplings. All four are closed.
+A drift-risk audit found four CRITICAL and four HIGH couplings. All eight are
+closed. The doc gates go from eight to twelve.
 
 ### Fixed
 
@@ -64,6 +65,43 @@ A drift-risk audit found four CRITICAL couplings. All four are closed.
   run in which everything skipped is the failure mode it exists to prevent. It
   never runs on `pull_request`, so a lagging sibling cannot wedge this package's
   release path.
+
+### The four HIGH couplings
+
+- **CI restated the Makefile's gate list instead of running it.** `ci.yml` spelled
+  out four commands that duplicated `make check`; the two agreed on the day they
+  were written and nothing kept them agreeing. Adding a fifth gate to the
+  Makefile would have left CI running the old four — the exact hole the CI
+  workflow was written to close, re-created for every gate added after it.
+
+  Each step now invokes a **Makefile target**. The wheel-contents assertion,
+  which existed only in CI so `make check` could not catch a broken
+  `force-include`, is **`make build-check`**.
+  `ci_mirrors_the_makefile_problems()` fails the build if a workflow step stops
+  being a `make` invocation, *and* in the other direction if a `make check`
+  dependency is never reached by CI.
+
+- **The MIGRATION.md deprecation table restated registry data nothing compared.**
+  The existing guard asserted each `id` appeared *somewhere* in the file — row
+  existence, not row content. Changing an entry's `replacement`, or flipping its
+  `valid_at_head`, left the id present and the test green while the published
+  table told a consumer the opposite of what `ff-codemod --list` prints.
+  `valid at HEAD` is the column the document itself calls "the field to branch
+  on". `migration_table_problems()` makes the table a checked projection of the
+  registry, tolerant of the table's shorter spellings (`ref` for
+  `ConnectorEndpoint.ref`) but not of its claims.
+
+- **Five figures narrated by the test suite were stale by 11–180 %.**
+  "183 declarations" against 203, "105 `$defs`" against 119, "36 probes: 14
+  ACCEPTED … 22 REJECTED" against 102: 45 and 57. These docstrings are the
+  primary explanation of *why* the golden suite exists; a reader reconciling
+  them against the goldens concludes the goldens were regenerated carelessly,
+  which is the opposite of what happened. `golden_count_problems()` now owns all
+  five, with an allowlist so a docstring may still name a t0 figure *as history*,
+  plus a backstop that fails if the current figures stop being named at all —
+  otherwise deleting the numbers would silence the gate rather than satisfy it.
+
+- **CHANGELOG could document a release that did not exist** — closed above.
 
 ## 1.3.1 — the test suite runs on the Pythons the package claims (2026-08-01)
 
